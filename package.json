@@ -1,0 +1,14 @@
+{
+  "name": "devconnect",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev:client": "pnpm --filter frontend dev",
+    "dev:server": "pnpm --filter backend dev",
+    "dev": "pnpm run -r dev",
+    "build": "pnpm --filter frontend build && pnpm --filter backend build",
+    "lint": "pnpm --filter frontend lint && pnpm --filter backend lint"
+  },
+  "author": "Owais Ahmad Shah",
+  "packageManager": "pnpm@10.4.1"
+}
