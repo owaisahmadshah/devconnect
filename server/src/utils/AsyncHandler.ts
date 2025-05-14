@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction, RequestHandler } from "express"
+import type { Request, Response, NextFunction, RequestHandler } from 'express';
 
 /**
  * Async handler to catch errors and pass them to Express error handler.
@@ -17,15 +17,9 @@ import type { Request, Response, NextFunction, RequestHandler } from "express"
  * }));
  */
 const asyncHandler =
-  <T = any>(
-    requestHandler: (
-      req: Request,
-      res: Response,
-      next: NextFunction
-    ) => Promise<T>
-  ) =>
+  <T = any>(requestHandler: (req: Request, res: Response, next: NextFunction) => Promise<T>) =>
   (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(requestHandler(req, res, next)).catch(next)
-  }
+    Promise.resolve(requestHandler(req, res, next)).catch(next);
+  };
 
-export { asyncHandler }
+export { asyncHandler };
