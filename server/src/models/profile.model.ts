@@ -1,6 +1,10 @@
-import { model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
-import type { IProfile } from '../types/profile.type.js';
+import type { TProfile } from 'shared';
+
+export interface IProfile extends Document, TProfile {
+  user: Schema.Types.ObjectId;
+}
 
 const profileSchema = new Schema<IProfile>(
   {
@@ -25,159 +29,200 @@ const profileSchema = new Schema<IProfile>(
     },
     profilePictureUrl: {
       type: String,
-      default: '', // Add a default url picture
+      default: '/default-profile-picture.png',
     },
     bio: {
       type: String,
+      default: '',
     },
-    skills: [
-      {
-        skillName: {
-          type: String,
-          index: true,
-        },
-        skillProficiency: {
-          type: String,
-          enum: ['Beginner', 'Intermediate', 'Advanced'],
-        },
-        endorsements: [
-          {
-            endorsedBy: {
-              type: String,
-            },
-            endorsedAt: {
-              type: Date,
-              default: Date.now,
-            },
-          },
-        ],
-      },
-    ],
-    educations: [
-      {
-        school: {
-          type: String,
-        },
-        degree: {
-          type: String,
-        },
-        fieldOfStudy: {
-          type: String,
-        },
-        started: {
-          type: Date,
-        },
-        ended: {
-          type: Schema.Types.Mixed, // Can be Date or String 'Present'
-        },
-      },
-    ],
-    certifications: [
-      {
-        title: {
-          type: String,
-        },
-        issuer: {
-          type: String,
-        },
-        issuedDate: {
-          type: Date,
-        },
-        credentials: {
-          type: String,
-        },
-        credentialsUrl: {
-          type: String,
-        },
-      },
-    ],
-    achievements: [
-      {
-        title: {
-          type: String,
-        },
-        description: {
-          type: String,
-        },
-        date: {
-          type: Date,
-        },
-        awardedBy: {
-          type: String,
-        },
-      },
-    ],
-    experiences: [
-      {
-        companyOrProject: {
-          type: String,
-        },
-        role: {
-          type: String,
-        },
-        description: {
-          type: String,
-        },
-        type: {
-          type: String,
-          enum: ['Job', 'Internship', 'Freelance', 'Project'],
-        },
-        location: {
-          type: String, // Can be 'Remote' or a location string
-        },
-        started: {
-          type: Date,
-        },
-        ended: {
-          type: Schema.Types.Mixed, // Can be Date or String 'Present'
-        },
-        technologies: [
-          {
+    skills: {
+      type: [
+        {
+          skillName: {
             type: String,
             index: true,
           },
-        ],
-      },
-    ],
-    visibility: [
-      {
-        education: {
-          type: String,
-          enum: ['Private', 'Public', 'connections-only'],
-          default: 'Public',
+          skillProficiency: {
+            type: String,
+            enum: ['Beginner', 'Intermediate', 'Advanced'],
+            default: 'Beginner',
+          },
+          endorsements: {
+            type: [
+              {
+                endorsedBy: {
+                  type: String,
+                },
+                endorsedAt: {
+                  type: Date,
+                  default: Date.now,
+                },
+              },
+            ],
+            default: [],
+          },
         },
-        skills: {
-          type: String,
-          enum: ['Private', 'Public', 'connections-only'],
-          default: 'Public',
+      ],
+      default: [],
+    },
+    educations: {
+      type: [
+        {
+          school: {
+            type: String,
+            required: true,
+          },
+          degree: {
+            type: String,
+            default: '',
+          },
+          fieldOfStudy: {
+            type: String,
+            default: '',
+          },
+          started: {
+            type: Date,
+          },
+          ended: {
+            type: Schema.Types.Mixed, // Can be Date or String 'Present'
+            default: 'Present',
+          },
         },
-        experience: {
-          type: String,
-          enum: ['Private', 'Public', 'connections-only'],
-          default: 'Public',
+      ],
+      default: [],
+    },
+    certifications: {
+      type: [
+        {
+          title: {
+            type: String,
+            required: true,
+          },
+          issuer: {
+            type: String,
+            default: '',
+          },
+          issuedDate: {
+            type: Date,
+            default: Date.now,
+          },
+          credentials: {
+            type: String,
+            default: '',
+          },
+          credentialsUrl: {
+            type: String,
+            default: '',
+          },
         },
-        certifications: {
-          type: String,
-          enum: ['Private', 'Public', 'connections-only'],
-          default: 'Public',
+      ],
+      default: [],
+    },
+    achievements: {
+      type: [
+        {
+          title: {
+            type: String,
+            required: true,
+          },
+          description: {
+            type: String,
+            default: '',
+          },
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+          awardedBy: {
+            type: String,
+            default: '',
+          },
         },
-      },
-    ],
-    profileUrls: [
-      {
+      ],
+      default: [],
+    },
+    experiences: {
+      type: [
+        {
+          companyOrProject: {
+            type: String,
+            required: true,
+          },
+          role: {
+            type: String,
+            default: '',
+          },
+          description: {
+            type: String,
+            default: '',
+          },
+          type: {
+            type: String,
+            enum: ['Job', 'Internship', 'Freelance', 'Project'],
+            default: 'Job',
+          },
+          location: {
+            type: String,
+            default: 'Remote',
+          },
+          started: {
+            type: Date,
+            default: Date.now,
+          },
+          ended: {
+            type: Schema.Types.Mixed, // Can be Date or String 'Present'
+            default: 'Present',
+          },
+          technologies: {
+            type: [String],
+            default: [],
+            index: true,
+          },
+        },
+      ],
+      default: [],
+    },
+    visibility: {
+      education: {
         type: String,
+        enum: ['Private', 'Public', 'connections-only'],
+        default: 'Public',
       },
-    ],
-    socialLinks: [
-      {
-        platform: {
-          type: String,
-        },
-        link: {
-          type: String,
-        },
+      skills: {
+        type: String,
+        enum: ['Private', 'Public', 'connections-only'],
+        default: 'Public',
       },
-    ],
+      experience: {
+        type: String,
+        enum: ['Private', 'Public', 'connections-only'],
+        default: 'Public',
+      },
+      certifications: {
+        type: String,
+        enum: ['Private', 'Public', 'connections-only'],
+        default: 'Public',
+      },
+    },
+    profileUrls: {
+      type: [String],
+      default: [],
+    },
+    socialMediaLinks: {
+      type: [
+        {
+          platform: {
+            type: String,
+            required: true,
+          },
+          link: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+      default: [],
+    },
     isVerified: {
       type: Boolean,
       default: false,
@@ -187,5 +232,9 @@ const profileSchema = new Schema<IProfile>(
     timestamps: true,
   },
 );
+
+profileSchema.index({ user: 1 }, { unique: true });
+profileSchema.index({ 'skills.skillName': 1 });
+profileSchema.index({ 'experiences.technologies': 1 });
 
 export const Profile = model<IProfile>('Profile', profileSchema);

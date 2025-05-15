@@ -1,40 +1,65 @@
-import { model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-import type { IUser } from '../types/user.type.js';
+import type { TDbUser } from 'shared';
 
-const userSchema = new Schema<IUser>({
-  username: {
-    type: String,
-    trim: true,
-    index: true,
-    unique: true,
-    lowercase: true,
-    required: [true, 'Username is required.'],
-  },
-  email: {
-    type: String,
-    unique: true,
-    lowercase: true,
-    time: true,
-    index: true,
-    required: [true, 'Email is required.'],
-  },
-  role: {
-    type: String,
-    enum: ['recruiter', 'developer'],
-    default: 'developer',
-  },
-  refreshToken: {
-    type: String,
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required.'],
-  },
-});
+export interface IDbUser extends Document, TDbUser {
+  isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
+}
 
-// Arrow functions are not recommended here
+const userSchema = new Schema<IDbUser>(
+  {
+    username: {
+      type: String,
+      trim: true,
+      index: true,
+      unique: true,
+      lowercase: true,
+      required: [true, 'Username is required.'],
+    },
+    email: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      time: true,
+      index: true,
+      required: [true, 'Email is required.'],
+    },
+    role: {
+      type: String,
+      enum: ['recruiter', 'developer'],
+      default: 'developer',
+    },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required.'],
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+// Use regular function (not arrow) for `this` binding
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -44,10 +69,33 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Add instance methods
 userSchema.methods.isPasswordCorrect = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
-// TODO: Add generateAccessToken and generateRefreshToken methods
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      role: this.role,
+    },
+    process.env.ACCESS_TOKEN_SECRET!,
+    // { expiresIn: process.env.ACCESS_TOKEN_SECRET },
+    { expiresIn: '1h' },
+  );
+};
 
-export const User = model('User', userSchema);
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET!,
+    // { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
+    { expiresIn: '14d' },
+  );
+};
+
+export const User = model<IDbUser>('User', userSchema);

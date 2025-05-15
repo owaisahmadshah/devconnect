@@ -44,4 +44,9 @@ import healthCheckRouter from './routes/healthCheck.route.js';
 // Register API routes
 app.use('/api/v1/health-check', healthCheckRouter);
 
+// Error middleware
+import { errorHandler } from './middleware/error.middleware.js';
+
+app.use(errorHandler);
+
 export { app };
