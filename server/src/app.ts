@@ -39,10 +39,12 @@ app.use(
 );
 
 // Import route handlers
-import healthCheckRouter from './routes/healthCheck.route.js';
+import healthCheckRouter from './routes/health-check.route.js';
+import userRouter from './routes/user.route.js';
 
 // Register API routes
 app.use('/api/v1/health-check', healthCheckRouter);
+app.use('/api/v1/users', userRouter);
 
 // Error middleware
 import { errorHandler } from './middleware/error.middleware.js';
