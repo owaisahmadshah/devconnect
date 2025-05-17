@@ -56,6 +56,26 @@ export const resendOtpSchema = z.object({
   }),
 });
 
+export const signOutUserSchema = z.object({
+  body: z.object({
+    _id: z.string().min(2),
+  }),
+});
+
+export const forgetPasswordSchema = z.object({
+  body: z.object({
+    identifier: z.string().min(2),
+    otp: z.string().length(6),
+    password: z.string().optional(),
+  }),
+});
+
+export const uniqueIdentifierSchema = z.object({
+  params: z.object({
+    identifier: z.string(),
+  }),
+});
+
 // Export typescript types from schemas
 export type TBaseUser = z.infer<typeof baseUserSchema>;
 export type TDbUser = z.infer<typeof dbUserSchema>;
@@ -64,3 +84,10 @@ export type TAuthUser = z.infer<typeof authUserSchema>['body'];
 export type TSignInUser = z.infer<typeof signInUserSchema>['body'];
 export type TVerifyOtp = z.infer<typeof verifyOtpSchema>['body'];
 export type TResendOtp = z.infer<typeof resendOtpSchema>['body'];
+export type TSignOutUser = z.infer<typeof signOutUserSchema>['body'];
+export type TForgetPassword = z.infer<typeof forgetPasswordSchema>['body'];
+export type TUniqueIdentifier = z.infer<typeof uniqueIdentifierSchema>['params'];
+
+export interface IUniqueIdentifierResponse {
+  isUniqueIdentifier: boolean;
+}

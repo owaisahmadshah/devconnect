@@ -1,6 +1,14 @@
 import type { Request, Response } from 'express';
 
-import type { TAuthUser, TResendOtp, TSignInUser, TVerifyOtp } from 'shared';
+import type {
+  IUniqueIdentifierResponse,
+  TAuthUser,
+  TForgetPassword,
+  TResendOtp,
+  TSignInUser,
+  TUniqueIdentifier,
+  TVerifyOtp,
+} from 'shared';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { UserService } from '../services/user.service.js';
@@ -30,7 +38,7 @@ export const signInUser = asyncHandler(async (req: Request, res: Response) => {
     .status(HttpStatus.NO_CONTENT)
     .cookie('accessToken', accessToken, options)
     .cookie('refreshToken', refreshToken, options)
-    .json(new ApiResponse(HttpStatus.NO_CONTENT, {}, 'Logged In user sucessfully.'));
+    .end();
 });
 
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
@@ -38,9 +46,7 @@ export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
 
   await UserService.verifyOtp(userData);
 
-  return res
-    .status(HttpStatus.NO_CONTENT)
-    .json(new ApiResponse(HttpStatus.NO_CONTENT, {}, 'Verified OTP sucessfully.'));
+  return res.status(HttpStatus.NO_CONTENT).end();
 });
 
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
@@ -48,7 +54,50 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
 
   await UserService.resendOtp(userData);
 
+  return res.status(HttpStatus.NO_CONTENT).end();
+});
+
+export const signOutUser = asyncHandler(async (req: Request, res: Response) => {
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  };
+
   return res
     .status(HttpStatus.NO_CONTENT)
-    .json(new ApiResponse(HttpStatus.NO_CONTENT, {}, 'Resend OTP successfully.'));
+    .clearCookie('accessToken', options)
+    .clearCookie('refreshToken', options)
+    .end();
+});
+
+export const forgetUserPassword = asyncHandler(async (req: Request, res: Response) => {
+  const userData: TForgetPassword = req.body;
+
+  const { accessToken, refreshToken } = await UserService.forgetPassword(userData);
+
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  };
+
+  return res
+    .status(HttpStatus.OK)
+    .cookie('accessToken', accessToken, options)
+    .cookie('refreshToken', refreshToken, options)
+    .json(new ApiResponse(HttpStatus.OK, {}, ''));
+});
+
+export const uniqueIdentifier = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.params.identifier) {
+    // Handle the error case
+    throw new Error('Missing required identifier parameter');
+  }
+
+  const userData: TUniqueIdentifier = { identifier: req.params.identifier };
+
+  const isUniqueIdentifier = await UserService.isIdentifierUnique(userData);
+
+  const isUniqueRes: IUniqueIdentifierResponse = { isUniqueIdentifier: isUniqueIdentifier };
+
+  return res.status(HttpStatus.OK).json(new ApiResponse(HttpStatus.OK, isUniqueRes, 'Success.'));
 });

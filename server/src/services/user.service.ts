@@ -7,15 +7,18 @@ import { ApiError } from '../utils/ApiError.js';
 import sendEmail from '../utils/emailSender.js';
 import { generateExpiryTime, generateOTP } from '../utils/generateOtpCodeAndExpiry.js';
 import { Profile } from '../models/profile.model.js';
+import logger from '../utils/logger.js';
 import {
   getDefaultMessageForStatus,
   HttpStatus,
   type TAuthUser,
+  type TForgetPassword,
   type TResendOtp,
   type TSignInUser,
+  type TSignOutUser,
+  type TUniqueIdentifier,
   type TVerifyOtp,
 } from 'shared';
-import logger from '../utils/logger.js';
 
 export class UserService {
   static async generateAccessAndRefreshToken(
@@ -214,4 +217,45 @@ export class UserService {
 
     return { accessToken, refreshToken };
   }
+
+  static async forgetPassword(
+    userData: TForgetPassword,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    await this.verifyOtp({ identifier: userData.identifier, otp: userData.otp });
+
+    const user = await User.findOne({
+      $or: [{ username: userData.identifier }, { email: userData.identifier }],
+    });
+
+    if (!user) {
+      throw new ApiError(404, 'Usern not found.');
+    }
+
+    if (userData.password) {
+      const hashedPassword = await this.#hashPassword(userData.password);
+      user.password = hashedPassword;
+    }
+
+    const { accessToken, refreshToken } = await this.generateAccessAndRefreshToken(
+      user._id as string,
+    );
+
+    user.refreshToken = refreshToken;
+    user.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+  }
+
+  static async isIdentifierUnique(userData: TUniqueIdentifier): Promise<boolean> {
+    const user = await User.findOne({
+      $or: [{ username: userData.identifier }, { email: userData.identifier }],
+    });
+
+    if (!user) {
+      return true;
+    }
+
+    return false;
+  }
+
 }
