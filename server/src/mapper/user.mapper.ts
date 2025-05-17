@@ -6,7 +6,7 @@ import {
   type TAuthUser,
   type TDbUser,
   type TPublicUser,
-} from '@shared/src/index.js';
+} from 'shared';
 
 /**
  * User Mapper class - responsible for transforming user data between different layers

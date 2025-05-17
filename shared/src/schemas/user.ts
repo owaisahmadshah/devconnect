@@ -25,10 +25,34 @@ export const publicUserSchema = baseUserSchema.extend({
   isVerified: z.boolean(),
 });
 
-// Auth user schema (for login/registration)
+// Auth user schema (for registration)
 export const authUserSchema = z.object({
   body: baseUserSchema.extend({
+    firstName: z.string().min(2, 'First name required'),
+    lastName: z.string().optional(),
     password: z.string().min(8, 'Password must contain at least 8 characters.'),
+  }),
+});
+
+// Login user schema
+export const signInUserSchema = z.object({
+  body: z.object({
+    identifier: z.string(), // username or email
+    password: z.string().min(8),
+  }),
+});
+
+// Otp verification schema
+export const verifyOtpSchema = z.object({
+  body: z.object({
+    identifier: z.string(),
+    otp: z.string().length(6),
+  }),
+});
+
+export const resendOtpSchema = z.object({
+  body: z.object({
+    identifier: z.string(),
   }),
 });
 
@@ -37,3 +61,6 @@ export type TBaseUser = z.infer<typeof baseUserSchema>;
 export type TDbUser = z.infer<typeof dbUserSchema>;
 export type TPublicUser = z.infer<typeof publicUserSchema>;
 export type TAuthUser = z.infer<typeof authUserSchema>['body'];
+export type TSignInUser = z.infer<typeof signInUserSchema>['body'];
+export type TVerifyOtp = z.infer<typeof verifyOtpSchema>['body'];
+export type TResendOtp = z.infer<typeof resendOtpSchema>['body'];

@@ -40,7 +40,6 @@ const profileSchema = new Schema<IProfile>(
         {
           skillName: {
             type: String,
-            index: true,
           },
           skillProficiency: {
             type: String,
@@ -176,7 +175,6 @@ const profileSchema = new Schema<IProfile>(
           technologies: {
             type: [String],
             default: [],
-            index: true,
           },
         },
       ],
