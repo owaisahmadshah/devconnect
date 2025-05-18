@@ -1,9 +1,12 @@
-import { IUser } from '../types/user.type.ts';
+import { TBaseUser } from '@shared/src/index.js';
 
+export interface IRequestUser extends TBaseUser {
+  _id: string;
+}
 declare global {
   namespace Express {
     interface Request {
-      user?: IUser;
+      user?: IRequestUser;
     }
   }
 }

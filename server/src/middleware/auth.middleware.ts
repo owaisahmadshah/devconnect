@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { ApiError } from '../utils/ApiError.js';
 import { User } from '../models/user.model.js';
+import type { IRequestUser } from '../types/index.js';
 
 interface JwtPayloadWithId extends jwt.JwtPayload {
   _id: string;
@@ -25,7 +26,14 @@ const auth = async (req: Request, _: Response, next: NextFunction): Promise<void
       return next(new ApiError(404, 'User not found'));
     }
 
-    req.user = user;
+    const reqUser: IRequestUser = {
+      _id: user._id as string,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
+
+    req.user = reqUser;
     next();
   } catch (error) {
     return next(new ApiError(401, 'Unauthorized: Invalid or expired token'));
