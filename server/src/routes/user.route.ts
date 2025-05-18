@@ -1,6 +1,8 @@
 import { Router } from 'express';
 
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
+import { ProfileController } from '../controllers/profile.controller.js';
+import auth from '../middleware/auth.middleware.js';
 import {
   forgetUserPassword,
   resendOtp,
@@ -34,5 +36,8 @@ router.get(
   validateSchema(uniqueIdentifierSchema),
   uniqueIdentifier,
 );
+
+// Protected routes
+router.get('/profile', auth, ProfileController.getSignedInUserProfileSummary);
 
 export default router;
