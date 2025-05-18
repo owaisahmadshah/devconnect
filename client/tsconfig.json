@@ -14,12 +14,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*",
-      ],
-      "@shared/*": [
-        "../shared/dist/*"
-      ]
+      "@/*": ["./src/*"],
+      "@shared/*": ["../shared/dist/*"]
     }
   }
 }
