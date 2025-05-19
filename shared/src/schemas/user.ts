@@ -34,12 +34,14 @@ export const authUserSchema = z.object({
   }),
 });
 
-// Login user schema
+export const signInUserSchemaClient = z.object({
+  identifier: z.string(), // username or email
+  password: z.string().min(8),
+});
+
+// Login user schema for backend api
 export const signInUserSchema = z.object({
-  body: z.object({
-    identifier: z.string(), // username or email
-    password: z.string().min(8),
-  }),
+  body: signInUserSchemaClient,
 });
 
 // Otp verification schema

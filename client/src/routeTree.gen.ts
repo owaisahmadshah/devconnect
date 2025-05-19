@@ -12,7 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as authSignupImport } from './routes/(auth)/signup'
+import { Route as authSigninImport } from './routes/(auth)/signin'
 
 // Create/Update Routes
 
@@ -22,9 +22,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const authSignupRoute = authSignupImport.update({
-  id: '/(auth)/signup',
-  path: '/signup',
+const authSigninRoute = authSigninImport.update({
+  id: '/(auth)/signin',
+  path: '/signin',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +39,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/(auth)/signup': {
-      id: '/(auth)/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof authSignupImport
+    '/(auth)/signin': {
+      id: '/(auth)/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof authSigninImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/signup': typeof authSignupRoute
+  '/signin': typeof authSigninRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/signup': typeof authSignupRoute
+  '/signin': typeof authSigninRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/(auth)/signup': typeof authSignupRoute
+  '/(auth)/signin': typeof authSigninRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/signup'
+  fullPaths: '/' | '/signin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signup'
-  id: '__root__' | '/' | '/(auth)/signup'
+  to: '/' | '/signin'
+  id: '__root__' | '/' | '/(auth)/signin'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  authSignupRoute: typeof authSignupRoute
+  authSigninRoute: typeof authSigninRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  authSignupRoute: authSignupRoute,
+  authSigninRoute: authSigninRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +97,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/(auth)/signup"
+        "/(auth)/signin"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/(auth)/signup": {
-      "filePath": "(auth)/signup.tsx"
+    "/(auth)/signin": {
+      "filePath": "(auth)/signin.tsx"
     }
   }
 }
