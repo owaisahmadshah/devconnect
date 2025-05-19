@@ -25,13 +25,30 @@ export const publicUserSchema = baseUserSchema.extend({
   isVerified: z.boolean(),
 });
 
-// Auth user schema (for registration)
+export const authUserSchemaBackend = baseUserSchema.extend({
+  firstName: z.string().min(2, 'First name required'),
+  lastName: z.string().optional(),
+  password: z.string().min(8, 'Password must contain at least 8 characters.'),
+});
+
+// Frontend user schema for registration
+export const authUserSchemaClient = authUserSchemaBackend
+  .extend({
+    confirmPassword: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['confirmPassword'],
+        message: "Passwords don't match",
+      });
+    }
+  });
+
+// Auth user schema (for backend registration)
 export const authUserSchema = z.object({
-  body: baseUserSchema.extend({
-    firstName: z.string().min(2, 'First name required'),
-    lastName: z.string().optional(),
-    password: z.string().min(8, 'Password must contain at least 8 characters.'),
-  }),
+  body: authUserSchemaBackend,
 });
 
 export const signInUserSchemaClient = z.object({
@@ -83,6 +100,7 @@ export type TBaseUser = z.infer<typeof baseUserSchema>;
 export type TDbUser = z.infer<typeof dbUserSchema>;
 export type TPublicUser = z.infer<typeof publicUserSchema>;
 export type TAuthUser = z.infer<typeof authUserSchema>['body'];
+export type TAuthUserClient = z.infer<typeof authUserSchemaClient>;
 export type TSignInUser = z.infer<typeof signInUserSchema>['body'];
 export type TVerifyOtp = z.infer<typeof verifyOtpSchema>['body'];
 export type TResendOtp = z.infer<typeof resendOtpSchema>['body'];

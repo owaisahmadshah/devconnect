@@ -18,7 +18,7 @@ export const AuthTemplate = ({
   footerLinkHref,
 }: AuthTemplateProps) => {
   return (
-    <div className="mx-auto flex min-h-[100vh] w-1/2 flex-col items-center justify-center max-sm:w-full">
+    <div className="mx-auto flex min-h-[100vh] w-1/2 flex-col items-center justify-center pb-10 max-sm:w-full">
       <div className="mx-auto w-full max-w-md">
         {/* Logo */}
         <div className="mb-6 flex justify-center">
