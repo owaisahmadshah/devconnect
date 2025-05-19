@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from '@tanstack/react-router';
 
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/molecules/FormField';
@@ -102,9 +101,6 @@ const SignUpForm = ({ onSubmit, isLoading }: SignInProps) => {
         />
 
         <SubmitButton isLoading={isLoading}>Create Account</SubmitButton>
-        <Link to="/">
-          <span className="text-primary text-sm hover:underline">Reset Password</span>
-        </Link>
       </form>
     </Form>
   );

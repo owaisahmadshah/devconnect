@@ -32,7 +32,7 @@ export const RadioFormField = <
           <FormLabel>{label}</FormLabel>
           <div className="flex gap-4">
             {options.map(opt => (
-              <label key={opt.value} className="flex items-center gap-1">
+              <label key={opt.value} className="flex items-center gap-1 text-sm">
                 <input
                   type="radio"
                   value={opt.value}

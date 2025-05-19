@@ -46,7 +46,7 @@ const SignInForm = ({ onSubmit, isLoading }: SignInProps) => {
           type="password"
         />
 
-        <SubmitButton isLoading={isLoading}>Create Account</SubmitButton>
+        <SubmitButton isLoading={isLoading}>Sign In</SubmitButton>
         <Link to="/">
           <span className="text-primary text-sm hover:underline">Reset Password</span>
         </Link>
