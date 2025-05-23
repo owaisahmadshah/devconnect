@@ -2,20 +2,20 @@ import type { Request, Response } from 'express';
 
 import type {
   IUniqueIdentifierResponse,
-  TAuthUser,
+  TAuthUserClient,
   TForgetPassword,
   TResendOtp,
   TSignInUser,
-  TUniqueIdentifier,
   TVerifyOtp,
 } from 'shared';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { UserService } from '../services/user.service.js';
 import { HttpStatus } from 'shared';
+import type { TUniqueIdentifier } from '../schemas/user.js';
 
 export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
-  const userData: TAuthUser = req.body;
+  const userData: TAuthUserClient = req.body;
 
   await UserService.createUser(userData);
 

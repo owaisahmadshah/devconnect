@@ -25,14 +25,14 @@ export const publicUserSchema = baseUserSchema.extend({
   isVerified: z.boolean(),
 });
 
-export const authUserSchemaBackend = baseUserSchema.extend({
+export const authUserSchemaServer = baseUserSchema.extend({
   firstName: z.string().min(2, 'First name required'),
   lastName: z.string().optional(),
   password: z.string().min(8, 'Password must contain at least 8 characters.'),
 });
 
-// Frontend user schema for registration
-export const authUserSchemaClient = authUserSchemaBackend
+// Frontend user schema for registration (Extending confirm password and checking it)
+export const authUserSchemaClient = authUserSchemaServer
   .extend({
     confirmPassword: z.string(),
   })
@@ -46,67 +46,37 @@ export const authUserSchemaClient = authUserSchemaBackend
     }
   });
 
-// Auth user schema (for backend registration)
-export const authUserSchema = z.object({
-  body: authUserSchemaBackend,
-});
-
-export const signInUserSchemaClient = z.object({
+export const signInUserSchema = z.object({
   identifier: z.string(), // username or email
   password: z.string().min(8),
 });
 
-// Login user schema for backend api
-export const signInUserSchema = z.object({
-  body: signInUserSchemaClient,
-});
-
 // Otp verification schema
 export const verifyOtpSchema = z.object({
-  body: z.object({
-    identifier: z.string(),
-    otp: z.string().length(6),
-  }),
+  identifier: z.string(),
+  otp: z.string().length(6),
 });
 
 export const resendOtpSchema = z.object({
-  body: z.object({
-    identifier: z.string(),
-  }),
-});
-
-export const signOutUserSchema = z.object({
-  body: z.object({
-    _id: z.string().min(2),
-  }),
+  identifier: z.string(),
 });
 
 export const forgetPasswordSchema = z.object({
-  body: z.object({
-    identifier: z.string().min(2),
-    otp: z.string().length(6),
-    password: z.string().optional(),
-  }),
-});
-
-export const uniqueIdentifierSchema = z.object({
-  params: z.object({
-    identifier: z.string(),
-  }),
+  identifier: z.string().min(2),
+  otp: z.string().length(6),
+  password: z.string().optional(),
 });
 
 // Export typescript types from schemas
 export type TBaseUser = z.infer<typeof baseUserSchema>;
 export type TDbUser = z.infer<typeof dbUserSchema>;
 export type TPublicUser = z.infer<typeof publicUserSchema>;
-export type TAuthUser = z.infer<typeof authUserSchema>['body'];
 export type TAuthUserClient = z.infer<typeof authUserSchemaClient>;
-export type TSignInUser = z.infer<typeof signInUserSchema>['body'];
-export type TVerifyOtp = z.infer<typeof verifyOtpSchema>['body'];
-export type TResendOtp = z.infer<typeof resendOtpSchema>['body'];
-export type TSignOutUser = z.infer<typeof signOutUserSchema>['body'];
-export type TForgetPassword = z.infer<typeof forgetPasswordSchema>['body'];
-export type TUniqueIdentifier = z.infer<typeof uniqueIdentifierSchema>['params'];
+export type TAuthUserServer = z.infer<typeof authUserSchemaServer>;
+export type TSignInUser = z.infer<typeof signInUserSchema>;
+export type TVerifyOtp = z.infer<typeof verifyOtpSchema>;
+export type TResendOtp = z.infer<typeof resendOtpSchema>;
+export type TForgetPassword = z.infer<typeof forgetPasswordSchema>;
 
 export interface IUniqueIdentifierResponse {
   isUniqueIdentifier: boolean;

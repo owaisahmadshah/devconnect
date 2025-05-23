@@ -11,14 +11,13 @@ import logger from '../utils/logger.js';
 import {
   getDefaultMessageForStatus,
   HttpStatus,
-  type TAuthUser,
+  type TAuthUserServer,
   type TForgetPassword,
   type TResendOtp,
   type TSignInUser,
-  type TSignOutUser,
-  type TUniqueIdentifier,
   type TVerifyOtp,
 } from 'shared';
+import type { TUniqueIdentifier } from '../schemas/user.js';
 
 export class UserService {
   static async generateAccessAndRefreshToken(
@@ -112,7 +111,7 @@ export class UserService {
    * Returns void as this operation doesn't need to return data
    * The controller should use HttpStatus.CREATED (201) for the response
    */
-  static async createUser(userData: TAuthUser): Promise<void> {
+  static async createUser(userData: TAuthUserServer): Promise<void> {
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email: userData.email }, { username: userData.username }],
@@ -257,5 +256,4 @@ export class UserService {
 
     return false;
   }
-
 }

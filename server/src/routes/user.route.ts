@@ -13,27 +13,26 @@ import {
   verifyOtp,
 } from '../controllers/user.controller.js';
 import {
-  authUserSchema,
-  forgetPasswordSchema,
-  resendOtpSchema,
-  signInUserSchema,
-  signOutUserSchema,
-  uniqueIdentifierSchema,
-  verifyOtpSchema,
-} from 'shared';
+  authUserBodySchema,
+  forgetPasswordBodySchema,
+  resendOtpBodySchema,
+  signInUserBodySchema,
+  uniqueIdentifierParamsSchema,
+  verifyOtpBodySchema,
+} from '../schemas/user.js';
 
 const router = Router();
 
 // Public routes
-router.post('/signup', validateSchema(authUserSchema), signUpUser);
-router.post('/signin', validateSchema(signInUserSchema), signInUser);
-router.post('/verify-otp', validateSchema(verifyOtpSchema), verifyOtp);
-router.post('/resend-otp', validateSchema(resendOtpSchema), resendOtp);
-router.post('/signout', validateSchema(signOutUserSchema), signOutUser);
-router.post('/forget-password', validateSchema(forgetPasswordSchema), forgetUserPassword);
+router.post('/signup', validateSchema(authUserBodySchema), signUpUser);
+router.post('/signin', validateSchema(signInUserBodySchema), signInUser);
+router.post('/verify-otp', validateSchema(verifyOtpBodySchema), verifyOtp);
+router.post('/resend-otp', validateSchema(resendOtpBodySchema), resendOtp);
+router.post('/signout', signOutUser);
+router.post('/forget-password', validateSchema(forgetPasswordBodySchema), forgetUserPassword);
 router.get(
   '/unique-identifier/:identifier',
-  validateSchema(uniqueIdentifierSchema),
+  validateSchema(uniqueIdentifierParamsSchema),
   uniqueIdentifier,
 );
 
