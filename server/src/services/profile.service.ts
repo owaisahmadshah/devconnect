@@ -1,5 +1,5 @@
 import { Profile } from '../models/profile.model.js';
-import { HttpStatus, type TUserProfileSummaryResponse } from '@shared/src/index.js';
+import { HttpStatus, type TUserProfileSummaryResponse } from 'shared';
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
 

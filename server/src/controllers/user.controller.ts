@@ -7,12 +7,12 @@ import type {
   TResendOtp,
   TSignInUser,
   TVerifyOtp,
+  TUniqueIdentifier,
 } from 'shared';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { UserService } from '../services/user.service.js';
 import { HttpStatus } from 'shared';
-import type { TUniqueIdentifier } from '../schemas/user.js';
 
 export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
   const userData: TAuthUserClient = req.body;

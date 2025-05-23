@@ -1,0 +1,27 @@
+import axios from 'axios';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Response interceptor — centralized error handling
+api.interceptors.response.use(
+  response => response,
+  error => {
+    // Log or handle specific error cases
+    if (error.response?.status === 401) {
+      // TODO: Request for another token
+      console.error('Unauthorized, redirecting to login...');
+    }
+
+    return Promise.reject(error);
+  },
+);
+
+export default api;

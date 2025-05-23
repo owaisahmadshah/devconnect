@@ -16,8 +16,8 @@ import {
   type TResendOtp,
   type TSignInUser,
   type TVerifyOtp,
+  type TUniqueIdentifier,
 } from 'shared';
-import type { TUniqueIdentifier } from '../schemas/user.js';
 
 export class UserService {
   static async generateAccessAndRefreshToken(

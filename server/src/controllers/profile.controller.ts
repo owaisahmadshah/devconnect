@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ProfileService } from '../services/profile.service.js';
-import { HttpStatus } from '@shared/src/index.js';
+import { HttpStatus } from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 

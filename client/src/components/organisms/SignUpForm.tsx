@@ -28,7 +28,6 @@ const SignUpForm = ({ onSubmit, isLoading }: SignInProps) => {
   });
 
   const handleSubmit = async (values: TAuthUserClient) => {
-    console.log(values);
     await onSubmit(values);
   };
 

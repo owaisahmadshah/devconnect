@@ -67,6 +67,10 @@ export const forgetPasswordSchema = z.object({
   password: z.string().optional(),
 });
 
+export const uniqueIdentifierSchema = z.object({
+  identifier: z.string(),
+});
+
 // Export typescript types from schemas
 export type TBaseUser = z.infer<typeof baseUserSchema>;
 export type TDbUser = z.infer<typeof dbUserSchema>;
@@ -77,6 +81,7 @@ export type TSignInUser = z.infer<typeof signInUserSchema>;
 export type TVerifyOtp = z.infer<typeof verifyOtpSchema>;
 export type TResendOtp = z.infer<typeof resendOtpSchema>;
 export type TForgetPassword = z.infer<typeof forgetPasswordSchema>;
+export type TUniqueIdentifier = z.infer<typeof uniqueIdentifierSchema>;
 
 export interface IUniqueIdentifierResponse {
   isUniqueIdentifier: boolean;

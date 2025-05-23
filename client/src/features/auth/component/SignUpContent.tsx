@@ -1,18 +1,22 @@
+// pages/SignUp.tsx
 import SignUpForm from '@/components/organisms/SignUpForm';
-import { useState } from 'react';
+import { useSignUp } from '@/features/auth/hooks/useAuth';
 import type { TAuthUserClient } from 'shared';
 
 export const SignUpContent = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const signUpMutation = useSignUp();
 
   const handleSubmit = async (data: TAuthUserClient) => {
-    console.log(data);
-    setIsLoading(prevValue => !prevValue);
+    signUpMutation.mutate(data);
   };
 
   return (
     <div>
-      <SignUpForm onSubmit={handleSubmit} isLoading={isLoading} />
+      <SignUpForm
+        onSubmit={handleSubmit}
+        isLoading={signUpMutation.isPending}
+        // error={signUpMutation.error?.response?.data?.message}
+      />
     </div>
   );
 };

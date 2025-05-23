@@ -5,6 +5,7 @@ import {
   forgetPasswordSchema,
   resendOtpSchema,
   signInUserSchema,
+  uniqueIdentifierSchema,
   verifyOtpSchema,
 } from 'shared';
 
@@ -17,9 +18,7 @@ export const authUserBodySchema = z.object({
 });
 
 export const uniqueIdentifierParamsSchema = z.object({
-  params: z.object({
-    identifier: z.string(),
-  }),
+  params: uniqueIdentifierSchema,
 });
 
 export const forgetPasswordBodySchema = z.object({
@@ -33,5 +32,3 @@ export const signInUserBodySchema = z.object({
 export const verifyOtpBodySchema = z.object({
   body: verifyOtpSchema,
 });
-
-export type TUniqueIdentifier = z.infer<typeof uniqueIdentifierParamsSchema>['params'];
