@@ -1,18 +1,23 @@
 import SignInForm from '@/components/organisms/SignInForm';
-import { useState } from 'react';
 import type { TSignInUser } from 'shared';
+import { useSignIn } from '../hooks/useAuth';
+import { getErrorMessage } from '@/lib/errorHanldling';
 
 export const SignInContent = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const signInMutation = useSignIn();
 
   const handleSubmit = async (data: TSignInUser) => {
-    console.log(data);
-    setIsLoading(prevValue => !prevValue);
+    signInMutation.mutate(data);
   };
 
   return (
     <div>
-      <SignInForm onSubmit={handleSubmit} isLoading={isLoading} />
+      <SignInForm
+        onSubmit={handleSubmit}
+        isLoading={signInMutation.isPending}
+        isError={signInMutation.isError}
+        error={getErrorMessage(signInMutation.error)}
+      />
     </div>
   );
 };

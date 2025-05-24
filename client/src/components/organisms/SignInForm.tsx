@@ -5,20 +5,22 @@ import { Link } from '@tanstack/react-router';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/molecules/FormField';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
-import { signInUserSchemaClient, type TSignInUser } from 'shared';
+import { signInUserSchema, type TSignInUser } from 'shared';
 
 interface SignInProps {
   onSubmit: (data: TSignInUser) => Promise<void>;
   isLoading: boolean;
+  isError: boolean;
+  error: string;
 }
 
-const SignInForm = ({ onSubmit, isLoading }: SignInProps) => {
+const SignInForm = ({ onSubmit, isLoading, isError, error }: SignInProps) => {
   const form = useForm<TSignInUser>({
     defaultValues: {
       identifier: '',
       password: '',
     },
-    resolver: zodResolver(signInUserSchemaClient),
+    resolver: zodResolver(signInUserSchema),
   });
 
   const handleSubmit = async (values: TSignInUser) => {
@@ -28,6 +30,8 @@ const SignInForm = ({ onSubmit, isLoading }: SignInProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 p-6">
+        {isError && <p className="text-sm text-red-500">{error}</p>}
+
         <FormField
           form={form}
           id="identifier"

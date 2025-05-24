@@ -1,18 +1,21 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/molecules/FormField';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
 import { authUserSchemaClient, type TAuthUserClient } from 'shared';
 import { RadioFormField } from '../molecules/RadioFormField';
+import { toast } from 'sonner';
 
 interface SignInProps {
   onSubmit: (data: TAuthUserClient) => Promise<void>;
   isLoading: boolean;
+  error: string | null;
 }
 
-const SignUpForm = ({ onSubmit, isLoading }: SignInProps) => {
+const SignUpForm = ({ onSubmit, isLoading, error }: SignInProps) => {
   const form = useForm<TAuthUserClient>({
     defaultValues: {
       firstName: '',
@@ -31,7 +34,13 @@ const SignUpForm = ({ onSubmit, isLoading }: SignInProps) => {
     await onSubmit(values);
   };
 
-  console.log(form.formState.errors);
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+    toast.error(error);
+  }, [error]);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 p-6">

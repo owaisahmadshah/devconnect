@@ -1,6 +1,6 @@
-// pages/SignUp.tsx
 import SignUpForm from '@/components/organisms/SignUpForm';
 import { useSignUp } from '@/features/auth/hooks/useAuth';
+import { getErrorMessage } from '@/lib/errorHanldling';
 import type { TAuthUserClient } from 'shared';
 
 export const SignUpContent = () => {
@@ -15,7 +15,7 @@ export const SignUpContent = () => {
       <SignUpForm
         onSubmit={handleSubmit}
         isLoading={signUpMutation.isPending}
-        // error={signUpMutation.error?.response?.data?.message}
+        error={signUpMutation.isError ? getErrorMessage(signUpMutation.error) : null}
       />
     </div>
   );
