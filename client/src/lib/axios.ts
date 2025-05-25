@@ -16,17 +16,30 @@ const api = axios.create({
 // Response interceptor — centralized error handling
 api.interceptors.response.use(
   response => response,
-  error => {
-    // Log or handle specific error cases
+  async error => {
+    const originalRequest = error.config;
     const errorDetails = getErrorDetails(error);
+
+    if (!originalRequest._retry) {
+      originalRequest._retry = false;
+    }
+
     if (
+      (errorDetails.message === 'Unauthorized' ||
+        errorDetails.message === 'Unauthorized: Invalid or expired token') &&
       errorDetails.statusCode === HttpStatus.UNAUTHORIZED &&
-      errorDetails.message === 'Unauthorized'
+      !originalRequest._retry
     ) {
-      // TODO: Request for another token
-      console.error('Unauthorized, redirecting to login...');
-    } else {
-      console.log(errorDetails);
+      originalRequest._retry = true;
+      try {
+        // Attempt to refresh the access token via cookie
+        await axios.post(`${BASE_URL}/api/v1/users/refresh-token`, {}, { withCredentials: true });
+
+        // Retry the original request with updated credentials
+        return api(originalRequest);
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);

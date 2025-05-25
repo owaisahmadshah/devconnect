@@ -5,6 +5,7 @@ import { ProfileController } from '../controllers/profile.controller.js';
 import auth from '../middleware/auth.middleware.js';
 import {
   forgetUserPassword,
+  refreshAccessToken,
   resendOtp,
   signInUser,
   signOutUser,
@@ -35,6 +36,7 @@ router.get(
   validateSchema(uniqueIdentifierParamsSchema),
   uniqueIdentifier,
 );
+router.post('/refresh-token', refreshAccessToken);
 
 // Protected routes
 router.get('/profile', auth, ProfileController.getSignedInUserProfileSummary);

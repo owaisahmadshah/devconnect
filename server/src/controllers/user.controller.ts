@@ -101,3 +101,23 @@ export const uniqueIdentifier = asyncHandler(async (req: Request, res: Response)
 
   return res.status(HttpStatus.OK).json(new ApiResponse(HttpStatus.OK, isUniqueRes, 'Success.'));
 });
+
+export const refreshAccessToken = asyncHandler(async (req: Request, res: Response) => {
+  const incommingRefreshToken =
+    req.cookies.refreshToken || req.headers['authorization']?.replace(/^Bearer\s+/i, '').trim();
+
+  const { accessToken, refreshToken } = await UserService.generateRefreshAccessToken(
+    incommingRefreshToken,
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  };
+
+  return res
+    .status(HttpStatus.OK)
+    .cookie('accessToken', accessToken, options)
+    .cookie('refreshToken', refreshToken, options)
+    .json(new ApiResponse(HttpStatus.OK, {}, ''));
+});

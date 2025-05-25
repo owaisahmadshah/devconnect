@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import { User } from '../models/user.model.js';
 import { UserMapper } from '../mapper/user.mapper.js';
@@ -245,5 +245,31 @@ export class UserService {
     }
 
     return false;
+  }
+
+  static async generateRefreshAccessToken(
+    token: string | null,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    if (!token) {
+      throw new ApiError(401, 'Refresh token is required');
+    }
+
+    const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!);
+
+    const user = await User.findById((decodedToken as any)._id);
+
+    if (!user) {
+      throw new ApiError(401, 'Invalid refresh token');
+    }
+
+    if (token !== user.refreshToken) {
+      throw new ApiError(401, 'Invalid refresh token');
+    }
+
+    const { accessToken, refreshToken } = await this.generateAccessAndRefreshToken(
+      user._id as string,
+    );
+
+    return { accessToken, refreshToken };
   }
 }

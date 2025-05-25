@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setUser } from '@/store/user/profileSlice';
+import { clearUser, setUser } from '@/store/user/profileSlice';
 import { useAuthUser } from './useAuthUser';
 
 export const useSyncUserToRedux = () => {
@@ -10,8 +10,13 @@ export const useSyncUserToRedux = () => {
   useEffect(() => {
     if (isSuccess && data) {
       dispatch(setUser(data));
+      return;
     }
-  }, [isSuccess, data, dispatch]);
+
+    if (isError) {
+      dispatch(clearUser(data));
+    }
+  }, [isSuccess, data, isError, isFetched, dispatch]);
 
   return { user: data, isSuccess, isLoading, isError, isFetched };
 };
