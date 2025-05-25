@@ -1,9 +1,11 @@
 import { AuthTemplate } from '@/components/templates/AuthTemplate';
 import { SignInContent } from '@/features/auth/component/SignInContent';
+import { requireLogOut } from '@/lib/requireLoggedOut';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(auth)/signin')({
   component: RouteComponent,
+  loader: requireLogOut,
 });
 
 function RouteComponent() {

@@ -5,7 +5,7 @@ import { ProfileMapper } from '../mapper/profile.mapper.js';
 
 export class ProfileService {
   static async getUserProfile(userId: string): Promise<TUserProfileSummaryResponse> {
-    const profile = await Profile.findById(userId)
+    const profile = await Profile.findOne({ user: userId })
       .populate({
         path: 'user',
         select: 'username email role',

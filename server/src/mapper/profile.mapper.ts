@@ -4,8 +4,7 @@ import { Document } from 'mongoose';
 export class ProfileMapper {
   static toUserProfileSummary(profileData: TProfile | Document): TUserProfileSummaryResponse {
     const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
-
-    const profile = userProfileSummarySchema.parse({
+    return {
       _id: profileObj._id,
       username: profileObj.user.username,
       email: profileObj.user.email,
@@ -15,8 +14,6 @@ export class ProfileMapper {
       profilePictureUrl: profileObj.profilePictureUrl,
       bio: profileObj.bio,
       isVerified: profileObj.isVerified,
-    });
-
-    return profile;
+    };
   }
 }
