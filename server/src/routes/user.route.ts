@@ -28,7 +28,7 @@ router.post('/signup', validateSchema(authUserBodySchema), signUpUser);
 router.post('/signin', validateSchema(signInUserBodySchema), signInUser);
 router.post('/verify-otp', validateSchema(verifyOtpBodySchema), verifyOtp);
 router.post('/resend-otp', validateSchema(resendOtpBodySchema), resendOtp);
-router.post('/signout', signOutUser);
+router.post('/signout', auth, signOutUser);
 router.post('/forget-password', validateSchema(forgetPasswordBodySchema), forgetUserPassword);
 router.get(
   '/unique-identifier/:identifier',
