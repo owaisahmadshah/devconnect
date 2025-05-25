@@ -24,7 +24,7 @@ const userSchema = new Schema<IDbUser>(
       type: String,
       unique: true,
       lowercase: true,
-      time: true,
+      trim: true,
       index: true,
       required: [true, 'Email is required.'],
     },

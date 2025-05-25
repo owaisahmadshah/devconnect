@@ -52,7 +52,7 @@ const SignInForm = ({ onSubmit, isLoading, isError, error }: SignInProps) => {
 
         <SubmitButton isLoading={isLoading}>Sign In</SubmitButton>
         <Link to="/">
-          <span className="text-primary text-sm hover:underline">Reset Password</span>
+          <span className="text-primary text-sm hover:underline">Forget Password</span>
         </Link>
       </form>
     </Form>

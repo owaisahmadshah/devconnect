@@ -1,7 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 
-import { HttpStatus, type TAuthUserClient, type TSignInUser } from 'shared';
+import {
+  HttpStatus,
+  type TAuthUserClient,
+  type TResendOtp,
+  type TSignInUser,
+  type TVerifyOtp,
+} from 'shared';
 import * as authService from '@/features/auth/services/authService';
 import { getErrorDetails } from '@/lib/errorHanldling';
 
@@ -38,5 +44,22 @@ export const useSignIn = () => {
         navigate({ to: '/verify-otp', state: { identifier: variables.identifier } });
       }
     },
+  });
+};
+
+export const useVerifyOtp = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (userData: TVerifyOtp) => authService.verifyOtpService(userData),
+    onSuccess: () => {
+      navigate({ to: '/signin' });
+    },
+  });
+};
+
+export const useResendOtp = () => {
+  return useMutation({
+    mutationFn: (userData: TResendOtp) => authService.resendOtpService(userData),
   });
 };

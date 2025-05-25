@@ -32,17 +32,9 @@ export class UserService {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-
-    // Skip validation as we're only updating the refresh token
-    await user.save({ validateBeforeSave: false });
+    await User.updateOne({ _id: user._id }, { refreshToken });
 
     return { accessToken, refreshToken };
-  }
-
-  // Private method for password hashing
-  static async #hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, 10);
   }
 
   static async verifyOtp(userData: TVerifyOtp): Promise<{ isValidOtp: boolean }> {
@@ -65,8 +57,7 @@ export class UserService {
     }
 
     if (!user.isVerified) {
-      user.isVerified = true;
-      await user.save({ validateBeforeSave: false });
+      await User.updateOne({ _id: user._id }, { isVerified: true });
     }
 
     return { isValidOtp: true };
@@ -123,7 +114,7 @@ export class UserService {
 
     const otpCode = generateOTP();
     const otpExpiry = generateExpiryTime();
-    const hashedPassword = await this.#hashPassword(userData.password);
+    // const hashedPassword = await this.#hashPassword(userData.password);
 
     // Sending otp email
     const isOtpSent = await sendEmail(userData.email, otpCode);
@@ -134,7 +125,7 @@ export class UserService {
       );
     }
 
-    const dbUserData = UserMapper.toDbUser(userData, hashedPassword, otpCode, otpExpiry);
+    const dbUserData = UserMapper.toDbUser(userData, otpCode, otpExpiry);
 
     // Start transaction session
     const session = await mongoose.startSession();
@@ -231,8 +222,7 @@ export class UserService {
     }
 
     if (userData.password) {
-      const hashedPassword = await this.#hashPassword(userData.password);
-      user.password = hashedPassword;
+      user.password = userData.password;
     }
 
     const { accessToken, refreshToken } = await this.generateAccessAndRefreshToken(
@@ -240,7 +230,7 @@ export class UserService {
     );
 
     user.refreshToken = refreshToken;
-    user.save({ validateBeforeSave: false });
+    user.save();
 
     return { accessToken, refreshToken };
   }

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import {
   dbUserSchema,
   publicUserSchema,
-  type TAuthUser,
+  type TAuthUserServer,
   type TDbUser,
   type TPublicUser,
 } from 'shared';
@@ -32,7 +32,7 @@ export class UserMapper {
   /**
    * Transforms an auth user to db user
    */
-  static toDbUser(user: TAuthUser, hashedPassword: string, otp: string, otpExpiry: Date): TDbUser {
+  static toDbUser(user: TAuthUserServer, otp: string, otpExpiry: Date): TDbUser {
     const dbUser = dbUserSchema.parse({
       username: user.username,
       email: user.email,
@@ -41,7 +41,7 @@ export class UserMapper {
       refreshToken: '',
       otp: otp,
       otpExpiry: otpExpiry,
-      password: hashedPassword,
+      password: user.password,
     });
     return dbUser;
   }
