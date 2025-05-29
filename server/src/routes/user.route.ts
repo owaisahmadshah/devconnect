@@ -20,8 +20,8 @@ import {
   signInUserBodySchema,
   uniqueIdentifierParamsSchema,
   verifyOtpBodySchema,
+  userProfileParamsSchema,
 } from '../schemas/user.js';
-import { userProfileParamsSchema } from '@shared/src/index.js';
 
 const router = Router();
 
