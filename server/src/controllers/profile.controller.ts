@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ProfileService } from '../services/profile.service.js';
-import { HttpStatus } from 'shared';
+import { HttpStatus, type TUserProfileParams } from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 
@@ -19,6 +19,25 @@ export class ProfileController {
     }
 
     const profile = await ProfileService.getUserProfile(req.user._id);
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, profile, 'Got user profile successfully.'));
+  });
+
+  /**
+   * Retrieves user's profile.
+   *
+   * @route GET /api/v1/users/:username
+   * @param {Request} req.params.identifier contains username or email
+   * @returns User profile of type TUserProfileResponse
+   */
+  static getUserProfile = asyncHandler(async (req: Request, res: Response) => {
+    const params = req.params;
+    if (!params.identifier) {
+      throw new ApiError(HttpStatus.BAD_REQUEST, 'Username is not provided.');
+    }
+    const profile = await ProfileService.getUserProfile(params.identifier);
 
     return res
       .status(HttpStatus.OK)

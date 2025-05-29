@@ -21,6 +21,7 @@ import {
   uniqueIdentifierParamsSchema,
   verifyOtpBodySchema,
 } from '../schemas/user.js';
+import { userProfileParamsSchema } from '@shared/src/index.js';
 
 const router = Router();
 
@@ -37,6 +38,11 @@ router.get(
   uniqueIdentifier,
 );
 router.post('/refresh-token', refreshAccessToken);
+router.get(
+  '/:identifier',
+  validateSchema(userProfileParamsSchema),
+  ProfileController.getUserProfile,
+);
 
 // Protected routes
 router.get('/profile', auth, ProfileController.getSignedInUserProfileSummary);

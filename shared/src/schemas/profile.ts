@@ -67,6 +67,11 @@ export const visibilitySchema = z.object({
   certifications: visibilityEnum,
 });
 
+// Paramater used to get user profile data
+export const userProfileParamsSchema = z.object({
+  identifier: z.string(),
+});
+
 // Main profile schema combining all pieces together
 export const profileSchema = z.object({
   firstName: z.string(),
@@ -95,6 +100,7 @@ export type TSocialMediaLink = z.infer<typeof socialMediaLinkSchema>;
 export type TVisibiltyEnum = z.infer<typeof visibilityEnum>;
 export type TVisibilty = z.infer<typeof visibilitySchema>;
 export type TProfile = z.infer<typeof profileSchema>;
+export type TUserProfileParams = z.infer<typeof userProfileParamsSchema>;
 
 // User profile summary light weight response
 export const userProfileSummarySchema = z.object({
@@ -109,5 +115,11 @@ export const userProfileSummarySchema = z.object({
   isVerified: z.boolean(),
 });
 
-// Export typescript types for response schemas
+// Export typescript types for responses
+export type TUserProfileResponse = Omit<TProfile, 'user'> & {
+  _id: string;
+  username: string;
+  email: string;
+  role: string;
+};
 export type TUserProfileSummaryResponse = z.infer<typeof userProfileSummarySchema>;

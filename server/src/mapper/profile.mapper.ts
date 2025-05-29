@@ -1,4 +1,9 @@
-import { userProfileSummarySchema, type TProfile, type TUserProfileSummaryResponse } from 'shared';
+import {
+  userProfileSummarySchema,
+  type TProfile,
+  type TUserProfileResponse,
+  type TUserProfileSummaryResponse,
+} from 'shared';
 import { Document } from 'mongoose';
 
 export class ProfileMapper {
@@ -14,6 +19,30 @@ export class ProfileMapper {
       profilePictureUrl: profileObj.profilePictureUrl,
       bio: profileObj.bio,
       isVerified: profileObj.isVerified,
+    };
+  }
+
+  static toUserProfile(profileData: TProfile | Document): TUserProfileResponse {
+    const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
+    return {
+      _id: profileObj._id,
+      username: profileObj.user.username,
+      email: profileObj.user.email,
+      role: profileObj.user.role,
+      firstName: profileObj.firstName,
+      lastName: profileObj.lastName ?? '',
+      profilePictureUrl: profileObj.profilePictureUrl,
+      bio: profileObj.bio,
+      isVerified: profileObj.isVerified,
+      achievements: profileObj.achievements,
+      certifications: profileObj.certifications,
+      educations: profileObj.educations,
+      experiences: profileObj.experience,
+      phoneNumber: profileObj.phoneNumber,
+      profileUrls: profileObj.profileUrls,
+      skills: profileObj.skills,
+      socialMediaLinks: profileObj.socialMediaLinks,
+      visibility: profileObj.visibility,
     };
   }
 }

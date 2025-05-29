@@ -17,6 +17,7 @@ import {
   type TSignInUser,
   type TVerifyOtp,
   type TUniqueIdentifier,
+  type TPublicUser,
 } from 'shared';
 
 export class UserService {
@@ -271,5 +272,19 @@ export class UserService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  static async getUser(identifier: string): Promise<TPublicUser> {
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    });
+
+    if (!user) {
+      throw new ApiError(404, 'User with this email or username not found.');
+    }
+
+    const responseUser: TPublicUser = UserMapper.toPublicUser(user);
+
+    return responseUser;
   }
 }
