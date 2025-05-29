@@ -39,7 +39,7 @@ router.get(
 );
 router.post('/refresh-token', refreshAccessToken);
 router.get(
-  '/:identifier',
+  '/profile/:identifier',
   validateSchema(userProfileParamsSchema),
   ProfileController.getUserProfile,
 );
