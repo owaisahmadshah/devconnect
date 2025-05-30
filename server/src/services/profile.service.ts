@@ -23,7 +23,7 @@ export class ProfileService {
   }
   static async getUsersProfile(identifier: string): Promise<TUserProfileResponse> {
     const user = await UserService.getUser(identifier);
-
+    console.log(user);
     const profile = await Profile.findOne({ user: user._id }).populate({
       path: 'user',
       select: 'username email role',

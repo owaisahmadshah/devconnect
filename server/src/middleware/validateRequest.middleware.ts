@@ -10,7 +10,7 @@ export const validateSchema = (schema: AnyZodObject) => {
         query: req.query,
         params: req.params,
       });
-
+      console.log('next is called');
       return next();
     } catch (error) {
       if (error instanceof ZodError) {

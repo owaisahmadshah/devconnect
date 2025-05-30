@@ -17,16 +17,13 @@ export class UserMapper {
    */
   static toPublicUser(user: TDbUser | mongoose.Document): TPublicUser {
     const userObj = user instanceof mongoose.Document ? user.toObject() : user;
-
-    const publicUser = publicUserSchema.parse({
+    return {
       _id: userObj._id,
       username: userObj.username,
       email: userObj.email,
       role: userObj.role,
       isVerified: userObj.isVerified,
-    });
-
-    return publicUser;
+    };
   }
 
   /**

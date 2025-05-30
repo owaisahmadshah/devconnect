@@ -81,10 +81,11 @@ const profileSchema = new Schema<IProfile>(
           },
           started: {
             type: Date,
+            default: Date.now,
           },
           ended: {
-            type: Schema.Types.Mixed, // Can be Date or String 'Present'
-            default: 'Present',
+            type: Date,
+            default: Date.now,
           },
         },
       ],
@@ -169,8 +170,8 @@ const profileSchema = new Schema<IProfile>(
             default: Date.now,
           },
           ended: {
-            type: Schema.Types.Mixed, // Can be Date or String 'Present'
-            default: 'Present',
+            type: Date,
+            default: Date.now,
           },
           technologies: {
             type: [String],

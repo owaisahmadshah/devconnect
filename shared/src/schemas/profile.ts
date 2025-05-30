@@ -18,7 +18,7 @@ export const educationSchema = z.object({
   degree: z.string(),
   fieldOfStudy: z.string(),
   started: z.date(),
-  ended: z.union([z.date(), z.literal('Present')]),
+  ended: z.date(),
 });
 
 // Certification schema: information about certifications
@@ -46,7 +46,7 @@ export const experienceSchema = z.object({
   type: z.enum(['Job', 'Internship', 'Freelance', 'Project']),
   location: z.string().or(z.literal('Remote')),
   started: z.date(),
-  ended: z.union([z.date(), z.literal('Present')]),
+  ended: z.date(),
   technologies: z.array(z.string()),
 });
 

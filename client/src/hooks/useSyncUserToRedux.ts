@@ -6,10 +6,9 @@ import { useAuthUser } from './useAuthUser';
 export const useSyncUserToRedux = () => {
   const dispatch = useDispatch();
   const { data, isSuccess, isLoading, isError, isFetched } = useAuthUser();
-
   useEffect(() => {
     if (isSuccess && data) {
-      dispatch(setUser(data));
+      dispatch(setUser(data.data));
       return;
     }
 

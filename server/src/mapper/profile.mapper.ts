@@ -37,7 +37,7 @@ export class ProfileMapper {
       achievements: profileObj.achievements,
       certifications: profileObj.certifications,
       educations: profileObj.educations,
-      experiences: profileObj.experience,
+      experiences: profileObj.experiences,
       phoneNumber: profileObj.phoneNumber,
       profileUrls: profileObj.profileUrls,
       skills: profileObj.skills,
