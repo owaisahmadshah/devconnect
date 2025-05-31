@@ -1,7 +1,9 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import * as profileService from '../services/profileService';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
+
+import * as profileService from '../services/profileService';
 import type { RootState } from '@/store/store';
+import type { TUserProfileUpdateArrayData } from 'shared';
 
 export const useProfile = (identifier: string) => {
   const { data: userProfile, error } = useSuspenseQuery({
@@ -19,4 +21,11 @@ export const useProfile = (identifier: string) => {
   const isCurrentUser = isLoggedIn && user?.username === identifier.trim();
 
   return { userProfile, error, isCurrentUser };
+};
+
+export const useProfileArrayUpdate = () => {
+  return useMutation({
+    mutationFn: (updateData: TUserProfileUpdateArrayData) =>
+      profileService.addProfileArrayItemService(updateData),
+  });
 };

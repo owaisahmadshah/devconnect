@@ -16,15 +16,15 @@ export const SkillsSection = ({ onItemAction, skills, isCurrentUser }: SkillsSec
       {isCurrentUser && <Button variant={'outline'}>Add Skill</Button>}
       <div className="flex w-full flex-col gap-3">
         {skills.map((skill, index) => (
-            <SkillItem
-              key={index}
-              onAction={onItemAction}
-              skillName={skill.skillName}
-              endorsements={skill.endorsements}
-              skillProficiency={skill.skillProficiency}
-              isCurrentUser={isCurrentUser}
-            />
-          ))}
+          <SkillItem
+            key={index}
+            onAction={onItemAction}
+            skillName={skill.skillName}
+            endorsements={skill.endorsements}
+            skillProficiency={skill.skillProficiency}
+            isCurrentUser={isCurrentUser}
+          />
+        ))}
       </div>
     </ProfileSectionCard>
   );

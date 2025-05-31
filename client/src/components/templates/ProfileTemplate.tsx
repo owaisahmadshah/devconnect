@@ -4,9 +4,11 @@ import { AchievementsSection } from '../organisms/profile/AchievementsSection';
 import { CertificationSection } from '../organisms/profile/CertificationSection';
 import { EducationSection } from '../organisms/profile/EducationSection';
 import { ExperienceSection } from '../organisms/profile/ExperienceSection';
-import type { TUserProfileResponse } from 'shared';
+import type { TUserProfileResponse, TUserProfileUpdateArrayData } from 'shared';
 
 interface ProfileTemplateProps {
+  onProfileArrayUpdate: (updateData: TUserProfileUpdateArrayData) => Promise<void>;
+  isPending: boolean;
   profile: TUserProfileResponse;
   isCurrentUser: boolean;
 }
