@@ -7,7 +7,6 @@ import {
   signInUserSchema,
   uniqueIdentifierSchema,
   verifyOtpSchema,
-  userProfileParamsSchema as uPPS,
 } from 'shared';
 
 export const resendOtpBodySchema = z.object({
@@ -32,8 +31,4 @@ export const signInUserBodySchema = z.object({
 
 export const verifyOtpBodySchema = z.object({
   body: verifyOtpSchema,
-});
-
-export const userProfileParamsSchema = z.object({
-  params: uPPS,
 });

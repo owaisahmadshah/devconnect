@@ -90,6 +90,33 @@ export const profileSchema = z.object({
   isVerified: z.boolean(),
 });
 
+export const userProfileUpdateArrayDataSchema = z.discriminatedUnion('fieldName', [
+  z.object({
+    fieldName: z.literal('skills'),
+    fieldData: skillSchema,
+  }),
+  z.object({
+    fieldName: z.literal('educations'),
+    fieldData: educationSchema,
+  }),
+  z.object({
+    fieldName: z.literal('certifications'),
+    fieldData: certificationSchema,
+  }),
+  z.object({
+    fieldName: z.literal('achievements'),
+    fieldData: achievementSchema,
+  }),
+  z.object({
+    fieldName: z.literal('experiences'),
+    fieldData: experienceSchema,
+  }),
+  z.object({
+    fieldName: z.literal('socialMediaLinks'),
+    fieldData: socialMediaLinkSchema,
+  }),
+]);
+
 // Export typescript types from schemas
 export type TSkill = z.infer<typeof skillSchema>;
 export type TEducation = z.infer<typeof educationSchema>;
@@ -101,6 +128,7 @@ export type TVisibiltyEnum = z.infer<typeof visibilityEnum>;
 export type TVisibilty = z.infer<typeof visibilitySchema>;
 export type TProfile = z.infer<typeof profileSchema>;
 export type TUserProfileParams = z.infer<typeof userProfileParamsSchema>;
+export type TUserProfileUpdateArrayData = z.infer<typeof userProfileUpdateArrayDataSchema>;
 
 // User profile summary light weight response
 export const userProfileSummarySchema = z.object({

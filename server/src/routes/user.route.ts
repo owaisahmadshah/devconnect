@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
-import { ProfileController } from '../controllers/profile.controller.js';
 import auth from '../middleware/auth.middleware.js';
 import {
   forgetUserPassword,
@@ -20,9 +19,7 @@ import {
   signInUserBodySchema,
   uniqueIdentifierParamsSchema,
   verifyOtpBodySchema,
-  userProfileParamsSchema,
 } from '../schemas/user.js';
-import attachUser from '../middleware/attachUser.middleware.js';
 
 const router = Router();
 
@@ -39,14 +36,5 @@ router.get(
   uniqueIdentifier,
 );
 router.post('/refresh-token', refreshAccessToken);
-router.get(
-  '/profile/:identifier',
-  validateSchema(userProfileParamsSchema),
-  attachUser, // User or null, authentication is'nt required.
-  ProfileController.getUserProfile,
-);
-
-// Protected routes
-router.get('/profile', auth, ProfileController.getSignedInUserProfileSummary);
 
 export default router;

@@ -1,12 +1,17 @@
 import { Profile } from '../models/profile.model.js';
-import { HttpStatus, type TUserProfileResponse, type TUserProfileSummaryResponse } from 'shared';
+import {
+  HttpStatus,
+  type TUserProfileResponse,
+  type TUserProfileSummaryResponse,
+  type TUserProfileUpdateArrayData,
+} from 'shared';
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
 import { UserService } from './user.service.js';
 import type { IRequestUser } from '../types/index.js';
 
 export class ProfileService {
-  static async getUserProfile(userId: string): Promise<TUserProfileSummaryResponse> {
+  static async getUserProfileSummary(userId: string): Promise<TUserProfileSummaryResponse> {
     const profile = await Profile.findOne({ user: userId })
       .populate({
         path: 'user',
@@ -50,5 +55,26 @@ export class ProfileService {
     // TODO: If user is not in connections filter connections-only
 
     return privateProfile;
+  }
+
+  static async addArrayItem(
+    updateData: TUserProfileUpdateArrayData,
+    user: IRequestUser,
+  ): Promise<TUserProfileResponse> {
+    const { fieldName, fieldData } = updateData;
+
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (!profile) {
+      throw new ApiError(404, 'Profile not found.');
+    }
+
+    // Add item to array
+    (profile as any)[fieldName].push(fieldData);
+
+    await profile.save();
+
+    const responseProfile = ProfileMapper.toUserProfile(profile);
+    return responseProfile;
   }
 }
