@@ -37,7 +37,7 @@ export class ProfileController {
     if (!params.identifier) {
       throw new ApiError(HttpStatus.BAD_REQUEST, 'Username is not provided.');
     }
-    const profile = await ProfileService.getUsersProfile(params.identifier);
+    const profile = await ProfileService.getUsersProfile(params.identifier, req?.user ?? null);
 
     return res
       .status(HttpStatus.OK)

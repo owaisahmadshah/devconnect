@@ -3,6 +3,7 @@ import { HttpStatus, type TUserProfileResponse, type TUserProfileSummaryResponse
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
 import { UserService } from './user.service.js';
+import type { IRequestUser } from '../types/index.js';
 
 export class ProfileService {
   static async getUserProfile(userId: string): Promise<TUserProfileSummaryResponse> {
@@ -21,7 +22,10 @@ export class ProfileService {
 
     return profileRes;
   }
-  static async getUsersProfile(identifier: string): Promise<TUserProfileResponse> {
+  static async getUsersProfile(
+    identifier: string,
+    reqUser: IRequestUser | null,
+  ): Promise<TUserProfileResponse> {
     const user = await UserService.getUser(identifier);
 
     const profile = await Profile.findOne({ user: user._id }).populate({
@@ -35,6 +39,16 @@ export class ProfileService {
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
 
-    return responseProfile;
+    // If user is requesting his/her profile
+    if (reqUser?._id === user._id) {
+      return responseProfile;
+    }
+
+    // Removing all privates
+    const privateProfile = ProfileMapper.toFilterPrivateProfile(responseProfile);
+
+    // TODO: If user is not in connections filter connections-only
+
+    return privateProfile;
   }
 }

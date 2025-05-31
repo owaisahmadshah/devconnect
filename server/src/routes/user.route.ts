@@ -22,6 +22,7 @@ import {
   verifyOtpBodySchema,
   userProfileParamsSchema,
 } from '../schemas/user.js';
+import attachUser from '../middleware/attachUser.middleware.js';
 
 const router = Router();
 
@@ -41,6 +42,7 @@ router.post('/refresh-token', refreshAccessToken);
 router.get(
   '/profile/:identifier',
   validateSchema(userProfileParamsSchema),
+  attachUser, // User or null, authentication is'nt required.
   ProfileController.getUserProfile,
 );
 
