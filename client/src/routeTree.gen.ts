@@ -12,22 +12,16 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as userProfileImport } from './routes/(user)/profile'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authSigninImport } from './routes/(auth)/signin'
+import { Route as ProfileIdentifierRouteImport } from './routes/profile/$identifier/route'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const userProfileRoute = userProfileImport.update({
-  id: '/(user)/profile',
-  path: '/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -49,6 +43,12 @@ const authSigninRoute = authSigninImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ProfileIdentifierRouteRoute = ProfileIdentifierRouteImport.update({
+  id: '/profile/$identifier',
+  path: '/profile/$identifier',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -58,6 +58,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile/$identifier': {
+      id: '/profile/$identifier'
+      path: '/profile/$identifier'
+      fullPath: '/profile/$identifier'
+      preLoaderRoute: typeof ProfileIdentifierRouteImport
       parentRoute: typeof rootRoute
     }
     '/(auth)/signin': {
@@ -81,13 +88,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authVerifyOtpImport
       parentRoute: typeof rootRoute
     }
-    '/(user)/profile': {
-      id: '/(user)/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof userProfileImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -95,58 +95,63 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
-  '/profile': typeof userProfileRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
-  '/profile': typeof userProfileRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/(auth)/signin': typeof authSigninRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
-  '/(user)/profile': typeof userProfileRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/signin' | '/signup' | '/verify-otp' | '/profile'
+  fullPaths:
+    | '/'
+    | '/profile/$identifier'
+    | '/signin'
+    | '/signup'
+    | '/verify-otp'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signin' | '/signup' | '/verify-otp' | '/profile'
+  to: '/' | '/profile/$identifier' | '/signin' | '/signup' | '/verify-otp'
   id:
     | '__root__'
     | '/'
+    | '/profile/$identifier'
     | '/(auth)/signin'
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
-    | '/(user)/profile'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProfileIdentifierRouteRoute: typeof ProfileIdentifierRouteRoute
   authSigninRoute: typeof authSigninRoute
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
-  userProfileRoute: typeof userProfileRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProfileIdentifierRouteRoute: ProfileIdentifierRouteRoute,
   authSigninRoute: authSigninRoute,
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
-  userProfileRoute: userProfileRoute,
 }
 
 export const routeTree = rootRoute
@@ -160,14 +165,17 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/profile/$identifier",
         "/(auth)/signin",
         "/(auth)/signup",
-        "/(auth)/verify-otp",
-        "/(user)/profile"
+        "/(auth)/verify-otp"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/profile/$identifier": {
+      "filePath": "profile/$identifier/route.tsx"
     },
     "/(auth)/signin": {
       "filePath": "(auth)/signin.tsx"
@@ -177,9 +185,6 @@ export const routeTree = rootRoute
     },
     "/(auth)/verify-otp": {
       "filePath": "(auth)/verify-otp.tsx"
-    },
-    "/(user)/profile": {
-      "filePath": "(user)/profile.tsx"
     }
   }
 }

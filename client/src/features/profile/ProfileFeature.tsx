@@ -4,14 +4,14 @@ import { ProfileTemplate } from '@/components/templates/ProfileTemplate';
 import { type TUserProfileResponse } from 'shared';
 import { useProfile } from './hooks/useProfile';
 
-export const ProfileFeature = () => {
+export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   const [profile, setProfile] = useState<TUserProfileResponse>();
 
-  const { userProfile, error } = useProfile();
+  const { userProfile, error } = useProfile(identifier);
 
   useEffect(() => {
     if (error) {
-      throw new Error(error.message);
+      return;
     }
 
     setProfile(userProfile);
