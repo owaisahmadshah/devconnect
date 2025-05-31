@@ -1,5 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import * as profileService from '../services/profileService';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/store';
 
 export const useProfile = (identifier: string) => {
   const { data: userProfile, error } = useSuspenseQuery({
@@ -12,5 +14,9 @@ export const useProfile = (identifier: string) => {
     },
   });
 
-  return { userProfile, error };
+  const { isLoggedIn, user } = useSelector((state: RootState) => state.profileSummary);
+
+  const isCurrentUser = isLoggedIn && user?.username === identifier.trim();
+
+  return { userProfile, error, isCurrentUser };
 };

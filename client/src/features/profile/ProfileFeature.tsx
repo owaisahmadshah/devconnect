@@ -7,7 +7,7 @@ import { useProfile } from './hooks/useProfile';
 export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   const [profile, setProfile] = useState<TUserProfileResponse>();
 
-  const { userProfile, error } = useProfile(identifier);
+  const { userProfile, error, isCurrentUser } = useProfile(identifier);
 
   useEffect(() => {
     if (error) {
@@ -17,5 +17,5 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
     setProfile(userProfile);
   }, [userProfile, error]);
 
-  return <>{profile && <ProfileTemplate profile={profile} isCurrentUser={false} />}</>;
+  return <>{profile && <ProfileTemplate profile={profile} isCurrentUser={isCurrentUser} />}</>;
 };
