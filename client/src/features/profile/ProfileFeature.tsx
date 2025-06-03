@@ -9,7 +9,7 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
 
   const { userProfile, error, isCurrentUser } = useProfile.useProfile(identifier);
 
-  const { mutateAsync, isPending } = useProfile.useProfileArrayUpdate();
+  const { mutateAsync, isPending } = useProfile.useProfileArrayUpdate(setProfile);
 
   useEffect(() => {
     if (error) {

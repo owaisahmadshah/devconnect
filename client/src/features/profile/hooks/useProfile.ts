@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import * as profileService from '../services/profileService';
 import type { RootState } from '@/store/store';
-import type { TUserProfileUpdateArrayData } from 'shared';
+import type { TUserProfileResponse, TUserProfileUpdateArrayData } from 'shared';
 
 export const useProfile = (identifier: string) => {
   const { data: userProfile, error } = useSuspenseQuery({
@@ -23,9 +23,21 @@ export const useProfile = (identifier: string) => {
   return { userProfile, error, isCurrentUser };
 };
 
-export const useProfileArrayUpdate = () => {
+export const useProfileArrayUpdate = (
+  setProfile: React.Dispatch<React.SetStateAction<TUserProfileResponse | undefined>>,
+) => {
   return useMutation({
     mutationFn: (updateData: TUserProfileUpdateArrayData) =>
       profileService.addProfileArrayItemService(updateData),
+    onSuccess: (_, variables) => {
+      setProfile(prev => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          [variables.fieldName]: [...prev[variables.fieldName], variables.fieldData],
+        };
+      });
+    },
   });
 };

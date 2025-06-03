@@ -13,7 +13,12 @@ interface ProfileTemplateProps {
   isCurrentUser: boolean;
 }
 
-export const ProfileTemplate = ({ profile, isCurrentUser }: ProfileTemplateProps) => {
+export const ProfileTemplate = ({
+  onProfileArrayUpdate,
+  isPending,
+  profile,
+  isCurrentUser,
+}: ProfileTemplateProps) => {
   return (
     <div className="mx-auto min-h-screen md:w-10/12">
       <ProfileHeader
@@ -28,7 +33,12 @@ export const ProfileTemplate = ({ profile, isCurrentUser }: ProfileTemplateProps
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-6">
-            <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
+            <SkillsSection
+              onAddItem={onProfileArrayUpdate}
+              isLoading={isPending}
+              skills={profile.skills}
+              isCurrentUser={isCurrentUser}
+            />
 
             <AchievementsSection
               achievements={profile.achievements}
