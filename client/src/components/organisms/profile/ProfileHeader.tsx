@@ -38,7 +38,7 @@ export const ProfileHeader = ({
           />
           <div className="mt-4 text-center sm:mt-0 sm:text-left">
             <div className="flex items-center justify-center space-x-4 sm:justify-start">
-              <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
+              <h1 className="text-2xl font-bold">{fullName}</h1>
               {isEditable && (
                 <Button variant="ghost" size="icon" onClick={onEdit} className="h-8 w-8">
                   <Pencil className="h-4 w-4" />
