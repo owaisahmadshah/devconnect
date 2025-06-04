@@ -64,4 +64,23 @@ export class ProfileController {
       .status(HttpStatus.OK)
       .json(new ApiResponse(HttpStatus.OK, profile, 'Got user profile successfully.'));
   });
+
+  /**
+   * Retrieves user's profile.
+   *
+   * @route DELETE /api/v1/profile/remove-array-item
+   * @param {Request} req contains IRequestUser and TUserProfileDeleteArrayData
+   * @returns
+   */
+  static removeArrayItem = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
+    }
+
+    const updateData: TUserProfileUpdateArrayData = req.body;
+
+    await ProfileService.addArrayItem(updateData, req.user);
+
+    return res.status(HttpStatus.NO_CONTENT).end();
+  });
 }

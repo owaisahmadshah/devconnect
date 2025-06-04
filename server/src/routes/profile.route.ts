@@ -2,7 +2,10 @@ import { Router } from 'express';
 import auth from '../middleware/auth.middleware.js';
 import { ProfileController } from '../controllers/profile.controller.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
-import { userProfileUpdateArrayDataBodySchema } from '../schemas/profile.js';
+import {
+  userProfileDeleteArrayDataBodySchema,
+  userProfileUpdateArrayDataBodySchema,
+} from '../schemas/profile.js';
 import attachUser from '../middleware/attachUser.middleware.js';
 import { userProfileParamsSchema } from '../schemas/profile.js';
 
@@ -23,6 +26,12 @@ router.patch(
   validateSchema(userProfileUpdateArrayDataBodySchema),
   auth,
   ProfileController.addArrayItem,
+);
+router.delete(
+  '/remove-array-item',
+  validateSchema(userProfileDeleteArrayDataBodySchema),
+  auth,
+  ProfileController.removeArrayItem,
 );
 
 export default router;

@@ -117,6 +117,33 @@ export const userProfileUpdateArrayDataSchema = z.discriminatedUnion('fieldName'
   }),
 ]);
 
+export const userProfileDeleteArrayDataSchema = z.discriminatedUnion('fieldName', [
+  z.object({
+    fieldName: z.literal('skills'),
+    fieldDeleteObjectId: z.string(),
+  }),
+  z.object({
+    fieldName: z.literal('educations'),
+    fieldDeleteObjectId: z.string(),
+  }),
+  z.object({
+    fieldName: z.literal('certifications'),
+    fieldDeleteObjectId: z.string(),
+  }),
+  z.object({
+    fieldName: z.literal('achievements'),
+    fieldDeleteObjectId: z.string(),
+  }),
+  z.object({
+    fieldName: z.literal('experiences'),
+    fieldDeleteObjectId: z.string(),
+  }),
+  z.object({
+    fieldName: z.literal('socialMediaLinks'),
+    fieldDeleteObjectId: z.string(),
+  }),
+]);
+
 // Export typescript types from schemas
 export type TSkill = z.infer<typeof skillSchema>;
 export type TEducation = z.infer<typeof educationSchema>;
@@ -129,6 +156,7 @@ export type TVisibilty = z.infer<typeof visibilitySchema>;
 export type TProfile = z.infer<typeof profileSchema>;
 export type TUserProfileParams = z.infer<typeof userProfileParamsSchema>;
 export type TUserProfileUpdateArrayData = z.infer<typeof userProfileUpdateArrayDataSchema>;
+export type TUserProfileDeleteArrayData = z.infer<typeof userProfileDeleteArrayDataSchema>;
 
 // User profile summary light weight response
 export const userProfileSummarySchema = z.object({

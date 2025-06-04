@@ -1,6 +1,7 @@
 import { Profile } from '../models/profile.model.js';
 import {
   HttpStatus,
+  type TUserProfileDeleteArrayData,
   type TUserProfileResponse,
   type TUserProfileSummaryResponse,
   type TUserProfileUpdateArrayData,
@@ -75,6 +76,29 @@ export class ProfileService {
     await profile.save();
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
+    return responseProfile;
+  }
+
+  static async removeArrayItem(
+    removeData: TUserProfileDeleteArrayData,
+    user: IRequestUser,
+  ): Promise<TUserProfileResponse> {
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (!profile) {
+      throw new ApiError(404, 'Profile not found.');
+    }
+
+    const { fieldName, fieldDeleteObjectId } = removeData;
+
+    (profile as any)[fieldName] = (profile as any)[fieldName].filter(
+      (field: any) => field._id !== fieldDeleteObjectId,
+    );
+
+    await profile.save();
+
+    const responseProfile = ProfileMapper.toUserProfile(profile);
+
     return responseProfile;
   }
 }
