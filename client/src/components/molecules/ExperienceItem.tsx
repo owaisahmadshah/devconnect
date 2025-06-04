@@ -1,8 +1,8 @@
 import { getDateRange, getDuration } from '@/lib/dateUtils';
 import { MdEdit, MdLocationOn, MdCalendarToday } from 'react-icons/md';
-import { type TExperience } from 'shared';
+import { type TExperienceWithId } from 'shared';
 
-interface ExperienceItemProps extends TExperience {
+interface ExperienceItemProps extends Partial<TExperienceWithId> {
   onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
@@ -33,8 +33,8 @@ export const ExperienceItem = ({
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-1">
             <MdCalendarToday size={16} />
-            <span>{getDateRange(started, ended)}</span>
-            {getDuration(started, ended) && <span>· {getDuration(started, ended)}</span>}
+            <span>{getDateRange(started!, ended!)}</span>
+            {getDuration(started!, ended!) && <span>· {getDuration(started!, ended!)}</span>}
           </div>
 
           {location && (

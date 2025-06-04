@@ -1,4 +1,4 @@
-import { type TEducation } from 'shared';
+import { type TEducationWithId } from 'shared';
 import { Button } from '../../ui/button';
 import { EducationItem } from '../../molecules/EducationItem';
 import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
@@ -6,7 +6,7 @@ import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
 interface EducationSectionProps {
   onItemAction?: () => Promise<void>;
   onAddItem?: () => Promise<void>;
-  educations: TEducation[];
+  educations: TEducationWithId[];
   isCurrentUser: boolean;
 }
 

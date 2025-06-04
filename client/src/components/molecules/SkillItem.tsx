@@ -2,9 +2,9 @@ import { cn } from '@/lib/utils';
 import { IoPeople } from 'react-icons/io5';
 import { MdEdit } from 'react-icons/md';
 
-import type { TSkill } from 'shared';
+import type { TSkillWithId } from 'shared';
 
-interface SkillItemProps extends TSkill {
+interface SkillItemProps extends Partial<TSkillWithId> {
   onAction?: () => Promise<void>;
   isCurrentUser: boolean;
   className: string;
@@ -31,7 +31,7 @@ export const SkillItem = ({
             <IoPeople />
             Endorsements
           </p>
-          <p>{endorsements.length === 0 ? '' : endorsements.length}</p>
+          <p>{endorsements!.length === 0 ? '' : endorsements!.length}</p>
           {/* TODO: Show all the user who have given endorsements */}
         </div>
       </div>

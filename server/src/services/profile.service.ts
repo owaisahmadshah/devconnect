@@ -1,10 +1,10 @@
 import { Profile } from '../models/profile.model.js';
 import {
   HttpStatus,
-  type TUserProfileDeleteArrayData,
+  type TDeleteProfileArrayItem,
   type TUserProfileResponse,
   type TUserProfileSummaryResponse,
-  type TUserProfileUpdateArrayData,
+  type TAddProfileArrayField,
 } from 'shared';
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
@@ -59,7 +59,7 @@ export class ProfileService {
   }
 
   static async addArrayItem(
-    updateData: TUserProfileUpdateArrayData,
+    updateData: TAddProfileArrayField,
     user: IRequestUser,
   ): Promise<TUserProfileResponse> {
     const { fieldName, fieldData } = updateData;
@@ -80,7 +80,7 @@ export class ProfileService {
   }
 
   static async removeArrayItem(
-    removeData: TUserProfileDeleteArrayData,
+    removeData: TDeleteProfileArrayItem,
     user: IRequestUser,
   ): Promise<TUserProfileResponse> {
     const profile = await Profile.findOne({ user: user._id });
@@ -89,10 +89,10 @@ export class ProfileService {
       throw new ApiError(404, 'Profile not found.');
     }
 
-    const { fieldName, fieldDeleteObjectId } = removeData;
+    const { fieldName, deleteObjectId } = removeData;
 
     (profile as any)[fieldName] = (profile as any)[fieldName].filter(
-      (field: any) => field._id !== fieldDeleteObjectId,
+      (field: any) => field._id !== deleteObjectId,
     );
 
     await profile.save();

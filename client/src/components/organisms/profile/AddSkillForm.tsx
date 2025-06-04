@@ -12,17 +12,17 @@ import {
 } from '@/components/ui/select';
 import FormField from '@/components/molecules/FormField';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
-import { userProfileUpdateArrayDataSchema, type TUserProfileUpdateArrayData } from 'shared';
+import { addProfileArrayFieldSchema, type TAddProfileArrayField } from 'shared';
 
 interface SkillsSectionProps {
   onItemAction?: () => Promise<void>;
-  onAddItem: (updateData: TUserProfileUpdateArrayData) => Promise<void>;
+  onAddItem: (updateData: TAddProfileArrayField) => Promise<void>;
   isLoading?: boolean;
 }
 
 export const AddSkillForm = ({ onAddItem, isLoading }: SkillsSectionProps) => {
-  const form = useForm<TUserProfileUpdateArrayData>({
-    resolver: zodResolver(userProfileUpdateArrayDataSchema),
+  const form = useForm<TAddProfileArrayField>({
+    resolver: zodResolver(addProfileArrayFieldSchema),
     defaultValues: {
       fieldName: 'skills',
       fieldData: {
@@ -33,7 +33,7 @@ export const AddSkillForm = ({ onAddItem, isLoading }: SkillsSectionProps) => {
     },
   });
 
-  const onSubmit = async (data: TUserProfileUpdateArrayData) => {
+  const onSubmit = async (data: TAddProfileArrayField) => {
     await onAddItem(data);
     form.reset();
   };

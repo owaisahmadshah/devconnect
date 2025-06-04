@@ -1,13 +1,12 @@
 import {
-  userProfileSummarySchema,
-  type TProfile,
+  type TBaseProfile,
   type TUserProfileResponse,
   type TUserProfileSummaryResponse,
 } from 'shared';
 import { Document } from 'mongoose';
 
 export class ProfileMapper {
-  static toUserProfileSummary(profileData: TProfile | Document): TUserProfileSummaryResponse {
+  static toUserProfileSummary(profileData: TBaseProfile | Document): TUserProfileSummaryResponse {
     const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
     return {
       _id: profileObj._id,
@@ -22,7 +21,7 @@ export class ProfileMapper {
     };
   }
 
-  static toUserProfile(profileData: TProfile | Document): TUserProfileResponse {
+  static toUserProfile(profileData: TBaseProfile | Document): TUserProfileResponse {
     const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
     return {
       _id: profileObj._id,
@@ -65,7 +64,6 @@ export class ProfileMapper {
   }
 
   static toFilterConnectionsOnlyProfile(profileData: TUserProfileResponse): TUserProfileResponse {
-    // const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
     const profileObj = profileData;
 
     const educations =

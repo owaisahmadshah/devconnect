@@ -1,9 +1,9 @@
 import { MdEdit, MdEmojiEvents, MdCalendarToday } from 'react-icons/md';
 
-import { type TAchievement } from 'shared';
+import { type TAchievementWithId } from 'shared';
 import { formatDate } from '@/lib/dateUtils';
 
-interface AchievementItemProps extends TAchievement {
+interface AchievementItemProps extends Partial<TAchievementWithId> {
   onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }

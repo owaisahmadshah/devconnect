@@ -1,8 +1,8 @@
 import { formatDate } from '@/lib/dateUtils';
 import { MdEdit, MdVerified, MdOpenInNew } from 'react-icons/md';
-import { type TCertification } from 'shared';
+import { type TCertificationWithId } from 'shared';
 
-interface CertificationItemProps extends TCertification {
+interface CertificationItemProps extends Partial<TCertificationWithId> {
   onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
@@ -27,7 +27,7 @@ export const CertificationItem = ({
         <div className="flex items-center gap-4 text-sm text-gray-600">
           <div className="flex items-center gap-1">
             <MdVerified className="text-blue-500" />
-            <span>Issued {formatDate(issuedDate)}</span>
+            <span>Issued {formatDate(issuedDate!)}</span>
           </div>
 
           {credentials && (

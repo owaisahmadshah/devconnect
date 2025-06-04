@@ -1,12 +1,7 @@
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ProfileService } from '../services/profile.service.js';
-import {
-  HttpStatus,
-  type TUserProfileDeleteArrayData,
-  type TUserProfileParams,
-  type TUserProfileUpdateArrayData,
-} from 'shared';
+import { HttpStatus, type TDeleteProfileArrayItem, type TAddProfileArrayField } from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 
@@ -61,7 +56,7 @@ export class ProfileController {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
-    const updateData: TUserProfileUpdateArrayData = req.body;
+    const updateData: TAddProfileArrayField = req.body;
 
     const profile = await ProfileService.addArrayItem(updateData, req.user);
 
@@ -74,7 +69,7 @@ export class ProfileController {
    * Retrieves user's profile.
    *
    * @route DELETE /api/v1/profile/remove-array-item
-   * @param {Request} req contains IRequestUser and TUserProfileDeleteArrayData
+   * @param {Request} req contains IRequestUser and TDeleteProfileArrayItem
    * @returns
    */
   static removeArrayItem = asyncHandler(async (req: Request, res: Response) => {
@@ -82,7 +77,7 @@ export class ProfileController {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
-    const updateData: TUserProfileDeleteArrayData = req.query as TUserProfileDeleteArrayData;
+    const updateData: TDeleteProfileArrayItem = req.query as TDeleteProfileArrayItem;
 
     await ProfileService.removeArrayItem(updateData, req.user);
 

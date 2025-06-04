@@ -1,4 +1,4 @@
-import { type TCertification } from 'shared';
+import { type TCertificationWithId } from 'shared';
 import { Button } from '../../ui/button';
 import { CertificationItem } from '../../molecules/CertificationItem';
 import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
@@ -6,7 +6,7 @@ import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
 interface EducationSectionProps {
   onItemAction?: () => Promise<void>;
   onAddItem?: () => Promise<void>;
-  certificates: TCertification[];
+  certificates: TCertificationWithId[];
   isCurrentUser: boolean;
 }
 

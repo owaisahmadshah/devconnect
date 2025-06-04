@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 import {
-  userProfileUpdateArrayDataSchema,
+  addProfileArrayFieldSchema,
   userProfileParamsSchema as uPPS,
-  userProfileDeleteArrayDataSchema,
+  deleteProfileArrayItemSchema,
 } from 'shared';
 
 export const userProfileUpdateArrayDataBodySchema = z.object({
-  body: userProfileUpdateArrayDataSchema,
+  body: addProfileArrayFieldSchema,
 });
 
 export const userProfileParamsSchema = z.object({
@@ -15,5 +15,5 @@ export const userProfileParamsSchema = z.object({
 });
 
 export const userProfileDeleteArrayDataBodySchema = z.object({
-  query: userProfileDeleteArrayDataSchema,
+  query: deleteProfileArrayItemSchema,
 });

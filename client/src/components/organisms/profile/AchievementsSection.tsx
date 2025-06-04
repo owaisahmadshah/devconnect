@@ -1,4 +1,4 @@
-import { type TAchievement } from 'shared';
+import { type TAchievementWithId } from 'shared';
 import { Button } from '../../ui/button';
 import { Plus } from 'lucide-react';
 import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
@@ -7,7 +7,7 @@ import { AchievementItem } from '../../molecules/AchievementItem';
 interface AchievementsSectionProps {
   onItemAction?: () => Promise<void>;
   onAddAchievement?: () => void;
-  achievements: TAchievement[];
+  achievements: TAchievementWithId[];
   isCurrentUser: boolean;
 }
 
@@ -31,16 +31,17 @@ export const AchievementsSection = ({
       )}
       <div className="flex flex-col gap-4">
         {achievements.map((achievement, index) => (
-            <AchievementItem
-              key={index}
-              onAction={onItemAction}
-              title={achievement.title}
-              awardedBy={achievement.awardedBy}
-              description={achievement.description}
-              date={achievement.date}
-              isCurrentUser={isCurrentUser}
-            />
-          ))}
+          <AchievementItem
+            key={index}
+            onAction={onItemAction}
+            title={achievement.title}
+            awardedBy={achievement.awardedBy}
+            description={achievement.description}
+            date={achievement.date}
+            _id={achievement._id}
+            isCurrentUser={isCurrentUser}
+          />
+        ))}
       </div>
     </ProfileSectionCard>
   );

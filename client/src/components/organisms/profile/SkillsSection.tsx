@@ -1,13 +1,13 @@
-import { type TSkill, type TUserProfileUpdateArrayData } from 'shared';
+import { type TSkillWithId, type TAddProfileArrayField } from 'shared';
 import { SkillItem } from '../../molecules/SkillItem';
 import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
 import { AddSkillForm } from './AddSkillForm';
 
 interface SkillsSectionProps {
   onItemAction?: () => Promise<void>;
-  onAddItem: (updateData: TUserProfileUpdateArrayData) => Promise<void>;
+  onAddItem: (updateData: TAddProfileArrayField) => Promise<void>;
   isLoading?: boolean;
-  skills: TSkill[];
+  skills: TSkillWithId[];
   isCurrentUser: boolean;
 }
 

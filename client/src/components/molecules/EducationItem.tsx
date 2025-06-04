@@ -1,8 +1,8 @@
 import { getDateRange } from '@/lib/dateUtils';
 import { MdEdit, MdCalendarToday } from 'react-icons/md';
-import { type TEducation } from 'shared';
+import { type TEducationWithId } from 'shared';
 
-interface EducationItemProps extends TEducation {
+interface EducationItemProps extends Partial<TEducationWithId> {
   onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
@@ -27,7 +27,7 @@ export const EducationItem = ({
 
         <div className="flex items-center gap-2 text-sm">
           <MdCalendarToday size={16} />
-          <span>{getDateRange(started, ended)}</span>
+          <span>{getDateRange(started!, ended!)}</span>
         </div>
       </div>
 

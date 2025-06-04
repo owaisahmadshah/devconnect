@@ -1,11 +1,11 @@
-import { type TExperience } from 'shared';
+import { type TExperienceWithId } from 'shared';
 import { ExperienceItem } from '../../molecules/ExperienceItem';
 import { Button } from '../../ui/button';
 import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
 
 interface ExperienceSectionProps {
   onItemAction?: () => Promise<void>;
-  experiences: TExperience[];
+  experiences: TExperienceWithId[];
   isCurrentUser: boolean;
 }
 
