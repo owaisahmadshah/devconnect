@@ -3,7 +3,11 @@ import { useSelector } from 'react-redux';
 
 import * as profileService from '../services/profileService';
 import type { RootState } from '@/store/store';
-import type { TUserProfileResponse, TUserProfileUpdateArrayData } from 'shared';
+import type {
+  TUserProfileDeleteArrayData,
+  TUserProfileResponse,
+  TUserProfileUpdateArrayData,
+} from 'shared';
 
 export const useProfile = (identifier: string) => {
   const { data: userProfile, error } = useSuspenseQuery({
@@ -36,6 +40,27 @@ export const useProfileArrayUpdate = (
         return {
           ...prev,
           [variables.fieldName]: [...prev[variables.fieldName], variables.fieldData],
+        };
+      });
+    },
+  });
+};
+
+export const useProfileArrayDelete = (
+  setProfile: React.Dispatch<React.SetStateAction<TUserProfileResponse | undefined>>,
+) => {
+  return useMutation({
+    mutationFn: (deleteData: TUserProfileDeleteArrayData) =>
+      profileService.removeProfileArrayItemService(deleteData),
+    onSuccess: (_, variables) => {
+      setProfile(prev => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          [variables.fieldName]: prev[variables.fieldName].filter(
+            field => field._id !== variables.fieldDeleteObjectId,
+          ),
         };
       });
     },
