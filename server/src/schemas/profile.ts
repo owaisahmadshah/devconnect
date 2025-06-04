@@ -15,5 +15,5 @@ export const userProfileParamsSchema = z.object({
 });
 
 export const userProfileDeleteArrayDataBodySchema = z.object({
-  body: userProfileDeleteArrayDataSchema,
+  query: userProfileDeleteArrayDataSchema,
 });
