@@ -5,7 +5,8 @@
   "scripts": {
     "dev:client": "pnpm --filter frontend dev",
     "dev:server": "pnpm --filter backend dev",
-    "dev": "pnpm run -r dev",
+    "dev:shared:barrels": "pnpm --filter shared run barrels:watch",
+    "dev": "pnpm run dev:shared:barrels & pnpm run -r dev",
     "build": "pnpm --filter frontend build && pnpm --filter backend build",
     "lint": "pnpm --filter frontend lint && pnpm --filter backend lint"
   },

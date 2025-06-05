@@ -1,0 +1,6 @@
+{
+  "directory": "src",
+  "delete": true,
+  "barrelName": "index.ts",
+  "structure": "flat"
+}

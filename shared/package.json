@@ -6,7 +6,14 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "barrels": "barrelsby --config ./barrelsby.json",
+    "barrels:watch": "barrelsby --config ./barrelsby.json --watch"
+  },
   "dependencies": {
     "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "barrelsby": "^2.8.1"
   }
 }
