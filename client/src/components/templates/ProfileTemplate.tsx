@@ -4,10 +4,11 @@ import { AchievementsSection } from '../organisms/profile/AchievementsSection';
 import { CertificationSection } from '../organisms/profile/CertificationSection';
 import { EducationSection } from '../organisms/profile/EducationSection';
 import { ExperienceSection } from '../organisms/profile/ExperienceSection';
-import type { TUserProfileResponse, TUserProfileUpdateArrayData } from 'shared';
+import type { TUserProfileResponse, TAddProfileArrayField, TDeleteProfileArrayItem } from 'shared';
 
 interface ProfileTemplateProps {
-  onProfileArrayUpdate: (updateData: TUserProfileUpdateArrayData) => Promise<void>;
+  onProfileArrayUpdate: (updateData: TAddProfileArrayField) => Promise<void>;
+  onProfileArrayDelete: (deleteData: TDeleteProfileArrayItem) => Promise<void>;
   isPending: boolean;
   profile: TUserProfileResponse;
   isCurrentUser: boolean;
@@ -15,6 +16,7 @@ interface ProfileTemplateProps {
 
 export const ProfileTemplate = ({
   onProfileArrayUpdate,
+  onProfileArrayDelete,
   isPending,
   profile,
   isCurrentUser,
@@ -35,6 +37,7 @@ export const ProfileTemplate = ({
           <div className="space-y-6">
             <SkillsSection
               onAddItem={onProfileArrayUpdate}
+              onDeleteItem={onProfileArrayDelete}
               isLoading={isPending}
               skills={profile.skills}
               isCurrentUser={isCurrentUser}

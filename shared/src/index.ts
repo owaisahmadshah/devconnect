@@ -11,6 +11,7 @@ export * from "./schemas/profile/params";
 export * from "./schemas/profile/profile";
 export * from "./schemas/profile/profileArrayField";
 export * from "./schemas/profile/profileResponse";
+export * from "./schemas/profile/profileUrls";
 export * from "./schemas/profile/skill";
 export * from "./schemas/profile/socialMediaLink";
 export * from "./schemas/profile/visibility";

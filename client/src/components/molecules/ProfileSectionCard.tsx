@@ -4,20 +4,25 @@ interface ProfileSectionCardProps {
   title: string;
   children: React.ReactNode;
   className?: string;
-  actionChildren?: React.ReactNode;
+  actionAddChild?: React.ReactNode;
+  actionEditChildren?: React.ReactNode;
 }
 
 export const ProfileSectionCard = ({
   title,
   children,
   className = '',
-  actionChildren,
+  actionAddChild,
+  actionEditChildren,
 }: ProfileSectionCardProps) => {
   return (
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle>{title}</CardTitle>
-        {actionChildren && <div>{actionChildren}</div>}
+        <div className="flex gap-3">
+          {actionAddChild && <span>{actionAddChild}</span>}
+          {actionEditChildren && <span>{actionEditChildren}</span>}
+        </div>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

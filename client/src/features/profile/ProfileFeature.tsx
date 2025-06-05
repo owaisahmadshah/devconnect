@@ -11,6 +11,8 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
 
   const { mutateAsync, isPending } = useProfile.useProfileArrayUpdate(setProfile);
 
+  const profileArrayDelete = useProfile.useProfileArrayDelete(setProfile);
+
   useEffect(() => {
     if (error) {
       return;
@@ -24,6 +26,7 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
       {profile && (
         <ProfileTemplate
           onProfileArrayUpdate={mutateAsync}
+          onProfileArrayDelete={profileArrayDelete.mutateAsync}
           isPending={isPending}
           profile={profile}
           isCurrentUser={isCurrentUser}

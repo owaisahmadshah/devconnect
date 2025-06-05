@@ -1,11 +1,12 @@
 import { z } from 'zod';
-import { createSkillSchema } from './skill';
-import { createEducationSchema } from './education';
-import { createCertificationSchema } from './certification';
-import { createAchievementSchema } from './achievement';
-import { createExperienceSchema } from './experience';
-import { createVisibilitySchema } from './visibility';
-import { createSocialMediaLinkSchema } from './socialMediaLink';
+import { skillWithIdSchema } from './skill';
+import { educationWithIdSchema } from './education';
+import { certificationWithIdSchema } from './certification';
+import { achievementWithIdSchema } from './achievement';
+import { experienceWithIdSchema } from './experience';
+import { fullVisibilitySchema } from './visibility';
+import { socialMediaLinkWithIdSchema } from './socialMediaLink';
+import { profileUrlsWithIdSchema } from './profileUrls';
 
 // Main profile schema combining all pieces together
 export const baseProfileSchema = z.object({
@@ -14,14 +15,14 @@ export const baseProfileSchema = z.object({
   phoneNumber: z.string(),
   profilePictureUrl: z.string(),
   bio: z.string(),
-  skills: z.array(createSkillSchema),
-  educations: z.array(createEducationSchema),
-  certifications: z.array(createCertificationSchema),
-  achievements: z.array(createAchievementSchema),
-  experiences: z.array(createExperienceSchema),
-  visibility: createVisibilitySchema,
-  profileUrls: z.array(z.string()),
-  socialMediaLinks: z.array(createSocialMediaLinkSchema),
+  skills: z.array(skillWithIdSchema),
+  educations: z.array(educationWithIdSchema),
+  certifications: z.array(certificationWithIdSchema),
+  achievements: z.array(achievementWithIdSchema),
+  experiences: z.array(experienceWithIdSchema),
+  visibility: fullVisibilitySchema,
+  profileUrls: z.array(profileUrlsWithIdSchema),
+  socialMediaLinks: z.array(socialMediaLinkWithIdSchema),
   isVerified: z.boolean(),
 });
 
