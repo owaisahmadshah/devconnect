@@ -1,13 +1,12 @@
 import { IoPeople } from 'react-icons/io5';
 import { MdDelete } from 'react-icons/md';
-import { useState } from 'react';
 
-import type { TDeleteProfileArrayItem, TSkillWithId } from 'shared';
+import type { TSkillWithId } from 'shared';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
+import { Button } from '../../../../components/ui/button';
+import { useProfileArrayDelete } from '../../hooks/useProfile';
 
 interface SkillItemProps extends Partial<TSkillWithId> {
-  onArrayItemDelete?: (deleteData: TDeleteProfileArrayItem) => Promise<void>;
   isCurrentUser: boolean;
   className: string;
   isEditable: boolean;
@@ -15,7 +14,6 @@ interface SkillItemProps extends Partial<TSkillWithId> {
 
 export const SkillItem = ({
   _id,
-  onArrayItemDelete,
   skillName,
   skillProficiency,
   endorsements,
@@ -23,14 +21,10 @@ export const SkillItem = ({
   className = '',
   isEditable = false,
 }: SkillItemProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutateAsync, isPending } = useProfileArrayDelete();
 
   const handleDeleteItem = async () => {
-    if (!onArrayItemDelete) return;
-    setIsLoading(true);
-    const response = await onArrayItemDelete({ fieldName: 'skills', deleteObjectId: _id! });
-    console.log(response);
-    setIsLoading(false);
+    await mutateAsync({ fieldName: 'skills', deleteObjectId: _id as string });
   };
 
   return (
@@ -57,8 +51,8 @@ export const SkillItem = ({
       {/* If the user is signed and looking at his own profile then he can perfom action on his profile */}
       {isCurrentUser && isEditable && (
         <div className="flex gap-2">
-          <Button variant={'ghost'} size={'icon'} onClick={handleDeleteItem} disabled={isLoading}>
-            {isLoading ? '...' : <MdDelete />}
+          <Button variant={'ghost'} size={'icon'} onClick={handleDeleteItem} disabled={isPending}>
+            {isPending ? '...' : <MdDelete />}
           </Button>
         </div>
       )}

@@ -13,14 +13,11 @@ import {
 import FormField from '@/components/molecules/FormField';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
 import { addProfileArrayFieldSchema, type TAddProfileArrayField } from 'shared';
+import { useProfileArrayUpdate } from '../../hooks/useProfile';
 
-interface SkillsSectionProps {
-  onItemAction?: () => Promise<void>;
-  onAddItem: (updateData: TAddProfileArrayField) => Promise<void>;
-  isLoading?: boolean;
-}
+export const AddSkillForm = () => {
+  const { mutateAsync, isPending } = useProfileArrayUpdate();
 
-export const AddSkillForm = ({ onAddItem, isLoading }: SkillsSectionProps) => {
   const form = useForm<TAddProfileArrayField>({
     resolver: zodResolver(addProfileArrayFieldSchema),
     defaultValues: {
@@ -34,7 +31,7 @@ export const AddSkillForm = ({ onAddItem, isLoading }: SkillsSectionProps) => {
   });
 
   const onSubmit = async (data: TAddProfileArrayField) => {
-    await onAddItem(data);
+    await mutateAsync(data);
     form.reset();
   };
 
@@ -63,7 +60,7 @@ export const AddSkillForm = ({ onAddItem, isLoading }: SkillsSectionProps) => {
               <SelectItem value="Advanced">Advanced</SelectItem>
             </SelectContent>
           </Select>
-          <SubmitButton isLoading={isLoading}>Save</SubmitButton>
+          <SubmitButton isLoading={isPending}>Save</SubmitButton>
         </form>
       </Form>
     </DynamicDialogWithHeaderAction>

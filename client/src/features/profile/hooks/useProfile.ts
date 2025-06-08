@@ -1,11 +1,19 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import * as profileService from '../services/profileService';
 import type { RootState } from '@/store/store';
-import type { TAddProfileArrayField, TDeleteProfileArrayItem, TUserProfileResponse } from 'shared';
+import type { TAddProfileArrayField, TDeleteProfileArrayItem } from 'shared';
+import {
+  addArrayItemToProfile,
+  deleteArrayItemProfile,
+  setProfile,
+} from '@/store/profile/profileSlice';
+import { useEffect } from 'react';
 
 export const useProfile = (identifier: string) => {
+  const dispatch = useDispatch();
+
   const { data: userProfile, error } = useSuspenseQuery({
     queryKey: ['profile', identifier] as const,
     queryFn: async () => {
@@ -20,45 +28,35 @@ export const useProfile = (identifier: string) => {
 
   const isCurrentUser = isLoggedIn && user?.username === identifier.trim();
 
+  // Dispatch to Redux once data is available
+  useEffect(() => {
+    if (userProfile) {
+      dispatch(setProfile({ profile: userProfile, isCurrentUser }));
+    }
+  }, [userProfile, isCurrentUser, dispatch]);
+
   return { userProfile, error, isCurrentUser };
 };
 
-export const useProfileArrayUpdate = (
-  setProfile: React.Dispatch<React.SetStateAction<TUserProfileResponse | undefined>>,
-) => {
+export const useProfileArrayUpdate = () => {
+  const dispatch = useDispatch();
   return useMutation({
     mutationFn: (updateData: TAddProfileArrayField) =>
       profileService.addProfileArrayItemService(updateData),
-    onSuccess: (_, variables) => {
-      setProfile(prev => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          [variables.fieldName]: [...prev[variables.fieldName], variables.fieldData],
-        };
-      });
+    onSuccess: (data, variables) => {
+      dispatch(addArrayItemToProfile({ fieldName: variables.fieldName, fieldData: data.data }));
     },
   });
 };
 
-export const useProfileArrayDelete = (
-  setProfile: React.Dispatch<React.SetStateAction<TUserProfileResponse | undefined>>,
-) => {
+export const useProfileArrayDelete = () => {
+  const dispatch = useDispatch();
+
   return useMutation({
     mutationFn: (deleteData: TDeleteProfileArrayItem) =>
       profileService.removeProfileArrayItemService(deleteData),
     onSuccess: (_, variables) => {
-      setProfile(prev => {
-        if (!prev) return prev;
-
-        return {
-          ...prev,
-          [variables.fieldName]: prev[variables.fieldName].filter(
-            field => field._id !== variables.deleteObjectId,
-          ),
-        };
-      });
+      dispatch(deleteArrayItemProfile(variables));
     },
   });
 };

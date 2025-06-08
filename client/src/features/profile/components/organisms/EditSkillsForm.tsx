@@ -1,14 +1,13 @@
 import { DynamicDialogWithHeaderAction } from '@/components/molecules/DynamicDialogWithHeaderAction';
-import { SkillItem } from '@/components/molecules/SkillItem';
-import type { TDeleteProfileArrayItem, TSkillWithId } from 'shared';
+import { SkillItem } from '@/features/profile/components/molecules/SkillItem';
+import type { TSkillWithId } from 'shared';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface EditSkillFormProps {
   skills: TSkillWithId[];
-  onArrayItemDelete: (deleteData: TDeleteProfileArrayItem) => Promise<void>;
 }
 
-export const EditSkillForm = ({ skills, onArrayItemDelete }: EditSkillFormProps) => {
+export const EditSkillForm = ({ skills }: EditSkillFormProps) => {
   return (
     <DynamicDialogWithHeaderAction
       title="Edit Skills"
@@ -19,7 +18,6 @@ export const EditSkillForm = ({ skills, onArrayItemDelete }: EditSkillFormProps)
         {skills.map((skill, index) => (
           <SkillItem
             _id={skill._id}
-            onArrayItemDelete={onArrayItemDelete}
             key={index}
             skillName={skill.skillName}
             endorsements={skill.endorsements}

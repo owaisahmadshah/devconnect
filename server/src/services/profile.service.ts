@@ -5,6 +5,7 @@ import {
   type TUserProfileResponse,
   type TUserProfileSummaryResponse,
   type TAddProfileArrayField,
+  type TAddNewItemToProfileWithIdResponse,
 } from 'shared';
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
@@ -61,7 +62,7 @@ export class ProfileService {
   static async addArrayItem(
     updateData: TAddProfileArrayField,
     user: IRequestUser,
-  ): Promise<TUserProfileResponse> {
+  ): Promise<TAddNewItemToProfileWithIdResponse> {
     const { fieldName, fieldData } = updateData;
 
     const profile = await Profile.findOne({ user: user._id });
@@ -71,12 +72,12 @@ export class ProfileService {
     }
 
     // Add item to array
-    (profile as any)[fieldName].push(fieldData);
+    (profile as any)[fieldName].unshift(fieldData);
 
     await profile.save();
 
-    const responseProfile = ProfileMapper.toUserProfile(profile);
-    return responseProfile;
+    const newlyAddedItem: TAddNewItemToProfileWithIdResponse = (profile as any)[fieldName][0];
+    return newlyAddedItem;
   }
 
   static async removeArrayItem(
@@ -92,7 +93,7 @@ export class ProfileService {
     const { fieldName, deleteObjectId } = removeData;
 
     (profile as any)[fieldName] = (profile as any)[fieldName].filter(
-      (field: any) => field._id !== deleteObjectId,
+      (field: any) => String(field._id) !== String(deleteObjectId),
     );
 
     await profile.save();

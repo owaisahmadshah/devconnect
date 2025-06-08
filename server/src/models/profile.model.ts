@@ -1,8 +1,8 @@
 import { Document, model, Schema } from 'mongoose';
 
-import type { TProfile } from 'shared';
+import type { TBaseProfile } from 'shared';
 
-export interface IProfile extends Document, TProfile {
+export interface IProfile extends Document, TBaseProfile {
   user: Schema.Types.ObjectId;
 }
 
