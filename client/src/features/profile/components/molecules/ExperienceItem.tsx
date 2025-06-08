@@ -3,12 +3,10 @@ import { MdEdit, MdLocationOn, MdCalendarToday } from 'react-icons/md';
 import { type TExperienceWithId } from 'shared';
 
 interface ExperienceItemProps extends Partial<TExperienceWithId> {
-  onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
 
 export const ExperienceItem = ({
-  onAction,
   type,
   description,
   role,
@@ -68,7 +66,7 @@ export const ExperienceItem = ({
       {/* Edit button for current user */}
       {isCurrentUser && (
         <div className="ml-4 flex-shrink-0">
-          <span onClick={onAction} className="hover: cursor-pointer transition-colors">
+          <span className="hover: cursor-pointer transition-colors">
             <MdEdit size={20} />
           </span>
         </div>

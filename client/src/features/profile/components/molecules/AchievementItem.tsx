@@ -4,12 +4,11 @@ import { type TAchievementWithId } from 'shared';
 import { formatDate } from '@/lib/dateUtils';
 
 interface AchievementItemProps extends Partial<TAchievementWithId> {
-  onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
 
 export const AchievementItem = ({
-  onAction,
+  _id,
   title,
   awardedBy,
   description,
@@ -47,7 +46,7 @@ export const AchievementItem = ({
       {/* Edit button for current user */}
       {isCurrentUser && (
         <div className="ml-4 flex-shrink-0">
-          <span onClick={onAction} className="cursor-pointer transition-colors hover:text-gray-600">
+          <span className="cursor-pointer transition-colors hover:text-gray-600">
             <MdEdit size={20} />
           </span>
         </div>

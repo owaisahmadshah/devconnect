@@ -1,39 +1,26 @@
 import { type TAchievementWithId } from 'shared';
-import { Button } from '../../ui/button';
+import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { ProfileSectionCard } from '../../molecules/ProfileSectionCard';
-import { AchievementItem } from '../../molecules/AchievementItem';
+import { ProfileSectionCard } from '../molecules/ProfileSectionCard';
+import { AchievementItem } from '../molecules/AchievementItem';
 
 interface AchievementsSectionProps {
-  onItemAction?: () => Promise<void>;
-  onAddAchievement?: () => void;
   achievements: TAchievementWithId[];
   isCurrentUser: boolean;
 }
 
-export const AchievementsSection = ({
-  onItemAction,
-  onAddAchievement,
-  achievements,
-  isCurrentUser,
-}: AchievementsSectionProps) => {
+export const AchievementsSection = ({ achievements, isCurrentUser }: AchievementsSectionProps) => {
   return (
     <ProfileSectionCard title="Achievements" className="relative">
       {isCurrentUser && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onAddAchievement}
-          className="absolute top-4 right-4"
-        >
+        <Button variant="ghost" size="icon" className="absolute top-4 right-4">
           <Plus className="h-4 w-4" />
         </Button>
       )}
       <div className="flex flex-col gap-4">
-        {achievements.map((achievement, index) => (
+        {achievements.map((achievement) => (
           <AchievementItem
-            key={index}
-            onAction={onItemAction}
+            key={achievement._id}
             title={achievement.title}
             awardedBy={achievement.awardedBy}
             description={achievement.description}

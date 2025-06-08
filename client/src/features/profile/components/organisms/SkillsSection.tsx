@@ -1,8 +1,8 @@
-import { ProfileSectionCard } from '@/components/molecules/ProfileSectionCard';
 import { type TSkillWithId } from 'shared';
 import { EditSkillForm } from './EditSkillsForm';
 import { SkillItem } from '../molecules/SkillItem';
 import { AddSkillForm } from './AddSkillForm';
+import { ProfileSectionCard } from '../molecules/ProfileSectionCard';
 
 interface SkillsSectionProps {
   skills: TSkillWithId[];
@@ -17,9 +17,9 @@ export const SkillsSection = ({ skills, isCurrentUser }: SkillsSectionProps) => 
       actionAddChild={isCurrentUser && <AddSkillForm />}
     >
       <div className="flex w-full flex-col gap-3">
-        {skills.map((skill, index) => (
+        {skills.map(skill => (
           <SkillItem
-            key={index}
+            key={skill._id}
             skillName={skill.skillName}
             endorsements={skill.endorsements}
             skillProficiency={skill.skillProficiency}

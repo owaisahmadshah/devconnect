@@ -3,12 +3,10 @@ import { MdEdit, MdCalendarToday } from 'react-icons/md';
 import { type TEducationWithId } from 'shared';
 
 interface EducationItemProps extends Partial<TEducationWithId> {
-  onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
 
 export const EducationItem = ({
-  onAction,
   degree,
   fieldOfStudy,
   school,
@@ -34,7 +32,7 @@ export const EducationItem = ({
       {/* If the user is signed and looking at his own profile then he can perform action on his profile */}
       {isCurrentUser && (
         <div>
-          <span onClick={onAction} className="cursor-pointer">
+          <span className="cursor-pointer">
             <MdEdit />
           </span>
         </div>

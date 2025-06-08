@@ -1,23 +1,17 @@
-import { ProfileHeader } from '../organisms/profile/ProfileHeader';
-import { SkillsSection } from '../organisms/profile/SkillsSection';
+import { ProfileHeader } from '../../features/profile/components/organisms/ProfileHeader';
+import { SkillsSection } from '@/features/profile/components/organisms/SkillsSection';
 import { AchievementsSection } from '../organisms/profile/AchievementsSection';
-import { CertificationSection } from '../organisms/profile/CertificationSection';
-import { EducationSection } from '../organisms/profile/EducationSection';
-import { ExperienceSection } from '../organisms/profile/ExperienceSection';
-import type { TUserProfileResponse, TAddProfileArrayField, TDeleteProfileArrayItem } from 'shared';
+import { CertificationSection } from '../../features/profile/components/organisms/CertificationSection';
+import { EducationSection } from '../../features/profile/components/organisms/EducationSection';
+import { ExperienceSection } from '../../features/profile/components/organisms/ExperienceSection';
+import type { TUserProfileResponse } from 'shared';
 
 interface ProfileTemplateProps {
-  onProfileArrayUpdate: (updateData: TAddProfileArrayField) => Promise<void>;
-  onProfileArrayDelete: (deleteData: TDeleteProfileArrayItem) => Promise<void>;
-  isPending: boolean;
   profile: TUserProfileResponse;
   isCurrentUser: boolean;
 }
 
 export const ProfileTemplate = ({
-  onProfileArrayUpdate,
-  onProfileArrayDelete,
-  isPending,
   profile,
   isCurrentUser,
 }: ProfileTemplateProps) => {
@@ -36,9 +30,6 @@ export const ProfileTemplate = ({
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-6">
             <SkillsSection
-              onAddItem={onProfileArrayUpdate}
-              onDeleteItem={onProfileArrayDelete}
-              isLoading={isPending}
               skills={profile.skills}
               isCurrentUser={isCurrentUser}
             />

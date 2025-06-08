@@ -8,7 +8,6 @@ interface ProfileHeaderProps {
   role: string;
   bio: string;
   profilePictureUrl?: string;
-  onEdit?: () => void;
   isEditable?: boolean;
 }
 
@@ -18,7 +17,6 @@ export const ProfileHeader = ({
   role,
   bio,
   profilePictureUrl,
-  onEdit,
   isEditable = false,
 }: ProfileHeaderProps) => {
   const fullName = `${firstName} ${lastName}`.trim();
@@ -40,7 +38,7 @@ export const ProfileHeader = ({
             <div className="flex items-center justify-center space-x-4 sm:justify-start">
               <h1 className="text-2xl font-bold">{fullName}</h1>
               {isEditable && (
-                <Button variant="ghost" size="icon" onClick={onEdit} className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Pencil className="h-4 w-4" />
                 </Button>
               )}

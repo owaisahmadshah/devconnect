@@ -1,14 +1,13 @@
-import { formatDate } from '@/lib/dateUtils';
 import { MdEdit, MdVerified, MdOpenInNew } from 'react-icons/md';
+
+import { formatDate } from '@/lib/dateUtils';
 import { type TCertificationWithId } from 'shared';
 
 interface CertificationItemProps extends Partial<TCertificationWithId> {
-  onAction?: () => Promise<void>;
   isCurrentUser: boolean;
 }
 
 export const CertificationItem = ({
-  onAction,
   title,
   issuer,
   issuedDate,
@@ -53,7 +52,7 @@ export const CertificationItem = ({
       {/* If the user is signed and looking at his own profile then he can perform action on his profile */}
       {isCurrentUser && (
         <div>
-          <span onClick={onAction} className="cursor-pointer transition-colors hover:text-gray-600">
+          <span className="cursor-pointer transition-colors hover:text-gray-600">
             <MdEdit />
           </span>
         </div>
