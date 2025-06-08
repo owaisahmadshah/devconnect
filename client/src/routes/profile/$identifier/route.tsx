@@ -1,4 +1,5 @@
 import ErrorFallback from '@/components/ErrorFallback';
+import ProfileLoader from '@/components/ProfileLoader';
 import { ProfileTemplate } from '@/components/templates/ProfileTemplate';
 import { ProfileFeature } from '@/features/profile/ProfileFeature';
 import { requireAuth } from '@/lib/requireAuth';
@@ -16,7 +17,7 @@ function RouteComponent() {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <Suspense fallback={<p>⌛Loading profile...</p>}>
+      <Suspense fallback={<ProfileLoader />}>
         <ProfileTemplate>
           <ProfileFeature identifier={identifier} />
         </ProfileTemplate>
