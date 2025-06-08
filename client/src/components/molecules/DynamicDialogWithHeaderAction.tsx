@@ -31,6 +31,7 @@ export const DynamicDialogWithHeaderAction = ({
         <Button
           variant={isModeString ? 'outline' : 'ghost'}
           size={isModeString ? 'default' : 'icon'}
+          className="cursor-pointer"
         >
           {mode === 'create' ? <FiPlus className="h-4 w-4" /> : mode === 'edit' ? <MdEdit /> : mode}
         </Button>

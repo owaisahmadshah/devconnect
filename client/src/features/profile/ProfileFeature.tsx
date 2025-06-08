@@ -26,7 +26,7 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:w-11/12 mx-auto">
           <div className="space-y-6">
             <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
 

@@ -18,7 +18,7 @@ export const ProfileSectionCard = ({
   return (
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="text-xl">{title}</CardTitle>
         <div className="flex gap-3">
           {actionAddChild && <span>{actionAddChild}</span>}
           {actionEditChildren && <span>{actionEditChildren}</span>}

@@ -29,22 +29,26 @@ export const SkillItem = ({
 
   return (
     <div className={cn('flex items-baseline justify-between', className)}>
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
+      <div className="space-y-2">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
             {!isEditable && <div className="bg-foreground h-2 w-2 rounded-full"></div>}
             <h1 className="font-bold">{skillName}</h1>
           </div>
-          <p className="text-xs">({skillProficiency})</p>
+          <p className="ml-5 text-xs">({skillProficiency})</p>
         </div>
 
         <div className="flex justify-center gap-3">
-          <p className="flex items-center gap-2 text-sm">
-            <IoPeople />
-            Endorsements
-          </p>
-          <p>{endorsements!.length === 0 ? '' : endorsements!.length}</p>
-          {/* TODO: Show all the user who have given endorsements */}
+          {endorsements!.length > 0 && (
+            <>
+              <p className="flex items-center gap-2 text-sm">
+                <IoPeople />
+                Endorsements
+              </p>
+              <p>{endorsements!.length}</p>
+              {/* TODO: Show all the user who have given endorsements */}
+            </>
+          )}
         </div>
       </div>
 
