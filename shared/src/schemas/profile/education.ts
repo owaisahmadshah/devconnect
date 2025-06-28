@@ -5,8 +5,8 @@ export const baseEducationSchema = z.object({
   school: z.string().min(1, 'School name is required'),
   degree: z.string().min(1, 'Degree is required'),
   fieldOfStudy: z.string().min(1, 'Field of study is required'),
-  started: z.date(),
-  ended: z.date(),
+  started: z.coerce.date(),
+  ended: z.coerce.date(),
 });
 
 // For API request (create) - no _id

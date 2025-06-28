@@ -1,7 +1,7 @@
 import { type TCertificationWithId } from 'shared';
-import { Button } from '../../../../components/ui/button';
 import { CertificationItem } from '../molecules/CertificationItem';
 import { ProfileSectionCard } from '../molecules/ProfileSectionCard';
+import { AddCertificationForm } from './AddCertificationForm';
 
 interface EducationSectionProps {
   certificates: TCertificationWithId[];
@@ -10,10 +10,12 @@ interface EducationSectionProps {
 
 export const CertificationSection = ({ certificates, isCurrentUser }: EducationSectionProps) => {
   return (
-    <ProfileSectionCard title="Education">
-      {isCurrentUser && <Button variant={'outline'}>Add Education</Button>}
+    <ProfileSectionCard
+      title="Certifications"
+      actionAddChild={isCurrentUser && <AddCertificationForm />}
+    >
       <div className="flex w-full flex-col gap-3">
-        {certificates.map((certificate) => (
+        {certificates.map(certificate => (
           <CertificationItem
             key={certificate._id}
             _id={certificate._id}

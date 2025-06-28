@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const baseCertificationSchema = z.object({
   title: z.string().min(1, 'Certificate title is required'),
   issuer: z.string().min(1, 'Certificate issuer is required'),
-  issuedDate: z.date(),
+  issuedDate: z.coerce.date(),
   credentials: z.string().optional(),
   credentialsUrl: z.string().optional(),
 });

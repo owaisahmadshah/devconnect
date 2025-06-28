@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const baseAchievementSchema = z.object({
   title: z.string().min(1, 'Achievement title is required'),
   description: z.string(),
-  date: z.date(),
+  date: z.coerce.date(),
   awardedBy: z.string().min(1, 'Awarded by is required'),
 });
 

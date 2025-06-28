@@ -1,7 +1,7 @@
 import { type TExperienceWithId } from 'shared';
 import { ExperienceItem } from '../molecules/ExperienceItem';
-import { Button } from '../../../../components/ui/button';
 import { ProfileSectionCard } from '../molecules/ProfileSectionCard';
+import { AddExperienceForm } from './AddExperience';
 
 interface ExperienceSectionProps {
   experiences: TExperienceWithId[];
@@ -10,8 +10,7 @@ interface ExperienceSectionProps {
 
 export const ExperienceSection = ({ experiences, isCurrentUser }: ExperienceSectionProps) => {
   return (
-    <ProfileSectionCard title="Experience">
-      {isCurrentUser && <Button variant={'outline'}>Add Experience</Button>}
+    <ProfileSectionCard title="Experience" actionAddChild={isCurrentUser && <AddExperienceForm />}>
       <div className="flex w-full flex-col gap-3">
         {experiences.map(experience => (
           <ExperienceItem

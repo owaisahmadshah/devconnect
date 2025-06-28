@@ -6,8 +6,8 @@ export const baseExperienceSchema = z.object({
   description: z.string(),
   type: z.enum(['Job', 'Internship', 'Freelance', 'Project']),
   location: z.string().or(z.literal('Remote')),
-  started: z.date(),
-  ended: z.date(),
+  started: z.coerce.date(),
+  ended: z.coerce.date(),
   technologies: z.array(z.string()),
 });
 

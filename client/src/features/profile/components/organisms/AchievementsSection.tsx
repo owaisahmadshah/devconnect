@@ -1,8 +1,7 @@
 import { type TAchievementWithId } from 'shared';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import { ProfileSectionCard } from '../molecules/ProfileSectionCard';
 import { AchievementItem } from '../molecules/AchievementItem';
+import { AddAchivementForm } from './AddAchievementForm';
 
 interface AchievementsSectionProps {
   achievements: TAchievementWithId[];
@@ -11,14 +10,13 @@ interface AchievementsSectionProps {
 
 export const AchievementsSection = ({ achievements, isCurrentUser }: AchievementsSectionProps) => {
   return (
-    <ProfileSectionCard title="Achievements" className="relative">
-      {isCurrentUser && (
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4">
-          <Plus className="h-4 w-4" />
-        </Button>
-      )}
+    <ProfileSectionCard
+      title="Achievements"
+      className="relative"
+      actionAddChild={isCurrentUser && <AddAchivementForm />}
+    >
       <div className="flex flex-col gap-4">
-        {achievements.map((achievement) => (
+        {achievements.map(achievement => (
           <AchievementItem
             key={achievement._id}
             title={achievement.title}

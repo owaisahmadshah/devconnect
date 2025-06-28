@@ -7,7 +7,7 @@ export const baseSkillSchema = z.object({
   endorsements: z.array(
     z.object({
       endorsedBy: z.string(),
-      endorsedAt: z.date(),
+      endorsedAt: z.coerce.date(),
     }),
   ),
 });
