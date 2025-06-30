@@ -1,6 +1,13 @@
+import { Pencil } from 'lucide-react';
+import { IoCamera } from 'react-icons/io5';
+
 import { ProfileImage } from '@/components/atoms/ProfileImage';
 import { Button } from '@/components/ui/button';
-import { Pencil } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { singleImageSchema } from 'shared';
+import { useProfilePictureUpdate } from '../../hooks/useProfile';
 
 interface ProfileHeaderProps {
   firstName: string;
@@ -22,24 +29,80 @@ export const ProfileHeader = ({
   const fullName = `${firstName} ${lastName}`.trim();
   const initials = `${firstName[0]} ${lastName[0]}`.toUpperCase();
 
+  const { mutateAsync: updatePicture } = useProfilePictureUpdate();
+
+  const handleChangeProfilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    const file = e.target.files?.[0];
+    if (!file) {
+      console.warn('No file selected.');
+      return;
+    }
+
+    const validationResult = singleImageSchema.safeParse({ image: file });
+    if (!validationResult.success) {
+      console.warn('Image validation failed.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
+    await updatePicture(formData);
+  };
+
   return (
     <div className="relative mb-6">
       {/* <div className="absolute inset-0 h-32 bg-gradient-to-br from-blue-600 to-blue-700" /> */}
       <div className="absolute inset-0 h-32 border-2 bg-gradient-to-br" />
       <div className="relative px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center sm:flex-row sm:space-x-6">
-          <ProfileImage
-            src={profilePictureUrl}
-            fallback={initials}
-            size="lg"
-            className="border-4 border-white"
-          />
+          <div className="flex items-end">
+            <ProfileImage
+              src={profilePictureUrl}
+              fallback={initials}
+              size="lg"
+              className="border-4 border-white"
+            />
+
+            {isEditable && (
+              <span className="mb-8">
+                <Label htmlFor="profilePicture">
+                  <HoverCard>
+                    <HoverCardTrigger className="cursor-pointer">
+                      <IoCamera />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="text-muted-foreground bg-background w-fit rounded-md px-2 py-1 text-sm shadow-md">
+                      Change profile picture.
+                    </HoverCardContent>
+                  </HoverCard>
+                </Label>
+                <Input
+                  name="profilePicture"
+                  id="profilePicture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChangeProfilePicture}
+                  hidden
+                />
+              </span>
+            )}
+          </div>
+
           <div className="mt-4 text-center sm:mt-0 sm:text-left">
             <div className="flex items-center justify-center space-x-4 sm:justify-start">
               <h1 className="text-2xl font-bold">{fullName}</h1>
               {isEditable && (
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Pencil className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
+                  <HoverCard>
+                    <HoverCardTrigger className="cursor-pointer">
+                      <Pencil className="h-4 w-4" />
+                    </HoverCardTrigger>
+                    <HoverCardContent className="text-muted-foreground bg-background w-fit rounded-md px-2 py-1 text-sm shadow-md">
+                      Edit name, role and bio.
+                    </HoverCardContent>
+                  </HoverCard>
                 </Button>
               )}
             </div>

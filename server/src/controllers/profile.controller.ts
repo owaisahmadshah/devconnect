@@ -1,7 +1,12 @@
 import type { Request, Response } from 'express';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ProfileService } from '../services/profile.service.js';
-import { HttpStatus, type TDeleteProfileArrayItem, type TAddProfileArrayField } from 'shared';
+import {
+  HttpStatus,
+  type TDeleteProfileArrayItem,
+  type TAddProfileArrayField,
+  type TSingleImageBackend,
+} from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 
@@ -82,5 +87,24 @@ export class ProfileController {
     await ProfileService.removeArrayItem(updateData, req.user);
 
     return res.status(HttpStatus.NO_CONTENT).end();
+  });
+
+  /**
+   * Retrieves user's profile.
+   *
+   * @route PATCH /api/v1/profile/update-profile-image
+   * @param {Request} req contains IRequestUser and TSingleImageBackend
+   * @returns
+   */
+  static updateProfilePicture = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
+    }
+    const updateData: TSingleImageBackend = req.file as TSingleImageBackend;
+    const profile = await ProfileService.updateProfileImage(updateData, req.user);
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, profile, 'Updated profile picture successfully.'));
   });
 }

@@ -4,6 +4,7 @@ import {
   addProfileArrayFieldSchema,
   userProfileParamsSchema as uPPS,
   deleteProfileArrayItemSchema,
+  singleBackendImageSchema,
 } from 'shared';
 
 export const userProfileUpdateArrayDataBodySchema = z.object({
@@ -16,4 +17,8 @@ export const userProfileParamsSchema = z.object({
 
 export const userProfileDeleteArrayDataBodySchema = z.object({
   query: deleteProfileArrayItemSchema,
+});
+
+export const userProfilePictureUpdateSchema = z.object({
+  file: singleBackendImageSchema,
 });

@@ -3,6 +3,7 @@
  */
 
 export * from "./schemas/user";
+export * from "./schemas/image/image";
 export * from "./schemas/profile/achievement";
 export * from "./schemas/profile/certification";
 export * from "./schemas/profile/education";

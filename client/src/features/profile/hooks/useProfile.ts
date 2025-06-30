@@ -60,3 +60,14 @@ export const useProfileArrayDelete = () => {
     },
   });
 };
+
+export const useProfilePictureUpdate = () => {
+  const dispatch = useDispatch();
+
+  return useMutation({
+    mutationFn: (imageData: FormData) => profileService.updateProfilePicture(imageData),
+    onSuccess: profile => {
+      dispatch(setProfile({ profile: profile.data, isCurrentUser: true }));
+    },
+  });
+};

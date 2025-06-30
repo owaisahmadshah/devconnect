@@ -4,10 +4,12 @@ import { ProfileController } from '../controllers/profile.controller.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
   userProfileDeleteArrayDataBodySchema,
+  userProfilePictureUpdateSchema,
   userProfileUpdateArrayDataBodySchema,
 } from '../schemas/profile.js';
 import attachUser from '../middleware/attachUser.middleware.js';
 import { userProfileParamsSchema } from '../schemas/profile.js';
+import { upload } from '../middleware/multer.middleware.js';
 
 const router = Router();
 
@@ -32,6 +34,13 @@ router.delete(
   validateSchema(userProfileDeleteArrayDataBodySchema),
   auth,
   ProfileController.removeArrayItem,
+);
+router.patch(
+  '/update-profile-image',
+  auth,
+  upload.single('profilePicture'),
+  validateSchema(userProfilePictureUpdateSchema),
+  ProfileController.updateProfilePicture,
 );
 
 export default router;

@@ -15,3 +15,12 @@ export const removeProfileArrayItemService = async (data: TDeleteProfileArrayIte
   const response = await api.delete('/api/v1/profile/remove-array-item', { params: data });
   return response.data;
 };
+
+export const updateProfilePicture = async (data: FormData) => {
+  const response = await api.patch('/api/v1/profile/update-profile-image', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
