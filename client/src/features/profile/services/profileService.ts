@@ -1,5 +1,10 @@
 import api from '@/lib/axios';
-import type { TAddProfileArrayField, TUserProfileParams, TDeleteProfileArrayItem } from 'shared';
+import type {
+  TAddProfileArrayField,
+  TUserProfileParams,
+  TDeleteProfileArrayItem,
+  TUpdateProfileField,
+} from 'shared';
 
 export const profileService = async (data: TUserProfileParams) => {
   const response = await api.get(`/api/v1/profile/${data.identifier}`);
@@ -22,5 +27,10 @@ export const updateProfilePicture = async (data: FormData) => {
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+};
+
+export const updateProfileFieldService = async (data: TUpdateProfileField) => {
+  const response = await api.patch('/api/v1/profile/update-field', data);
   return response.data;
 };

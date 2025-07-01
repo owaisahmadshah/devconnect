@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import * as profileService from '../services/profileService';
 import type { RootState } from '@/store/store';
-import type { TAddProfileArrayField, TDeleteProfileArrayItem } from 'shared';
+import type { TAddProfileArrayField, TDeleteProfileArrayItem, TUpdateProfileField } from 'shared';
 import {
   addArrayItemToProfile,
   deleteArrayItemProfile,
@@ -68,6 +68,18 @@ export const useProfilePictureUpdate = () => {
     mutationFn: (imageData: FormData) => profileService.updateProfilePicture(imageData),
     onSuccess: profile => {
       dispatch(setProfile({ profile: profile.data, isCurrentUser: true }));
+    },
+  });
+};
+
+export const useProfileFieldUpdate = () => {
+  const dispatch = useDispatch();
+
+  return useMutation({
+    mutationFn: (updateData: TUpdateProfileField) =>
+      profileService.updateProfileFieldService(updateData),
+    onSuccess: response => {
+      dispatch(setProfile({ profile: response.data, isCurrentUser: true }));
     },
   });
 };

@@ -1,13 +1,12 @@
-import { Pencil } from 'lucide-react';
 import { IoCamera } from 'react-icons/io5';
 
 import { ProfileImage } from '@/components/atoms/ProfileImage';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { singleImageSchema } from 'shared';
 import { useProfilePictureUpdate } from '../../hooks/useProfile';
+import { UpdateProfileHeaderForm } from './UpdateProfileHeaderForm';
 
 interface ProfileHeaderProps {
   firstName: string;
@@ -32,8 +31,6 @@ export const ProfileHeader = ({
   const { mutateAsync: updatePicture } = useProfilePictureUpdate();
 
   const handleChangeProfilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-
     const file = e.target.files?.[0];
     if (!file) {
       console.warn('No file selected.');
@@ -94,20 +91,25 @@ export const ProfileHeader = ({
             <div className="flex items-center justify-center space-x-4 sm:justify-start">
               <h1 className="text-2xl font-bold">{fullName}</h1>
               {isEditable && (
-                <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
-                  <HoverCard>
-                    <HoverCardTrigger className="cursor-pointer">
-                      <Pencil className="h-4 w-4" />
-                    </HoverCardTrigger>
-                    <HoverCardContent className="text-muted-foreground bg-background w-fit rounded-md px-2 py-1 text-sm shadow-md">
-                      Edit name, role and bio.
-                    </HoverCardContent>
-                  </HoverCard>
-                </Button>
+                <HoverCard>
+                  <HoverCardTrigger className="cursor-pointer">
+                    <UpdateProfileHeaderForm />
+                  </HoverCardTrigger>
+                  <HoverCardContent className="text-muted-foreground bg-background w-fit rounded-md px-2 py-1 text-sm shadow-md">
+                    Edit name, role and bio.
+                  </HoverCardContent>
+                </HoverCard>
               )}
             </div>
             <p className="text-sm text-gray-500">{role}</p>
-            <p className="mt-2 text-gray-600">{bio}</p>
+            <HoverCard>
+              <HoverCardTrigger>
+                <p className="mt-2 mb-2 line-clamp-1 w-3xs text-sm text-gray-600">{bio}</p>
+              </HoverCardTrigger>
+              <HoverCardContent className="text-muted-foreground bg-background w-fit rounded-md px-2 py-1 text-sm shadow-md">
+                <p className="w-3xs text-sm text-gray-600">{bio}</p>
+              </HoverCardContent>
+            </HoverCard>
           </div>
         </div>
       </div>
