@@ -1,0 +1,59 @@
+import { z } from 'zod';
+import { baseCollaboratorSchema, createCollaboratorSchema } from './collaborator';
+import { baseTagSchema, createTagSchema, tagWithIdSchema } from './tag';
+import { baseMediaSchema, createMediaSchema, mediaWithIdSchema } from './media';
+import { baseTechStackSchema, createTechStackSchema, techStackWithIdSchema } from './techStack';
+
+export const projectVisibilityEnum = z.enum(['Private', 'Public', 'connections-only']);
+
+// Base Project Schema: All pieces of project together
+export const baseProjectSchema = z.object({
+  title: z.string().min(1, 'Project title is required.'),
+  description: z.string().min(1, 'Project description is required.'),
+  githubUrl: z.string(),
+  liveDemoUrl: z.string(),
+  createdBy: z.string().min(1, 'Project creator is required.'),
+  isFeatured: z.boolean(),
+  creationDate: z.coerce.date(),
+  visibility: projectVisibilityEnum,
+  collaborators: z.array(baseCollaboratorSchema),
+  tags: z.array(baseTagSchema),
+  media: z.array(baseMediaSchema),
+  techStacks: z.array(baseTechStackSchema),
+});
+
+// For API request (create) - no _id needed
+export const createProjectSchema = baseProjectSchema
+  .omit({
+    collaborators: true,
+    tags: true,
+    media: true,
+    techStacks: true,
+  })
+  .extend({
+    collaborators: z.array(createCollaboratorSchema),
+    tags: z.array(createTagSchema),
+    media: z.array(createMediaSchema),
+    techStacks: z.array(createTechStackSchema),
+  });
+
+// For frontend and API response
+export const projectWithIdSchema = baseProjectSchema
+  .omit({
+    collaborators: true,
+    tags: true,
+    media: true,
+    techStacks: true,
+  })
+  .extend({
+    _id: z.string(),
+    collaborators: z.array(createCollaboratorSchema),
+    tags: z.array(tagWithIdSchema),
+    media: z.array(mediaWithIdSchema),
+    techStacks: z.array(techStackWithIdSchema),
+  });
+
+// For typescript types
+export type TBaseProject = z.infer<typeof baseProjectSchema>;
+export type TCreateProject = z.infer<typeof createProjectSchema>;
+export type TProjectWithId = z.infer<typeof projectWithIdSchema>;
