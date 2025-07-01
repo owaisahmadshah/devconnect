@@ -4,6 +4,7 @@ import { ProfileController } from '../controllers/profile.controller.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
   userProfileDeleteArrayDataBodySchema,
+  userProfileFieldUpdateSchema,
   userProfilePictureUpdateSchema,
   userProfileUpdateArrayDataBodySchema,
 } from '../schemas/profile.js';
@@ -28,6 +29,12 @@ router.patch(
   validateSchema(userProfileUpdateArrayDataBodySchema),
   auth,
   ProfileController.addArrayItem,
+);
+router.patch(
+  '/update-field',
+  validateSchema(userProfileFieldUpdateSchema),
+  auth,
+  ProfileController.updateProfileField,
 );
 router.delete(
   '/remove-array-item',

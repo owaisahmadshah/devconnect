@@ -6,6 +6,7 @@ import {
   type TDeleteProfileArrayItem,
   type TAddProfileArrayField,
   type TSingleImageBackend,
+  type TUpdateProfileField,
 } from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -94,7 +95,7 @@ export class ProfileController {
    *
    * @route PATCH /api/v1/profile/update-profile-image
    * @param {Request} req contains IRequestUser and TSingleImageBackend
-   * @returns
+   * @returns User profile of type TUserProfileResponse
    */
   static updateProfilePicture = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
@@ -102,6 +103,26 @@ export class ProfileController {
     }
     const updateData: TSingleImageBackend = req.file as TSingleImageBackend;
     const profile = await ProfileService.updateProfileImage(updateData, req.user);
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, profile, 'Updated profile picture successfully.'));
+  });
+
+  /**
+   * Updates user's profile single field.
+   *
+   * @route PATCH /api/v1/profile/update-field
+   * @param {Request} req contains IRequestUser and TUpdateProfileField
+   * @returns User profile of type TUserProfileResponse
+   */
+  static updateProfileField = asyncHandler(async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
+    }
+
+    const updateData: TUpdateProfileField = req.body as TUpdateProfileField;
+    const profile = await ProfileService.updateProfileField(updateData, req.user);
 
     return res
       .status(HttpStatus.OK)

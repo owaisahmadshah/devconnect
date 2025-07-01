@@ -7,6 +7,7 @@ import {
   type TAddProfileArrayField,
   type TAddNewItemToProfileWithIdResponse,
   type TSingleImageBackend,
+  type TUpdateProfileField,
 } from 'shared';
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
@@ -132,6 +133,28 @@ export class ProfileService {
     }
 
     profile.profilePictureUrl = url;
+    await profile.save();
+
+    const responseProfile = ProfileMapper.toUserProfile(profile);
+    return responseProfile;
+  }
+
+  static async updateProfileField(
+    updateData: TUpdateProfileField,
+    user: IRequestUser,
+  ): Promise<TUserProfileResponse> {
+    const { fieldName, fieldData } = updateData;
+
+    const profile = await Profile.findOne({ user: user._id }).populate({
+      path: 'user',
+      select: 'username email role',
+    });
+
+    if (!profile) {
+      throw new ApiError(401, 'User not found.');
+    }
+
+    profile[fieldName] = fieldData;
     await profile.save();
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
