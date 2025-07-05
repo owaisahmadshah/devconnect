@@ -37,6 +37,11 @@ export const createProjectSchema = baseProjectSchema
     techStacks: z.array(createTechStackSchema),
   });
 
+// For API request (delete) _id needed
+export const deleteProjectSchema = z.object({
+  _id: z.string(),
+});
+
 // For frontend and API response
 export const projectWithIdSchema = baseProjectSchema
   .omit({
@@ -51,9 +56,12 @@ export const projectWithIdSchema = baseProjectSchema
     tags: z.array(tagWithIdSchema),
     media: z.array(mediaWithIdSchema),
     techStacks: z.array(techStackWithIdSchema),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date().optional(),
   });
 
 // For typescript types
 export type TBaseProject = z.infer<typeof baseProjectSchema>;
 export type TCreateProject = z.infer<typeof createProjectSchema>;
 export type TProjectWithId = z.infer<typeof projectWithIdSchema>;
+export type TDeleteProject = z.infer<typeof deleteProjectSchema>;
