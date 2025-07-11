@@ -23,23 +23,6 @@ interface RequestOptions {
  * @example
  * const project = await request<Project>('get', '/project/123');
  */
-// export const request = async <T>(
-//   method: Method,
-//   url: string,
-//   options: RequestOptions = {},
-// ): Promise<T | ApiResponse<T>> => {
-//   const { params, data, unwrapData = true } = options;
-
-//   const res = await api.request<ApiResponse<T>>({
-//     method,
-//     url,
-//     params,
-//     data,
-//   });
-
-//   return unwrapData ? res.data.data : res.data;
-// };
-
 export const request = async <T, U extends boolean = true>(
   method: Method,
   url: string,

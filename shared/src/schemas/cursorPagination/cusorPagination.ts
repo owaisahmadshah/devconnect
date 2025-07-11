@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Project base request schema
 export const paginationSchema = z.object({
   limit: z
     .string()
@@ -13,4 +12,10 @@ export const paginationSchema = z.object({
   cursor: z.string().nullable().optional(),
 });
 
+export const validateSearchParamsPaginationSchema = z.object({
+  limit: z.coerce.number().default(10),
+  cursor: z.string().nullable().default(null),
+});
+
 export type TPagination = z.infer<typeof paginationSchema>;
+export type TValidateSearchParamsPagination = z.infer<typeof validateSearchParamsPaginationSchema>;

@@ -14,7 +14,7 @@ import {
   type TUpdateProjectField,
 } from 'shared';
 
-export const createProjectSerice = async (data: TCreateProject): Promise<TProjectResponse> => {
+export const createProjectService = async (data: TCreateProject): Promise<TProjectResponse> => {
   return apiPost<TProjectResponse>('/api/v1/project/create', data);
 };
 
@@ -43,8 +43,8 @@ export const updateFieldItemProjectSerice = async (
 export const fetchProjectsByTitleService = async (
   data: TProjectByTitle,
   pagination: TPagination,
-): Promise<TProjectsSummaryWithCursorPaginationResponse[]> => {
-  return apiGet<TProjectsSummaryWithCursorPaginationResponse[]>('/api/v1/project/by-title', {
+): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
+  return apiGet<TProjectsSummaryWithCursorPaginationResponse>('/api/v1/project/by-title', {
     ...data,
     ...pagination,
   });
@@ -53,8 +53,8 @@ export const fetchProjectsByTitleService = async (
 export const fetchProjectsByTechStackService = async (
   data: TProjectByTechStack,
   pagination: TPagination,
-): Promise<TProjectsSummaryWithCursorPaginationResponse[]> => {
-  return apiGet<TProjectsSummaryWithCursorPaginationResponse[]>('/api/v1/project/by-techstack', {
+): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
+  return apiGet<TProjectsSummaryWithCursorPaginationResponse>('/api/v1/project/by-techstack', {
     ...data,
     ...pagination,
   });
@@ -63,8 +63,8 @@ export const fetchProjectsByTechStackService = async (
 export const fetchUserProjectsService = async (
   data: TProjectsOfUser,
   pagination: TPagination,
-): Promise<TProjectsSummaryWithCursorPaginationResponse[]> => {
-  return apiGet<TProjectsSummaryWithCursorPaginationResponse[]>(
+): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
+  return apiGet<TProjectsSummaryWithCursorPaginationResponse>(
     `/api/v1/project/user/${data.profileId}`,
     pagination,
   );
