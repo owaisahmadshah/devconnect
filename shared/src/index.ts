@@ -9,6 +9,7 @@ export * from "./schemas/profile/achievement";
 export * from "./schemas/profile/certification";
 export * from "./schemas/profile/education";
 export * from "./schemas/profile/experience";
+export * from "./schemas/profile/fullName";
 export * from "./schemas/profile/params";
 export * from "./schemas/profile/profile";
 export * from "./schemas/profile/profileArrayField";

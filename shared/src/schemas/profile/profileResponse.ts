@@ -23,3 +23,8 @@ export type TUserProfileResponse = Omit<TBaseProfile, 'user'> & {
   role: string;
 };
 export type TUserProfileSummaryResponse = z.infer<typeof userProfileSummarySchema>;
+export type TUserProfileSummaryresponseWithPagination = {
+  profiles: TUserProfileResponse[],
+  hasMore: boolean;
+  nextCursor: string | null;
+}

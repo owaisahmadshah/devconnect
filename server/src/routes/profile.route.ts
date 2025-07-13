@@ -3,6 +3,7 @@ import auth from '../middleware/auth.middleware.js';
 import { ProfileController } from '../controllers/profile.controller.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
+  fullNameSearchSchemas,
   userProfileDeleteArrayDataBodySchema,
   userProfileFieldUpdateSchema,
   userProfilePictureUpdateSchema,
@@ -20,6 +21,11 @@ router.get(
   validateSchema(userProfileParamsSchema),
   attachUser, // User or null, authentication is'nt required.
   ProfileController.getUserProfile,
+);
+router.get(
+  '/fetch-profiles-by-names',
+  validateSchema(fullNameSearchSchemas),
+  ProfileController.fullNameSearch,
 );
 
 // Protected routes

@@ -7,6 +7,8 @@ import {
   type TAddProfileArrayField,
   type TSingleImageBackend,
   type TUpdateProfileField,
+  type TFullNameSearch,
+  type TPagination,
 } from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -127,5 +129,25 @@ export class ProfileController {
     return res
       .status(HttpStatus.OK)
       .json(new ApiResponse(HttpStatus.OK, profile, 'Updated profile picture successfully.'));
+  });
+
+  /**
+   * Fetches user profiles using first and last name.
+   *
+   * @route GET /api/v1/profile/fetch-profiles-by-names
+   * @param {Request} req contains TFullNameSearch & TPagination
+   * @returns User profile of type TUserProfileResponse
+   */
+  static fullNameSearch = asyncHandler(async (req: Request, res: Response) => {
+    const { fullName, limit, cursor } = req.query;
+
+    const profiles = await ProfileService.fetchUsersByName(
+      { fullName: fullName as string },
+      { limit: Number(limit), cursor: typeof cursor === 'string' ? cursor : null },
+    );
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, profiles, 'Got profiles successfully.'));
   });
 }

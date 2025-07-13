@@ -8,6 +8,9 @@ import {
   type TAddNewItemToProfileWithIdResponse,
   type TSingleImageBackend,
   type TUpdateProfileField,
+  type TValidateSearchParamsPagination,
+  type TUserProfileSummaryresponseWithPagination,
+  type TFullNameSearch,
 } from 'shared';
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
@@ -159,5 +162,72 @@ export class ProfileService {
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
     return responseProfile;
+  }
+
+  static async searchProfiles(
+    input: string,
+    pagination: TValidateSearchParamsPagination,
+  ): Promise<TUserProfileSummaryresponseWithPagination> {
+    const { limit, cursor } = pagination;
+
+    const matchStage = cursor ? { $match: { createdAt: { $lt: new Date(cursor) } } } : null;
+
+    const pipeline: any[] = [
+      {
+        $search: {
+          index: 'name_autocomplete',
+          autocomplete: {
+            query: input,
+            path: ['firstName', 'lastName', 'fullName'],
+            fuzzy: { maxEdits: 1, prefixLength: 1 },
+          },
+        },
+      },
+      ...(matchStage ? [matchStage] : []),
+      { $sort: { createdAt: -1 } }, // Ensure descending order for pagination
+      { $limit: limit + 1 }, // Fetch one extra to determine if there's a next page
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      {
+        $project: {
+          _id: 1,
+          firstName: 1,
+          lastName: 1,
+          profilePictureUrl: 1,
+          bio: 1,
+          role: 1,
+          username: 1,
+          isVerified: 1,
+          email: 1,
+          score: { $meta: 'searchScore' },
+        },
+      },
+    ];
+
+    const results = await Profile.aggregate(pipeline);
+
+    const hasMore = results.length > limit;
+    const items = hasMore ? results.slice(0, -1) : results;
+    const nextCursor = hasMore ? items[items.length - 1].createdAt.toISOString() : null;
+
+    return {
+      profiles: items,
+      hasMore,
+      nextCursor,
+    };
+  }
+
+  static async fetchUsersByName(
+    { fullName }: TFullNameSearch,
+    pagination: TValidateSearchParamsPagination,
+  ): Promise<TUserProfileSummaryresponseWithPagination> {
+    return this.searchProfiles(fullName, pagination);
   }
 }

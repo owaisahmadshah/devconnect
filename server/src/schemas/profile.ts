@@ -6,6 +6,8 @@ import {
   deleteProfileArrayItemSchema,
   singleBackendImageSchema,
   updateProfileFieldSchema,
+  fullNameSearchSchema as fNSS,
+  paginationSchema,
 } from 'shared';
 
 export const userProfileUpdateArrayDataBodySchema = z.object({
@@ -26,4 +28,8 @@ export const userProfilePictureUpdateSchema = z.object({
 
 export const userProfileFieldUpdateSchema = z.object({
   body: updateProfileFieldSchema,
+});
+
+export const fullNameSearchSchemas = z.object({
+  query: fNSS.extend(paginationSchema.shape),
 });
