@@ -3,6 +3,7 @@ import { baseCollaboratorSchema, createCollaboratorSchema } from './collaborator
 import { baseTagSchema, createTagSchema, tagWithIdSchema } from './tag';
 import { baseMediaSchema, createMediaSchema, mediaWithIdSchema } from './media';
 import { baseTechStackSchema, createTechStackSchema, techStackWithIdSchema } from './techStack';
+import { multipleImagesSchema } from '../image/image';
 
 export const projectVisibilityEnum = z.enum(['Private', 'Public', 'connections-only']);
 
@@ -33,7 +34,7 @@ export const createProjectSchema = baseProjectSchema
   .extend({
     collaborators: z.array(createCollaboratorSchema),
     tags: z.array(createTagSchema),
-    media: z.array(createMediaSchema),
+    media: multipleImagesSchema,
     techStacks: z.array(createTechStackSchema),
   });
 
@@ -65,3 +66,4 @@ export type TBaseProject = z.infer<typeof baseProjectSchema>;
 export type TCreateProject = z.infer<typeof createProjectSchema>;
 export type TProjectWithId = z.infer<typeof projectWithIdSchema>;
 export type TDeleteProject = z.infer<typeof deleteProjectSchema>;
+export type TProjectVisibilityEnum = 'Private' | 'Public' | 'connections-only';

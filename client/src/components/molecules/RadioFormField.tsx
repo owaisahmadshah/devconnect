@@ -10,7 +10,7 @@ interface FormFieldProps<
   label?: string;
   options: {
     label: string;
-    value: string;
+    value: string | boolean | number;
   }[];
 }
 
@@ -31,13 +31,17 @@ export const RadioFormField = <
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <div className="flex gap-4">
-            {options.map(opt => (
-              <label key={opt.value} className="flex items-center gap-1 text-sm">
+            {options.map((opt, idx) => (
+              <label key={idx} className="flex items-center gap-1 text-sm">
                 <input
                   type="radio"
-                  value={opt.value}
+                  value={String(opt.value)}
                   checked={field.value === opt.value}
-                  onChange={field.onChange}
+                  onChange={e => {
+                    const value =
+                      typeof opt.value === 'boolean' ? e.target.value === 'true' : e.target.value;
+                    field.onChange(value);
+                  }}
                 />
                 {opt.label}
               </label>
