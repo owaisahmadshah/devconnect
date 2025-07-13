@@ -19,8 +19,8 @@ import Lightbox from 'yet-another-react-lightbox';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
 import 'yet-another-react-lightbox/styles.css';
-import { cn } from '@/lib/utils';
 import { MdDelete } from 'react-icons/md';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const CreateProjectForm = () => {
   const [tag, setTag] = useState('');
@@ -118,159 +118,196 @@ export const CreateProjectForm = () => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField form={form} placeholder="Title" id="title" name="title" />
-        <TextAreaField form={form} placeholder="Description" id="description" name="description" />
-        <FormField form={form} placeholder="Github url" id="githubUrl" name="githubUrl" />
-        <FormField form={form} placeholder="Live demo url" id="liveDemoUrl" name="liveDemoUrl" />
-        <div>
-          <div className="flex gap-2">
-            <Input placeholder="Tags" onChange={e => setTag(e.target.value?.trim())} value={tag} />
-            <Button type="button" onClick={handleAddTag}>
-              Add
-            </Button>
-          </div>
-          <div className="text-muted-foreground m-2 space-y-2 space-x-2 text-xs italic">
-            {watchedTags.length > 0 ? (
-              watchedTags.map(tag => (
-                <DismissibleBadge
-                  key={tag.tag}
-                  text={tag.tag}
-                  onRemove={() => handleDeleteTag(tag.tag)}
-                  customClasses="rounded"
-                />
-              ))
-            ) : (
-              <p className="">No tags have been added!</p>
-            )}
-          </div>
-        </div>
-        <div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Tech Stack"
-              onChange={e => setTechStack(e.target.value?.trim())}
-              value={techStack}
-            />
-            <Button type="button" onClick={handleAddTechStack}>
-              Add
-            </Button>
-          </div>
-          <div className="text-muted-foreground m-2 space-y-2 space-x-2 text-xs italic">
-            {watchedTechStacks.length > 0 ? (
-              watchedTechStacks.map(tech => (
-                <DismissibleBadge
-                  key={tech.tech}
-                  text={tech.tech}
-                  onRemove={() => handleDeleteTechStack(tech.tech)}
-                  customClasses="rounded"
-                />
-              ))
-            ) : (
-              <p className="">No tags have been added!</p>
-            )}
-          </div>
-        </div>
-        <div className="mx-auto w-[50%]">
-          <div
-            className={cn(
-              preview && 'grid grid-cols-2 place-items-center gap-2 max-sm:grid-cols-1',
-            )}
-          >
-            {preview &&
-              preview.map((s, i) => (
-                <img
-                  key={i}
-                  src={s}
-                  onClick={() => {
-                    setCurrentIndex(i);
-                    setOpen(true);
-                  }}
-                  className={cn(
-                    'h-64 cursor-pointer rounded-lg object-cover',
-                    i >= 3 ? 'hidden' : '',
-                    i >= 2 ? 'max-sm:hidden' : '',
+    <div className="fixed inset-0 h-full w-full overflow-hidden">
+      <ScrollArea className="relative h-full w-full rounded-md border">
+        <div className="p-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-[60%] space-y-8 py-5">
+              <FormField form={form} placeholder="Title" id="title" name="title" />
+              <TextAreaField
+                form={form}
+                placeholder="Description"
+                id="description"
+                name="description"
+              />
+              <FormField form={form} placeholder="Github url" id="githubUrl" name="githubUrl" />
+              <FormField
+                form={form}
+                placeholder="Live demo url"
+                id="liveDemoUrl"
+                name="liveDemoUrl"
+              />
+              <div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Tags"
+                    onChange={e => setTag(e.target.value?.trim())}
+                    value={tag}
+                  />
+                  <Button type="button" onClick={handleAddTag}>
+                    Add
+                  </Button>
+                </div>
+                <div className="text-muted-foreground m-2 space-y-2 space-x-2 text-xs italic">
+                  {watchedTags.length > 0 ? (
+                    watchedTags.map(tag => (
+                      <DismissibleBadge
+                        key={tag.tag}
+                        text={tag.tag}
+                        onRemove={() => handleDeleteTag(tag.tag)}
+                        customClasses="rounded"
+                      />
+                    ))
+                  ) : (
+                    <p className="">No tags have been added!</p>
                   )}
-                />
-              ))}
-            <div
-              {...getRootProps()}
-              className={`mx-auto my-auto flex h-40 w-64 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed text-gray-400 transition ${
-                isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-              }`}
-            >
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <p>Drop the image here...</p>
-              ) : (
-                <p>Click or drag image here to upload</p>
-              )}
-            </div>
+                </div>
+              </div>
+              <div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Tech Stack"
+                    onChange={e => setTechStack(e.target.value?.trim())}
+                    value={techStack}
+                  />
+                  <Button type="button" onClick={handleAddTechStack}>
+                    Add
+                  </Button>
+                </div>
+                <div className="text-muted-foreground m-2 space-y-2 space-x-2 text-xs italic">
+                  {watchedTechStacks.length > 0 ? (
+                    watchedTechStacks.map(tech => (
+                      <DismissibleBadge
+                        key={tech.tech}
+                        text={tech.tech}
+                        onRemove={() => handleDeleteTechStack(tech.tech)}
+                        customClasses="rounded"
+                      />
+                    ))
+                  ) : (
+                    <p className="">No tech stacks have been added!</p>
+                  )}
+                </div>
+              </div>
 
-            {/* Lightbox Viewer */}
-            <Lightbox
-              open={open}
-              close={() => setOpen(false)}
-              index={currentIndex}
-              plugins={[Zoom, Fullscreen]}
-              slides={preview?.map(src => ({ src })) || []}
-              on={{
-                view: ({ index }) => setCurrentIndex(index),
-              }}
-              toolbar={{
-                buttons: [
-                  <button
-                    onClick={handleDelete}
-                    type="button"
-                    className="hover:text-muted-foreground cursor-pointer rounded px-3 py-1 text-2xl"
+              {/* Image Upload Section - Fixed Layout */}
+              <div className="w-full">
+                <div className="mx-auto w-[80%] space-y-4">
+                  {/* Image Preview Grid */}
+                  {preview && preview.length > 0 && (
+                    <div className="rounded-sm border p-4">
+                      <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+                        {preview.slice(0, 4).map((src, i) => (
+                          <div key={i} className="relative overflow-hidden rounded-lg">
+                            <img
+                              src={src}
+                              onClick={() => {
+                                setCurrentIndex(i);
+                                setOpen(true);
+                              }}
+                              className="h-40 w-full cursor-pointer object-cover transition-transform hover:scale-105"
+                              alt={`Preview ${i + 1}`}
+                            />
+                            {i === 3 && preview.length > 4 && (
+                              <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center bg-black text-white">
+                                <span className="text-lg font-semibold">
+                                  +{preview.length - 4} more
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dropzone */}
+                  <div
+                    {...getRootProps()}
+                    className={`mx-auto flex h-40 w-full max-w-md cursor-pointer items-center justify-center rounded-xl border-2 border-dashed text-gray-400 transition ${
+                      isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    }`}
                   >
-                    <MdDelete />
-                  </button>,
-                  <button
-                    key="close"
-                    onClick={() => setOpen(false)}
-                    type="button"
-                    className="hover:text-mutated-foreground cursor-pointer rounded px-3 py-1 text-2xl"
-                  >
-                    ✖
-                  </button>,
-                ],
-              }}
-            />
-          </div>
+                    <input {...getInputProps()} />
+                    {isDragActive ? (
+                      <p>Drop the image here...</p>
+                    ) : (
+                      <p>Click or drag image here to upload</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <DatePickerField
+                form={form}
+                id="creationDate"
+                name="creationDate"
+                disabledFuture={true}
+                labelText="Project Creation Date"
+                placeholder="Creation Date"
+              />
+              <RadioFormField
+                form={form}
+                name="visibility"
+                label="Project Visibility"
+                options={[
+                  { label: 'Public', value: 'Public' },
+                  { label: 'Private', value: 'Private' },
+                  { label: 'Connections-only', value: 'connections-only' },
+                ]}
+              />
+              <RadioFormField
+                form={form}
+                name="isFeatured"
+                label="Feature Project"
+                options={[
+                  { label: 'Yes', value: true },
+                  { label: 'No', value: false },
+                ]}
+              />
+              <SubmitButton isLoading={false} disabled={false}>
+                Create Project
+              </SubmitButton>
+            </form>
+          </Form>
         </div>
-        <DatePickerField
-          form={form}
-          id="creationDate"
-          name="creationDate"
-          disabledFuture={true}
-          labelText="Project Creation Date"
-          placeholder="Creation Date"
-        />
-        <RadioFormField
-          form={form}
-          name="visibility"
-          label="Project Visibility"
-          options={[
-            { label: 'Public', value: 'Public' },
-            { label: 'Private', value: 'Private' },
-            { label: 'Connections-only', value: 'connections-only' },
-          ]}
-        />
-        <RadioFormField
-          form={form}
-          name="isFeatured"
-          label="Feature Project"
-          options={[
-            { label: 'Yes', value: true },
-            { label: 'No', value: false },
-          ]}
-        />
-        <SubmitButton isLoading={false} disabled={false}>
-          Create Project
-        </SubmitButton>
-      </form>
-    </Form>
+      </ScrollArea>
+
+      {/* Lightbox - Positioned as portal to prevent scroll interference */}
+      {open && (
+        <div className="fixed inset-0 z-50">
+          <Lightbox
+            open={open}
+            close={() => setOpen(false)}
+            index={currentIndex}
+            plugins={[Zoom, Fullscreen]}
+            slides={preview?.map(src => ({ src })) || []}
+            on={{
+              view: ({ index }) => setCurrentIndex(index),
+            }}
+            toolbar={{
+              buttons: [
+                <button
+                  key="delete"
+                  onClick={handleDelete}
+                  type="button"
+                  className="hover:text-muted-foreground cursor-pointer rounded px-3 py-1 text-2xl"
+                >
+                  <MdDelete />
+                </button>,
+                <button
+                  key="close"
+                  onClick={() => setOpen(false)}
+                  type="button"
+                  className="hover:text-muted-foreground cursor-pointer rounded px-3 py-1 text-2xl"
+                >
+                  ✖
+                </button>,
+              ],
+            }}
+          />
+        </div>
+      )}
+    </div>
   );
 };
