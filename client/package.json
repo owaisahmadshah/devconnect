@@ -43,11 +43,13 @@
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.56.4",
     "react-icons": "^5.5.0",
+    "react-photo-view": "^1.2.7",
     "react-redux": "^9.2.0",
     "shared": "workspace:*",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.7",
+    "yet-another-react-lightbox": "^3.24.0",
     "zod": "^3.24.4"
   },
   "devDependencies": {

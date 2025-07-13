@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { createProjectSchema, type TCreateProject } from 'shared';
 import { Form } from '@/components/ui/form';
@@ -15,18 +15,19 @@ import { Button } from '@/components/ui/button';
 import { DismissibleBadge } from '@/components/molecules/DismissibleBadge';
 import { useDropzone } from 'react-dropzone';
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import 'yet-another-react-lightbox/styles.css';
+import { cn } from '@/lib/utils';
+import { MdDelete } from 'react-icons/md';
 
 export const CreateProjectForm = () => {
   const [tag, setTag] = useState('');
   const [techStack, setTechStack] = useState('');
   const [preview, setPreview] = useState<string[] | null>(null);
+  const [open, setOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const form = useForm<TCreateProject>({
     resolver: zodResolver(createProjectSchema),
@@ -84,13 +85,20 @@ export const CreateProjectForm = () => {
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles;
-    if (file.length) {
-      const img = [];
-      for (let i = 0; i < file.length; i++) {
-        img.push(URL.createObjectURL(file[i]));
+    const files = acceptedFiles;
+
+    if (files.length) {
+      const currentMedia = form.getValues('media');
+
+      const media = files.map(file => ({ image: file }));
+      form.setValue('media', [...currentMedia, ...media]);
+
+      const img: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        img.push(URL.createObjectURL(files[i]));
       }
-      setPreview(img);
+
+      setPreview(prev => (prev ? [...prev, ...img] : [...img]));
     }
   }, []);
 
@@ -99,6 +107,15 @@ export const CreateProjectForm = () => {
     onDrop,
     multiple: true,
   });
+
+  const handleDelete = () => {
+    setPreview(prev => (prev ? prev.filter((_, i) => i !== currentIndex) : prev));
+
+    const media = form.getValues('media').filter((_, idx) => idx !== currentIndex);
+    form.setValue('media', media);
+
+    setOpen(preview && preview?.length - 1 > currentIndex ? true : currentIndex > 0 ? true : false);
+  };
 
   return (
     <Form {...form}>
@@ -155,32 +172,72 @@ export const CreateProjectForm = () => {
             )}
           </div>
         </div>
-        <div className="mx-auto max-h-2/3 max-w-2/3">
-          {preview && preview.length > 0 && (
-            <Carousel>
-              <CarouselContent>
-                {preview.map(image => (
-                  <CarouselItem>
-                    <img src={image} alt={image} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious type="button" />
-              <CarouselNext type="button" />
-            </Carousel>
-          )}
+        <div className="mx-auto w-[50%]">
           <div
-            {...getRootProps()}
-            className={`mx-auto flex h-40 w-64 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed text-gray-400 transition ${
-              isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-            }`}
-          >
-            <input {...getInputProps()} />
-            {isDragActive ? (
-              <p>Drop the image here...</p>
-            ) : (
-              <p>Click or drag image here to upload</p>
+            className={cn(
+              preview && 'grid grid-cols-2 place-items-center gap-2 max-sm:grid-cols-1',
             )}
+          >
+            {preview &&
+              preview.map((s, i) => (
+                <img
+                  key={i}
+                  src={s}
+                  onClick={() => {
+                    setCurrentIndex(i);
+                    setOpen(true);
+                  }}
+                  className={cn(
+                    'h-64 cursor-pointer rounded-lg object-cover',
+                    i >= 3 ? 'hidden' : '',
+                    i >= 2 ? 'max-sm:hidden' : '',
+                  )}
+                />
+              ))}
+            <div
+              {...getRootProps()}
+              className={`mx-auto my-auto flex h-40 w-64 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed text-gray-400 transition ${
+                isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+              }`}
+            >
+              <input {...getInputProps()} />
+              {isDragActive ? (
+                <p>Drop the image here...</p>
+              ) : (
+                <p>Click or drag image here to upload</p>
+              )}
+            </div>
+
+            {/* Lightbox Viewer */}
+            <Lightbox
+              open={open}
+              close={() => setOpen(false)}
+              index={currentIndex}
+              plugins={[Zoom, Fullscreen]}
+              slides={preview?.map(src => ({ src })) || []}
+              on={{
+                view: ({ index }) => setCurrentIndex(index),
+              }}
+              toolbar={{
+                buttons: [
+                  <button
+                    onClick={handleDelete}
+                    type="button"
+                    className="hover:text-muted-foreground cursor-pointer rounded px-3 py-1 text-2xl"
+                  >
+                    <MdDelete />
+                  </button>,
+                  <button
+                    key="close"
+                    onClick={() => setOpen(false)}
+                    type="button"
+                    className="hover:text-mutated-foreground cursor-pointer rounded px-3 py-1 text-2xl"
+                  >
+                    ✖
+                  </button>,
+                ],
+              }}
+            />
           </div>
         </div>
         <DatePickerField
