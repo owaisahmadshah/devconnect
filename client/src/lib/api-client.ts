@@ -9,6 +9,7 @@ interface RequestOptions {
   params?: any;
   data?: any;
   unwrapData?: boolean; // Optional: return just `data` or full ApiResponse
+  signal?: AbortSignal;
 }
 
 /**
@@ -28,13 +29,14 @@ export const request = async <T, U extends boolean = true>(
   url: string,
   options: RequestOptions & { unwrapData?: U } = {},
 ): Promise<U extends true ? T : ApiResponse<T>> => {
-  const { params, data, unwrapData = true } = options;
+  const { params, data, unwrapData = true, signal } = options;
 
   const res = await api.request<ApiResponse<T>>({
     method,
     url,
     params,
     data,
+    signal,
   });
 
   return (unwrapData ? res.data.data : res.data) as any;
@@ -44,22 +46,35 @@ export const request = async <T, U extends boolean = true>(
  * @example
  * const project = await apiGet<Project>('/project/123');
  */
-export const apiGet = <T>(url: string, params?: any) => request<T>('get', url, { params });
+export const apiGet = <T>(
+  url: string,
+  params?: any,
+  options?: Omit<RequestOptions, 'params' | 'unwrapData'>,
+) => request<T>('get', url, { params, ...options });
 
 /**
  * @example
  * const result = await apiPost<Project>('/project/create', { title: 'New' });
  */
-export const apiPost = <T>(url: string, data?: any) => request<T>('post', url, { data });
+export const apiPost = <T>(url: string, data?: any, options?: Omit<RequestOptions, 'unwrapData'>) =>
+  request<T>('post', url, { data, ...options });
 
 /**
  * @example
  * await apiPatch('/project/update', { id: '123', title: 'Updated' });
  */
-export const apiPatch = <T>(url: string, data?: any) => request<T>('patch', url, { data });
+export const apiPatch = <T>(
+  url: string,
+  data?: any,
+  options?: Omit<RequestOptions, 'unwrapData'>,
+) => request<T>('patch', url, { data, ...options });
 
 /**
  * @example
  * await apiDelete('/project/delete', { id: '123' });
  */
-export const apiDelete = <T>(url: string, params?: any) => request<T>('delete', url, { params });
+export const apiDelete = <T>(
+  url: string,
+  params?: any,
+  options?: Omit<RequestOptions, 'params' | 'unwrapData'>,
+) => request<T>('delete', url, { params, ...options });

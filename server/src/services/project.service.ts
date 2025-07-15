@@ -78,10 +78,12 @@ export class ProjectService {
       path: 'createdBy',
       select: '_id username email firstName lastName role profilePictureUrl bio isVerified',
     });
-
+    console.log('projects', project);
     if (!project) {
+      console.log('projects returning error.');
       throw new ApiError(404, 'Project not found');
     }
+    console.log('projects after', project);
 
     const responseProject = ProjectMapper.toPublicProject(project);
 

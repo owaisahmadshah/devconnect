@@ -17,15 +17,15 @@ const router = Router();
 
 // Public routes
 router.get(
+  '/fetch-profiles-by-names',
+  validateSchema(fullNameSearchSchemas),
+  ProfileController.fullNameSearch,
+);
+router.get(
   '/:identifier',
   validateSchema(userProfileParamsSchema),
   attachUser, // User or null, authentication is'nt required.
   ProfileController.getUserProfile,
-);
-router.get(
-  '/fetch-profiles-by-names',
-  validateSchema(fullNameSearchSchemas),
-  ProfileController.fullNameSearch,
 );
 
 // Protected routes

@@ -1,4 +1,4 @@
-import { type TCreateProject } from '@shared/src/index.js';
+import { type TCreateProject } from 'shared';
 import { Document, model, Schema } from 'mongoose';
 
 export interface IProjectSchema extends Document, Omit<TCreateProject, 'createdBy'> {
@@ -39,8 +39,10 @@ const projectSchema = new Schema<IProjectSchema>({
   tags: {
     type: [
       {
-        tag: String,
-        lowercase: true,
+        tag: {
+          type: String,
+          lowercase: true,
+        },
       },
     ],
     default: [],
@@ -48,7 +50,7 @@ const projectSchema = new Schema<IProjectSchema>({
   media: {
     type: [
       {
-        type: {
+        mediaType: {
           type: String,
           enum: ['video', 'image'],
         },

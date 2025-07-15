@@ -176,10 +176,23 @@ export class ProfileService {
       {
         $search: {
           index: 'name_autocomplete',
-          autocomplete: {
-            query: input,
-            path: ['firstName', 'lastName', 'fullName'],
-            fuzzy: { maxEdits: 1, prefixLength: 1 },
+          compound: {
+            should: [
+              {
+                autocomplete: {
+                  query: input,
+                  path: 'firstName',
+                  fuzzy: { maxEdits: 1, prefixLength: 1 },
+                },
+              },
+              {
+                autocomplete: {
+                  query: input,
+                  path: 'lastName',
+                  fuzzy: { maxEdits: 1, prefixLength: 1 },
+                },
+              },
+            ],
           },
         },
       },

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Media schema: represents a media(specifically a url, maybe a picture or a video)
-export const baseMediaSchema = z.object({ url: z.string(), type: z.enum(['video', 'image']) });
+export const baseMediaSchema = z.object({ url: z.string(), mediaType: z.enum(['video', 'image']) });
 
 // For API request (create) - no _id
 export const createMediaSchema = baseMediaSchema;
