@@ -204,7 +204,11 @@ const profileSchema = new Schema<IProfile>(
       },
     },
     profileUrls: {
-      type: [String],
+      type: [
+        {
+          url: String,
+        },
+      ],
       default: [],
     },
     socialMediaLinks: {

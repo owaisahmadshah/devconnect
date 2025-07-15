@@ -2,7 +2,7 @@ import { z } from "zod"
 
 // Base profile urls
 export const baseProfileUrlsSchema = z.object({
-  username: z.string().min(1, ''),
+  url: z.string().min(1, ''),
 });
 
 // For API request (create) - no _id

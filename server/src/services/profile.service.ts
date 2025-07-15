@@ -158,6 +158,24 @@ export class ProfileService {
     }
 
     profile[fieldName] = fieldData;
+
+    if (fieldName === 'firstName' || fieldName === 'lastName') {
+      const originalFirstName = profile.firstName.trim()?.split(' ').join('-').toLowerCase();
+      const originalLastName = profile.lastName?.trim()?.split(' ').join('-').toLowerCase();
+      const originalSlug = `${originalFirstName}-${originalLastName}`;
+
+      let newSlug = fieldData.trim().split(' ').join('-').toLowerCase();
+
+      if (fieldName === 'firstName') {
+        newSlug = `${newSlug}-${originalLastName}`;
+      } else {
+        newSlug = `${originalFirstName}-${newSlug}`;
+      }
+
+      profile.profileUrls = profile.profileUrls?.filter(url => url.url !== originalSlug);
+      (profile.profileUrls as any[]).unshift({ url: newSlug });
+    }
+
     await profile.save();
 
     const responseProfile = ProfileMapper.toUserProfile(profile);

@@ -141,6 +141,10 @@ export class UserService {
         throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Unable to create user.');
       }
 
+      const firstNames = userData.firstName.trim()?.split(' ').join('-').toLowerCase();
+      const lastNames = userData.lastName?.trim()?.split(' ').join('-').toLowerCase();
+      const slug = `${firstNames}-${lastNames}`;
+
       // Now we're sure user exists and has an _id
       await Profile.create(
         [
@@ -148,6 +152,7 @@ export class UserService {
             user: user._id,
             firstName: userData.firstName,
             lastName: userData.lastName ? userData.lastName : '',
+            profileUrls: [{ url: slug }],
           },
         ],
         { session },

@@ -56,6 +56,7 @@ router.get(
 router.get(
   '/user/:profileId',
   validateSchema(projectSchema.projectsOfUserParmsSchema),
+  auth,
   ProjectController.fetchUserProjects,
 );
 
