@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
+import slugify from 'slugify';
 import { User } from '../models/user.model.js';
 import { UserMapper } from '../mapper/user.mapper.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -141,22 +142,47 @@ export class UserService {
         throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Unable to create user.');
       }
 
-      const firstNames = userData.firstName.trim()?.split(' ').join('-').toLowerCase();
-      const lastNames = userData.lastName?.trim()?.split(' ').join('-').toLowerCase();
-      const slug = `${firstNames}-${lastNames}`;
+      const baseSlug = (slugify as any)(`${userData.firstName} ${userData.lastName || ''}`, {
+        lower: true,
+        strict: true,
+      });
 
-      // Now we're sure user exists and has an _id
-      await Profile.create(
-        [
-          {
-            user: user._id,
-            firstName: userData.firstName,
-            lastName: userData.lastName ? userData.lastName : '',
-            profileUrls: [{ url: slug }],
-          },
-        ],
-        { session },
-      );
+      let slug = baseSlug;
+      let attempt = 0;
+      let uniqueSlugFound = false;
+
+      while (!uniqueSlugFound) {
+        try {
+          await Profile.create(
+            [
+              {
+                user: user._id,
+                firstName: userData.firstName,
+                lastName: userData.lastName || '',
+                profileUrls: [{ url: slug }],
+              },
+            ],
+            { session },
+          );
+
+          uniqueSlugFound = true; // success
+        } catch (err: any) {
+          if (err.code === 11000) {
+            // Duplicate key error modify slug
+            attempt++;
+
+            if (attempt === 1) {
+              // First retry append email prefix
+              slug = `${baseSlug}-${userData.email.split('@')[0]}`;
+            } else {
+              // Further retries → append random number
+              slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+            }
+          } else {
+            throw err;
+          }
+        }
+      }
 
       // Explicitly commit the transaction
       await session.commitTransaction();

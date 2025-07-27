@@ -206,7 +206,11 @@ const profileSchema = new Schema<IProfile>(
     profileUrls: {
       type: [
         {
-          url: String,
+          url: {
+            type: String,
+            unique: true,
+            required: true,
+          },
         },
       ],
       default: [],
@@ -239,5 +243,6 @@ const profileSchema = new Schema<IProfile>(
 profileSchema.index({ user: 1 }, { unique: true });
 profileSchema.index({ 'skills.skillName': 1 });
 profileSchema.index({ 'experiences.technologies': 1 });
+profileSchema.index({ 'profileUrls.url': 1 }, { unique: true });
 
 export const Profile = model<IProfile>('Profile', profileSchema);

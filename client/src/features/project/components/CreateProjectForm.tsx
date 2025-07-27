@@ -21,6 +21,7 @@ import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
 import 'yet-another-react-lightbox/styles.css';
 import { MdDelete } from 'react-icons/md';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useInfiniteUserSearchByFullName } from '@/hooks/useProfile';
 
 export const CreateProjectForm = () => {
   const [tag, setTag] = useState('');
@@ -28,6 +29,7 @@ export const CreateProjectForm = () => {
   const [preview, setPreview] = useState<string[] | null>(null);
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [fullName, setFullName] = useState('');
 
   const form = useForm<TCreateProject>({
     resolver: zodResolver(createProjectSchema),
@@ -49,6 +51,11 @@ export const CreateProjectForm = () => {
 
   const watchedTags = form.watch('tags');
   const watchedTechStacks = form.watch('techStacks');
+
+  // const { data, fetchNextPage, hasNextPage, isFetchNextPageError } =
+  const { data } = useInfiniteUserSearchByFullName(fullName);
+
+  console.log(data);
 
   const onSubmit = async (data: TCreateProject) => {
     console.log(data);
@@ -187,6 +194,17 @@ export const CreateProjectForm = () => {
                   ) : (
                     <p className="">No tech stacks have been added!</p>
                   )}
+                </div>
+              </div>
+
+              {/* Adding collaborators */}
+              <div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Search Collaborators"
+                    onChange={e => setFullName(e.target.value?.trim())}
+                    value={fullName}
+                  />
                 </div>
               </div>
 

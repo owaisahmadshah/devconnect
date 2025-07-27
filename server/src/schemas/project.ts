@@ -5,8 +5,7 @@ import {
   deleteProjectSchema,
   addProjectArrayItem,
   updateProjectFieldSchema,
-  deleteProjectArrayItem,
-  projectByIdSchema,
+  projectByProfileUrlSchema,
   projectByTitleSchema,
   projectByTechStackSchema,
   projectsOfUserSchema,
@@ -41,7 +40,7 @@ export const projectsByTechStacksQuerySchema = z.object({
 });
 
 export const projectByIdParamsSchema = z.object({
-  params: projectByIdSchema,
+  params: projectByProfileUrlSchema,
 });
 
 export const projectsOfUserParmsSchema = z.object({

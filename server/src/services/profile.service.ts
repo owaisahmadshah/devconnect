@@ -36,12 +36,12 @@ export class ProfileService {
     return profileRes;
   }
   static async getUsersProfile(
-    identifier: string,
+    profileUrl: string,
     reqUser: IRequestUser | null,
   ): Promise<TUserProfileResponse> {
-    const user = await UserService.getUser(identifier);
+    const user = await UserService.getUser(reqUser?.email ?? '');
 
-    const profile = await Profile.findOne({ user: user._id }).populate({
+    const profile = await Profile.findOne({ 'profileUrls.url': profileUrl }).populate({
       path: 'user',
       select: 'username email role',
     });
@@ -53,7 +53,7 @@ export class ProfileService {
     const responseProfile = ProfileMapper.toUserProfile(profile);
 
     // If user is requesting his/her profile
-    if (reqUser?._id === user._id) {
+    if (reqUser?._id === user?._id) {
       return responseProfile;
     }
 

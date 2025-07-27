@@ -6,7 +6,7 @@ import {
   type TDeleteProject,
   type TDeleteProjectArrayItem,
   type TPagination,
-  type TProjectById,
+  type TProjectByProfileUrl,
   type TProjectByTechStack,
   type TProjectByTitle,
   type TProjectResponse,
@@ -70,6 +70,8 @@ export const fetchUserProjectsService = async (
   );
 };
 
-export const fetchProjectByIdService = async (data: TProjectById): Promise<TProjectResponse> => {
-  return apiGet<TProjectResponse>(`/api/v1/project/${data.projectId}`);
+export const fetchProjectByIdService = async (
+  data: TProjectByProfileUrl,
+): Promise<TProjectResponse> => {
+  return apiGet<TProjectResponse>(`/api/v1/project/${data.url}`);
 };

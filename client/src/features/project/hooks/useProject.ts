@@ -1,9 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import { useSearch } from '@tanstack/react-router';
 
 import * as projectService from '../services/projectService';
-import type { TPagination } from 'shared';
 
 export const useCreateProject = () => {
   return useMutation({
@@ -11,24 +9,22 @@ export const useCreateProject = () => {
   });
 };
 
-export const useFetchProjectsById = (
-  profileId?: string,
-  pagination: TPagination = { limit: 10, cursor: null },
-) => {
+export const useInfiniteFetchProjectsProfileUrl = (profileId?: string, pageSize: number = 10) => {
   const { profileId: routeId } = useParams({ strict: false });
-  const { limit, cursor } = useSearch({ strict: false });
 
   const finalId = profileId ?? routeId;
 
-  const finalPagination: TPagination = {
-    limit: limit ?? pagination.limit,
-    cursor: cursor ?? pagination.cursor,
-  };
-
-  return useQuery({
-    queryKey: ['projects', finalId, finalPagination],
-    queryFn: () => projectService.fetchUserProjectsService({ profileId: finalId }, finalPagination),
+  return useInfiniteQuery({
+    queryKey: ['infinite-projects', finalId],
+    queryFn: ({ pageParam = null }: { pageParam: string | null }) => {
+      return projectService.fetchUserProjectsService(
+        { profileId: finalId },
+        { limit: pageSize, cursor: pageParam },
+      );
+    },
+    getNextPageParam: lastPage => lastPage.nextCursor,
     enabled: !!finalId,
+    initialPageParam: null,
     staleTime: 3 * 60 * 1000,
   });
 };

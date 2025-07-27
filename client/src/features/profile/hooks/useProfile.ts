@@ -11,14 +11,14 @@ import {
 } from '@/store/profile/profileSlice';
 import { useEffect } from 'react';
 
-export const useProfile = (identifier: string) => {
+export const useProfile = (url: string) => {
   const dispatch = useDispatch();
 
   const { data: userProfile, error } = useSuspenseQuery({
-    queryKey: ['profile', identifier] as const,
+    queryKey: ['profile', url] as const,
     queryFn: async () => {
       const { data: profile } = await profileService.profileService({
-        identifier: identifier.trim(),
+        url: url.trim(),
       });
       return profile;
     },
@@ -26,7 +26,7 @@ export const useProfile = (identifier: string) => {
 
   const { isLoggedIn, user } = useSelector((state: RootState) => state.profileSummary);
 
-  const isCurrentUser = isLoggedIn && user?.username === identifier.trim();
+  const isCurrentUser = isLoggedIn && user?.username === userProfile?.username;
 
   // Dispatch to Redux once data is available
   useEffect(() => {

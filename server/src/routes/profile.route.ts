@@ -22,7 +22,7 @@ router.get(
   ProfileController.fullNameSearch,
 );
 router.get(
-  '/:identifier',
+  '/:url',
   validateSchema(userProfileParamsSchema),
   attachUser, // User or null, authentication is'nt required.
   ProfileController.getUserProfile,

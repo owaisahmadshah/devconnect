@@ -7,8 +7,6 @@ import {
   type TAddProfileArrayField,
   type TSingleImageBackend,
   type TUpdateProfileField,
-  type TFullNameSearch,
-  type TPagination,
 } from 'shared';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -37,15 +35,17 @@ export class ProfileController {
    * Retrieves user's profile.
    *
    * @route GET /api/v1/users/:username
-   * @param {Request} req.params.identifier contains username or email
+   * @param {Request} req.params.url contains username or email
    * @returns User profile of type TUserProfileResponse
    */
   static getUserProfile = asyncHandler(async (req: Request, res: Response) => {
     const params = req.params;
-    if (!params.identifier) {
+
+    if (!params.url) {
       throw new ApiError(HttpStatus.BAD_REQUEST, 'Username is not provided.');
     }
-    const profile = await ProfileService.getUsersProfile(params.identifier, req?.user ?? null);
+
+    const profile = await ProfileService.getUsersProfile(params.url, req?.user ?? null);
 
     return res
       .status(HttpStatus.OK)

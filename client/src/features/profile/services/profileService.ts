@@ -7,7 +7,7 @@ import type {
 } from 'shared';
 
 export const profileService = async (data: TUserProfileParams) => {
-  const response = await api.get(`/api/v1/profile/${data.identifier}`);
+  const response = await api.get(`/api/v1/profile/${data.url}`);
   return response.data;
 };
 
