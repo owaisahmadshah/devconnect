@@ -17,6 +17,7 @@ import { ProfileMapper } from '../mapper/profile.mapper.js';
 import { UserService } from './user.service.js';
 import type { IRequestUser } from '../types/index.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import mongoose from 'mongoose';
 
 export class ProfileService {
   static async getUserProfileSummary(userId: string): Promise<TUserProfileSummaryResponse> {
@@ -188,7 +189,10 @@ export class ProfileService {
   ): Promise<TUserProfileSummaryresponseWithPagination> {
     const { limit, cursor } = pagination;
 
-    const matchStage = cursor ? { $match: { createdAt: { $lt: new Date(cursor) } } } : null;
+    // TODO: Change all createdAt cursors' to _id
+    const matchStage = cursor
+      ? { $match: { _id: { $lt: new mongoose.Types.ObjectId(cursor) } } }
+      : null;
 
     const pipeline: any[] = [
       {
@@ -214,8 +218,8 @@ export class ProfileService {
           },
         },
       },
+      { $sort: { _id: -1 } }, // Ensure descending order for pagination
       ...(matchStage ? [matchStage] : []),
-      { $sort: { createdAt: -1 } }, // Ensure descending order for pagination
       { $limit: limit + 1 }, // Fetch one extra to determine if there's a next page
       {
         $lookup: {
@@ -237,6 +241,7 @@ export class ProfileService {
           username: 1,
           isVerified: 1,
           email: 1,
+          user: 1,
           score: { $meta: 'searchScore' },
         },
       },
@@ -245,8 +250,10 @@ export class ProfileService {
     const results = await Profile.aggregate(pipeline);
 
     const hasMore = results.length > limit;
-    const items = hasMore ? results.slice(0, -1) : results;
-    const nextCursor = hasMore ? items[items.length - 1].createdAt.toISOString() : null;
+    const items = hasMore
+      ? results.slice(0, -1).map(item => ProfileMapper.toUserProfileSummary(item))
+      : results;
+    const nextCursor = hasMore ? items[items.length - 1]._id.toString() : null;
 
     return {
       profiles: items,
