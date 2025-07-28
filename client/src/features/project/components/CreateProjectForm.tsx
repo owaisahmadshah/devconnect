@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ChangeEvent } from 'react';
 
-import { createProjectSchema, type TCreateProject } from 'shared';
+import { createProjectSchema, type TCreateProject, type TUserProfileSummary } from 'shared';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/molecules/FormField';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
@@ -23,6 +23,11 @@ import { MdDelete } from 'react-icons/md';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useInfiniteUserSearchByFullName } from '@/hooks/useProfile';
 
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Search } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+
 export const CreateProjectForm = () => {
   const [tag, setTag] = useState('');
   const [techStack, setTechStack] = useState('');
@@ -30,6 +35,8 @@ export const CreateProjectForm = () => {
   const [open, setOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fullName, setFullName] = useState('');
+  const [isPopOverOpen, setIsPopOverOpen] = useState(false);
+  const [collaborators, setCollaborators] = useState<TUserProfileSummary[]>([]);
 
   const form = useForm<TCreateProject>({
     resolver: zodResolver(createProjectSchema),
@@ -53,9 +60,14 @@ export const CreateProjectForm = () => {
   const watchedTechStacks = form.watch('techStacks');
 
   // const { data, fetchNextPage, hasNextPage, isFetchNextPageError } =
-  const { data } = useInfiniteUserSearchByFullName(fullName);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteUserSearchByFullName(fullName);
 
-  console.log(data);
+  // Filtered profiles, if a user is already selected it won't be shown
+  const allProfiles =
+    data?.pages
+      ?.flatMap(page => page.profiles)
+      ?.filter(profile => !collaborators.some(colUser => colUser._id === profile._id)) || [];
 
   const onSubmit = async (data: TCreateProject) => {
     console.log(data);
@@ -122,6 +134,33 @@ export const CreateProjectForm = () => {
     form.setValue('media', media);
 
     setOpen(preview && preview?.length - 1 > currentIndex ? true : currentIndex > 0 ? true : false);
+  };
+
+  const handleFullNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFullName(value);
+  };
+
+  const handleCollaboratorUserSelect = (user: TUserProfileSummary) => {
+    const currentCollaborators = form.getValues('collaborators');
+
+    const userExists = currentCollaborators.some(colUserId => colUserId.user === user._id);
+
+    if (!userExists) {
+      form.setValue('collaborators', [...currentCollaborators, { user: user._id }]);
+      setCollaborators(prevValues => [...prevValues, user]);
+      setIsPopOverOpen(false);
+    }
+  };
+
+  const handleCollaboratorUserDelete = (user: TUserProfileSummary) => {
+    const currentCollaborators = form
+      .getValues('collaborators')
+      .filter(colUser => colUser.user !== user._id);
+
+    form.setValue('collaborators', currentCollaborators);
+
+    setCollaborators(prevValues => prevValues.filter(prevValue => prevValue._id !== user._id));
   };
 
   return (
@@ -199,13 +238,89 @@ export const CreateProjectForm = () => {
 
               {/* Adding collaborators */}
               <div>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Search Collaborators"
-                    onChange={e => setFullName(e.target.value?.trim())}
-                    value={fullName}
-                  />
-                </div>
+                <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
+                  <PopoverTrigger asChild>
+                    <div className="relative flex gap-2">
+                      <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                      <Input
+                        placeholder="Search collaborators..."
+                        onChange={handleFullNameChange}
+                        value={fullName}
+                        className="pl-10"
+                      />
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 overflow-y-auto p-0" align="start" side="bottom">
+                    <ScrollArea
+                      className={cn(
+                        'h-80 min-h-2.5 rounded-md',
+                        allProfiles.length === 0 && 'h-10',
+                      )}
+                    >
+                      {isLoading ? (
+                        <div className="max-h-72 p-4 text-center text-sm text-gray-500">
+                          Searching...
+                        </div>
+                      ) : allProfiles.length > 0 ? (
+                        <div className="py-2">
+                          {allProfiles.map(user => (
+                            <div
+                              key={user._id}
+                              onClick={() => handleCollaboratorUserSelect(user)}
+                              className="bg-card hover:bg-muted flex cursor-pointer items-center gap-3 px-4 py-2 transition-colors"
+                            >
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.profilePictureUrl} />
+                                <AvatarFallback>
+                                  {user.firstName?.[0]}
+                                  {user.lastName?.[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="text-sm font-medium">
+                                  {user.firstName} {user.lastName}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+
+                          {hasNextPage && (
+                            <div className="border-t px-4 py-2">
+                              <button
+                                onClick={() => fetchNextPage()}
+                                disabled={isFetchingNextPage}
+                                className="w-full text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                              >
+                                {isFetchingNextPage ? 'Loading more...' : 'Load more users'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : fullName ? (
+                        <div className="p-4 text-center text-sm text-gray-500">No users found</div>
+                      ) : null}
+                    </ScrollArea>
+                  </PopoverContent>
+                </Popover>
+                {/* Display selected collaborators */}
+                {collaborators.length > 0 && (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-sm font-medium">Selected Collaborators:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {collaborators.map(user => (
+                        <DismissibleBadge
+                          key={user._id}
+                          avatar={user.profilePictureUrl}
+                          avatarFallBack={`${user.firstName?.[0]} ${user.lastName?.[0]}`}
+                          avatarClasses='h-5 w-5'
+                          text={`${user.firstName} ${user.lastName}`}
+                          onRemove={() => handleCollaboratorUserDelete(user)}
+                          customClasses="rounded"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Image Upload Section - Fixed Layout */}

@@ -1,8 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface DismissibleBadgeProps {
+  avatar?: string;
+  avatarFallBack?: string;
+  avatarClasses?: string;
   text: string;
   onRemove?: () => void;
   customClasses?: string;
@@ -10,6 +14,9 @@ interface DismissibleBadgeProps {
 }
 
 export const DismissibleBadge = ({
+  avatar,
+  avatarFallBack,
+  avatarClasses,
   text,
   onRemove,
   customClasses,
@@ -23,7 +30,13 @@ export const DismissibleBadge = ({
       )}
       variant={variant}
     >
-      {text}
+      {avatar && (
+        <Avatar className={cn("h-8 w-8", avatarClasses)}>
+          <AvatarImage src={avatar} />
+          <AvatarFallback>{avatarFallBack}</AvatarFallback>
+        </Avatar>
+      )}
+      <p>{text}</p>
       <button
         type="button"
         onClick={onRemove}
