@@ -17,7 +17,7 @@ export const singleBackendImageSchema = z.object({
   fieldname: z.string(),
   originalname: z.string(),
   encoding: z.string(),
-  mimetype: z.enum(['image/jpeg', 'image/png']),
+  mimetype: z.enum(['image/jpeg', 'image/png', 'image/webp']),
   destination: z.string(),
   filename: z.string(),
   path: z.string(),

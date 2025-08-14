@@ -2,11 +2,10 @@ import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api-client';
 import {
   type TProjectsSummaryWithCursorPaginationResponse,
   type TAddProjectArrayItem,
-  type TCreateProject,
   type TDeleteProject,
   type TDeleteProjectArrayItem,
   type TPagination,
-  type TProjectByProfileUrl,
+  type TProjectById,
   type TProjectByTechStack,
   type TProjectByTitle,
   type TProjectResponse,
@@ -14,7 +13,7 @@ import {
   type TUpdateProjectField,
 } from 'shared';
 
-export const createProjectService = async (data: TCreateProject): Promise<TProjectResponse> => {
+export const createProjectService = async (data: FormData): Promise<TProjectResponse> => {
   return apiPost<TProjectResponse>('/api/v1/project/create', data);
 };
 
@@ -70,8 +69,6 @@ export const fetchUserProjectsService = async (
   );
 };
 
-export const fetchProjectByIdService = async (
-  data: TProjectByProfileUrl,
-): Promise<TProjectResponse> => {
-  return apiGet<TProjectResponse>(`/api/v1/project/${data.url}`);
+export const fetchProjectByIdService = async (data: TProjectById): Promise<TProjectResponse> => {
+  return apiGet<TProjectResponse>(`/api/v1/project/${data.projectId}`);
 };

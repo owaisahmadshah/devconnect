@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { baseCollaboratorSchema, createCollaboratorSchema } from './collaborator';
 import { baseTagSchema, createTagSchema, tagWithIdSchema } from './tag';
-import { baseMediaSchema, createMediaSchema, mediaWithIdSchema } from './media';
+import { baseMediaSchema, mediaWithIdSchema } from './media';
 import { baseTechStackSchema, createTechStackSchema, techStackWithIdSchema } from './techStack';
-import { multipleImagesSchema } from '../image/image';
+import { multipleBackendImagesSchema, multipleImagesSchema } from '../image/image';
 
 export const projectVisibilityEnum = z.enum(['Private', 'Public', 'connections-only']);
 
@@ -38,6 +38,15 @@ export const createProjectSchema = baseProjectSchema
     techStacks: z.array(createTechStackSchema),
   });
 
+// For API request (create) - no _id needed
+export const createProjectBackendSchema = createProjectSchema
+  .omit({
+    media: true,
+  })
+  .extend({
+    media: multipleBackendImagesSchema,
+  });
+
 // For API request (delete) _id needed
 export const deleteProjectSchema = z.object({
   _id: z.string(),
@@ -64,6 +73,7 @@ export const projectWithIdSchema = baseProjectSchema
 // For typescript types
 export type TBaseProject = z.infer<typeof baseProjectSchema>;
 export type TCreateProject = z.infer<typeof createProjectSchema>;
+export type TCreateProjectBackend = z.infer<typeof createProjectBackendSchema>;
 export type TProjectWithId = z.infer<typeof projectWithIdSchema>;
 export type TDeleteProject = z.infer<typeof deleteProjectSchema>;
 export type TProjectVisibilityEnum = 'Private' | 'Public' | 'connections-only';

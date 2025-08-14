@@ -1,7 +1,7 @@
 import {
   HttpStatus,
   type TAddProjectArrayItem,
-  type TCreateProject,
+  type TCreateProjectBackend,
   type TDeleteProject,
   type TDeleteProjectArrayItem,
   type TProjectById,
@@ -18,10 +18,21 @@ import { ProjectMapper } from '../mapper/project.mapper.js';
 import mongoose from 'mongoose';
 import { ApiError } from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
+import { uploadMultipleImages } from '../utils/uploadImages.js';
 
 export class ProjectService {
-  static async createProject(projectData: TCreateProject): Promise<TProjectResponse> {
-    const project = await Project.create(projectData);
+  static async createProject(projectData: TCreateProjectBackend): Promise<TProjectResponse> {
+    let paths: string[] = [];
+    projectData.media.forEach(path => paths.push(path.path));
+
+    // Uploading images to cloudinary
+    const { urls: media, success } = await uploadMultipleImages(paths);
+
+    if (!success) {
+      throw new ApiError(401, 'Error uploading project images');
+    }
+
+    const project = await Project.create({ ...projectData, media });
 
     const responseProject = ProjectMapper.toPublicProject(project);
 
@@ -78,11 +89,11 @@ export class ProjectService {
       path: 'createdBy',
       select: '_id username email firstName lastName role profilePictureUrl bio isVerified',
     });
-    
+
     if (!project) {
       throw new ApiError(404, 'Project not found');
     }
-    console.log('projects after', project)
+    console.log('projects after', project);
 
     const responseProject = ProjectMapper.toPublicProject(project);
 

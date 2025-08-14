@@ -1,6 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useCallback, useState, type ChangeEvent } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { MdDelete } from 'react-icons/md';
+import { Search } from 'lucide-react';
+import { useSelector } from 'react-redux';
+
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import 'yet-another-react-lightbox/styles.css';
 
 import { createProjectSchema, type TCreateProject, type TUserProfileSummary } from 'shared';
 import { Form } from '@/components/ui/form';
@@ -13,20 +22,15 @@ import { TextAreaField } from '@/components/molecules/TextAreaField';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DismissibleBadge } from '@/components/molecules/DismissibleBadge';
-import { useDropzone } from 'react-dropzone';
 
-import Lightbox from 'yet-another-react-lightbox';
-import Zoom from 'yet-another-react-lightbox/plugins/zoom';
-import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
-import 'yet-another-react-lightbox/styles.css';
-import { MdDelete } from 'react-icons/md';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useInfiniteUserSearchByFullName } from '@/hooks/useProfile';
-
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Search } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import type { RootState } from '@/store/store';
+import { useCreateProject } from '../hooks/useProject';
+import { getErrorDetails } from '@/lib/errorHanldling';
 
 export const CreateProjectForm = () => {
   const [tag, setTag] = useState('');
@@ -38,6 +42,10 @@ export const CreateProjectForm = () => {
   const [isPopOverOpen, setIsPopOverOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<TUserProfileSummary[]>([]);
 
+  const currentLoggedInUser = useSelector((state: RootState) => state.profileSummary.user);
+
+  const { mutateAsync, isPending, error, isError } = useCreateProject();
+
   const form = useForm<TCreateProject>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
@@ -45,11 +53,11 @@ export const CreateProjectForm = () => {
       description: '',
       githubUrl: '',
       liveDemoUrl: '',
-      createdBy: '',
+      createdBy: currentLoggedInUser?._id ?? '',
       isFeatured: true,
       creationDate: new Date(),
       visibility: 'Public',
-      collaborators: [],
+      collaborators: [{ user: currentLoggedInUser?._id ?? '' }],
       tags: [],
       media: [],
       techStacks: [],
@@ -59,25 +67,56 @@ export const CreateProjectForm = () => {
   const watchedTags = form.watch('tags');
   const watchedTechStacks = form.watch('techStacks');
 
-  // const { data, fetchNextPage, hasNextPage, isFetchNextPageError } =
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteUserSearchByFullName(fullName);
 
-  // Filtered profiles, if a user is already selected it won't be shown
+  // Filtered profiles, if a user is already selected it won't be shown or if currentUser is searching for this
   const allProfiles =
     data?.pages
       ?.flatMap(page => page.profiles)
-      ?.filter(profile => !collaborators.some(colUser => colUser._id === profile._id)) || [];
+      ?.filter(
+        profile =>
+          !collaborators.some(
+            colUser => colUser._id === profile._id || colUser._id === currentLoggedInUser?._id,
+          ),
+      ) || [];
 
   const onSubmit = async (data: TCreateProject) => {
-    console.log(data);
+    const formData = new FormData();
+
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('githubUrl', data.githubUrl);
+    formData.append('liveDemoUrl', data.liveDemoUrl);
+    formData.append('createdBy', data.createdBy);
+    formData.append('visibility', data.visibility);
+    formData.append('isFeatured', data.isFeatured.toString());
+    formData.append('creationDate', data.creationDate.toISOString());
+
+    data.tags.forEach((tag, i) => {
+      formData.append(`tags[${i}][tag]`, tag.tag);
+    });
+
+    data.techStacks.forEach((tech, i) => {
+      formData.append(`techStacks[${i}][tech]`, tech.tech);
+    });
+
+    data.collaborators.forEach((collab, i) => {
+      formData.append(`collaborators[${i}][user]`, collab.user);
+    });
+
+    data.media.forEach(mediaObj => {
+      formData.append('media', mediaObj.image);
+    });
+
+    await mutateAsync(formData);
   };
 
   const handleAddTag = () => {
     if (tag) {
       const currentTags = form.getValues('tags');
       if (!currentTags.some(t => t.tag === tag)) {
-        form.setValue('tags', [...currentTags, { tag }]);
+        form.setValue('tags', [...currentTags, { tag: tag.trim() }]);
       }
       setTag('');
     }
@@ -87,7 +126,7 @@ export const CreateProjectForm = () => {
     if (techStack) {
       const currentTechStacks = form.getValues('techStacks');
       if (!currentTechStacks.some(t => t.tech === techStack)) {
-        form.setValue('techStacks', [...currentTechStacks, { tech: techStack }]);
+        form.setValue('techStacks', [...currentTechStacks, { tech: techStack.trim() }]);
       }
       setTechStack('');
     }
@@ -168,7 +207,12 @@ export const CreateProjectForm = () => {
       <ScrollArea className="relative h-full w-full rounded-md border">
         <div className="p-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-[60%] space-y-8 py-5">
+            <form
+              onSubmit={form.handleSubmit(onSubmit, error => {
+                console.log('Form validation failed:', error);
+              })}
+              className="mx-auto w-[60%] space-y-8 py-5 max-sm:w-[90%]"
+            >
               <FormField form={form} placeholder="Title" id="title" name="title" />
               <TextAreaField
                 form={form}
@@ -185,11 +229,7 @@ export const CreateProjectForm = () => {
               />
               <div>
                 <div className="flex gap-2">
-                  <Input
-                    placeholder="Tags"
-                    onChange={e => setTag(e.target.value?.trim())}
-                    value={tag}
-                  />
+                  <Input placeholder="Tags" onChange={e => setTag(e.target.value)} value={tag} />
                   <Button type="button" onClick={handleAddTag}>
                     Add
                   </Button>
@@ -205,15 +245,15 @@ export const CreateProjectForm = () => {
                       />
                     ))
                   ) : (
-                    <p className="">No tags have been added!</p>
+                    <p>No tags have been added!</p>
                   )}
                 </div>
               </div>
               <div>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Tech Stack"
-                    onChange={e => setTechStack(e.target.value?.trim())}
+                    placeholder="Tech stack"
+                    onChange={e => setTechStack(e.target.value)}
                     value={techStack}
                   />
                   <Button type="button" onClick={handleAddTechStack}>
@@ -231,7 +271,7 @@ export const CreateProjectForm = () => {
                       />
                     ))
                   ) : (
-                    <p className="">No tech stacks have been added!</p>
+                    <p>No tech stacks have been added!</p>
                   )}
                 </div>
               </div>
@@ -312,7 +352,7 @@ export const CreateProjectForm = () => {
                           key={user._id}
                           avatar={user.profilePictureUrl}
                           avatarFallBack={`${user.firstName?.[0]} ${user.lastName?.[0]}`}
-                          avatarClasses='h-5 w-5'
+                          avatarClasses="h-5 w-5"
                           text={`${user.firstName} ${user.lastName}`}
                           onRemove={() => handleCollaboratorUserDelete(user)}
                           customClasses="rounded"
@@ -398,9 +438,22 @@ export const CreateProjectForm = () => {
                   { label: 'No', value: false },
                 ]}
               />
-              <SubmitButton isLoading={false} disabled={false}>
+              <SubmitButton isLoading={isPending} disabled={false}>
                 Create Project
               </SubmitButton>
+              <div className="mx-auto w-1/2 text-sm font-semibold text-red-500">
+                {isError && <p className="text-center">{getErrorDetails(error).message}</p>}
+
+                {/* {isError
+                  ? getErrorDetails(error).errors.length
+                    ? getErrorDetails(error).errors.map(err => (
+                        <p>
+                          {err.path.split('.')[1]}: {err.message}
+                        </p>
+                      ))
+                    : getErrorDetails(error).message
+                  : ''} */}
+              </div>
             </form>
           </Form>
         </div>

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 // Get project by Id
-export const projectByProfileUrlSchema = z.object({
-  url: z.string().min(1, 'Project ID is required'),
+export const projectByIdSchema = z.object({
+  projectId: z.string().min(1, 'Project ID is required'),
 });
 
 // Get project by title
@@ -26,7 +26,7 @@ export const projectByTechStackSchema = z.object({
 });
 
 // Types for typescript
-export type TProjectByProfileUrl = z.infer<typeof projectByProfileUrlSchema>;
+export type TProjectById = z.infer<typeof projectByIdSchema>;
 export type TProjectByTitle = z.infer<typeof projectByTitleSchema>;
 export type TProjectsOfUser = z.infer<typeof projectsOfUserSchema>;
 export type TProjectByTechStack = z.infer<typeof projectByTechStackSchema>;

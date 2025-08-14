@@ -4,6 +4,7 @@ import auth from '../middleware/auth.middleware.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import { ProjectController } from '../controllers/project.controller.js';
 import * as projectSchema from '../schemas/project.js';
+import { upload } from '../middleware/multer.middleware.js';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post(
   '/create',
   auth,
+  upload.fields([{ name: 'media', maxCount: 15 }]),
   validateSchema(projectSchema.createProjectBodySchema),
   ProjectController.createProject,
 );

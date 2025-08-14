@@ -3,12 +3,14 @@ import { Button } from '@/components/ui/button';
 interface SubmitButtonProps {
   children: React.ReactNode;
   isLoading?: boolean;
+  loadingText?: string;
   disabled?: boolean;
 }
 
 export const SubmitButton = ({
   children,
   isLoading = false,
+  loadingText = 'Loading...',
   disabled = false,
 }: SubmitButtonProps) => {
   return (
@@ -39,7 +41,7 @@ export const SubmitButton = ({
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          Loading...
+          {loadingText}
         </span>
       ) : (
         children

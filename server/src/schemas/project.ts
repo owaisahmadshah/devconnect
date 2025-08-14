@@ -1,20 +1,28 @@
 import { z } from 'zod';
 
 import {
-  createProjectSchema,
+  createProjectBackendSchema,
   deleteProjectSchema,
   addProjectArrayItem,
   updateProjectFieldSchema,
-  projectByProfileUrlSchema,
+  projectByIdSchema,
   projectByTitleSchema,
   projectByTechStackSchema,
   projectsOfUserSchema,
   paginationSchema,
+  multipleBackendImagesSchema,
 } from 'shared';
 
 export const createProjectBodySchema = z.object({
-  body: createProjectSchema,
+  body: createProjectBackendSchema
+    .omit({
+      media: true,
+      isFeatured: true,
+    })
+    .extend({ isFeatured: z.string() }),
+  files: z.object({ media: multipleBackendImagesSchema }),
 });
+
 export const addProjectArrayItemFieldBodySchema = z.object({
   body: addProjectArrayItem,
 });
@@ -40,7 +48,7 @@ export const projectsByTechStacksQuerySchema = z.object({
 });
 
 export const projectByIdParamsSchema = z.object({
-  params: projectByProfileUrlSchema,
+  params: projectByIdSchema,
 });
 
 export const projectsOfUserParmsSchema = z.object({

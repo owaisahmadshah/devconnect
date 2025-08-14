@@ -16,8 +16,8 @@ import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
 import { UserService } from './user.service.js';
 import type { IRequestUser } from '../types/index.js';
-import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import mongoose from 'mongoose';
+import { uploadSingleImage } from '../utils/uploadImages.js';
 
 export class ProfileService {
   static async getUserProfileSummary(userId: string): Promise<TUserProfileSummaryResponse> {
@@ -110,18 +110,11 @@ export class ProfileService {
     return responseProfile;
   }
 
-  static async uploadImageOnCloudinary(
-    imagePath: string,
-  ): Promise<{ url: string; success: boolean }> {
-    const response = await uploadOnCloudinary(imagePath);
-    return { url: response?.url ?? '', success: response?.url ? true : false };
-  }
-
   static async updateProfileImage(
     image: TSingleImageBackend,
     user: IRequestUser,
   ): Promise<TUserProfileResponse> {
-    const { url, success } = await this.uploadImageOnCloudinary(image.path);
+    const { url, success } = await uploadSingleImage(image.path);
 
     if (!success) {
       throw new ApiError(401, 'Error uploading proilfe picture to cloudinary.');

@@ -4,8 +4,10 @@ import {
   HttpStatus,
   type TAddProjectArrayItem,
   type TCreateProject,
+  type TCreateProjectBackend,
   type TDeleteProject,
   type TDeleteProjectArrayItem,
+  type TMultipleBackendImages,
   type TUpdateProjectField,
 } from 'shared';
 import { ApiError } from '../utils/ApiError.js';
@@ -25,9 +27,17 @@ export class ProjectController {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
-    const data: TCreateProject = req.body;
 
-    const project = await ProjectService.createProject(data);
+    const data: Omit<TCreateProjectBackend, 'media' | 'isFeatured'> = req.body;
+    const media: TMultipleBackendImages = (req.files as any)?.media as TMultipleBackendImages;
+
+    const createProjectData: TCreateProjectBackend = {
+      ...data,
+      media,
+      isFeatured: req.body.isFeatured === 'true' ? true : false,
+    };
+
+    const project = await ProjectService.createProject(createProjectData);
 
     return res
       .status(HttpStatus.CREATED)

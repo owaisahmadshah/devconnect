@@ -53,6 +53,7 @@ const projectSchema = new Schema<IProjectSchema>({
         mediaType: {
           type: String,
           enum: ['video', 'image'],
+          default: 'image',
         },
         url: {
           type: String,

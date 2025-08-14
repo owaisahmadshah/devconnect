@@ -3,13 +3,14 @@ import { ZodError, type AnyZodObject } from 'zod';
 import { ApiError } from '../utils/ApiError.js';
 
 export const validateSchema = (schema: AnyZodObject) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _: Response, next: NextFunction) => {
     try {
       await schema.parseAsync({
         body: req.body,
         query: req.query,
         params: req.params,
         file: req.file,
+        files: req.files,
       });
       return next();
     } catch (error) {

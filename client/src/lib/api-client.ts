@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { AxiosRequestHeaders } from 'axios';
+
 import api from './axios';
 import { type ApiResponse } from './ApiResopnse';
 
@@ -10,6 +12,7 @@ interface RequestOptions {
   data?: any;
   unwrapData?: boolean; // Optional: return just `data` or full ApiResponse
   signal?: AbortSignal;
+  headers?: AxiosRequestHeaders;
 }
 
 /**
@@ -29,7 +32,14 @@ export const request = async <T, U extends boolean = true>(
   url: string,
   options: RequestOptions & { unwrapData?: U } = {},
 ): Promise<U extends true ? T : ApiResponse<T>> => {
-  const { params, data, unwrapData = true, signal } = options;
+  const { params, data, unwrapData = true, signal, headers } = options;
+
+  const defaultHeaders =
+    data instanceof FormData
+      ? { 'Content-Type': 'multipart/form-data' }
+      : data && !headers
+        ? { 'Content-Type': 'application/json' }
+        : undefined;
 
   const res = await api.request<ApiResponse<T>>({
     method,
@@ -37,6 +47,7 @@ export const request = async <T, U extends boolean = true>(
     params,
     data,
     signal,
+    headers: headers ?? defaultHeaders,
   });
 
   return (unwrapData ? res.data.data : res.data) as any;
@@ -50,14 +61,19 @@ export const apiGet = <T>(
   url: string,
   params?: any,
   options?: Omit<RequestOptions, 'params' | 'unwrapData'>,
-) => request<T>('get', url, { params, ...options });
+  headers?: AxiosRequestHeaders,
+) => request<T>('get', url, { params, ...options, headers });
 
 /**
  * @example
  * const result = await apiPost<Project>('/project/create', { title: 'New' });
  */
-export const apiPost = <T>(url: string, data?: any, options?: Omit<RequestOptions, 'unwrapData'>) =>
-  request<T>('post', url, { data, ...options });
+export const apiPost = <T>(
+  url: string,
+  data?: any,
+  options?: Omit<RequestOptions, 'unwrapData'>,
+  headers?: AxiosRequestHeaders,
+) => request<T>('post', url, { data, ...options, headers });
 
 /**
  * @example
@@ -67,7 +83,8 @@ export const apiPatch = <T>(
   url: string,
   data?: any,
   options?: Omit<RequestOptions, 'unwrapData'>,
-) => request<T>('patch', url, { data, ...options });
+  headers?: AxiosRequestHeaders,
+) => request<T>('patch', url, { data, ...options, headers });
 
 /**
  * @example
@@ -77,4 +94,5 @@ export const apiDelete = <T>(
   url: string,
   params?: any,
   options?: Omit<RequestOptions, 'params' | 'unwrapData'>,
-) => request<T>('delete', url, { params, ...options });
+  headers?: AxiosRequestHeaders,
+) => request<T>('delete', url, { params, ...options, headers });
