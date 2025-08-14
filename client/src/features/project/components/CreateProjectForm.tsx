@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils';
 import type { RootState } from '@/store/store';
 import { useCreateProject } from '../hooks/useProject';
 import { getErrorDetails } from '@/lib/errorHanldling';
+import { ProjectCreatedDialog } from './ProjectCreatedDialog';
 
 export const CreateProjectForm = () => {
   const [tag, setTag] = useState('');
@@ -44,7 +45,7 @@ export const CreateProjectForm = () => {
 
   const currentLoggedInUser = useSelector((state: RootState) => state.profileSummary.user);
 
-  const { mutateAsync, isPending, error, isError } = useCreateProject();
+  const { mutateAsync, isPending, isSuccess, error, isError } = useCreateProject();
 
   const form = useForm<TCreateProject>({
     resolver: zodResolver(createProjectSchema),
@@ -201,6 +202,10 @@ export const CreateProjectForm = () => {
 
     setCollaborators(prevValues => prevValues.filter(prevValue => prevValue._id !== user._id));
   };
+
+  if (isSuccess) {
+    return <ProjectCreatedDialog />
+  }
 
   return (
     <div className="fixed inset-0 h-full w-full overflow-hidden">
