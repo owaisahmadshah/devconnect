@@ -20,8 +20,18 @@ import mongoose from 'mongoose';
 import { uploadSingleImage } from '../utils/uploadImages.js';
 
 export class ProfileService {
-  static async getUserProfileSummary(userId: string): Promise<TUserProfileSummaryResponse> {
-    const profile = await Profile.findOne({ user: userId })
+  static async getUserProfileSummary(queryText: string): Promise<TUserProfileSummaryResponse> {
+    const conditions: any[] = [];
+
+    if (mongoose.Types.ObjectId.isValid(queryText)) {
+      conditions.push({ user: queryText });
+    }
+
+    conditions.push({ 'profileUrls.url': queryText });
+
+    const profile = await Profile.findOne({
+      $or: conditions,
+    })
       .populate({
         path: 'user',
         select: 'username email role',
@@ -36,6 +46,7 @@ export class ProfileService {
 
     return profileRes;
   }
+
   static async getUsersProfile(
     profileUrl: string,
     reqUser: IRequestUser | null,

@@ -184,17 +184,17 @@ export class ProjectController {
    * @param {Request} req contains authenticated user(req.user) profilId(req.params) and {limit, cursor}(req.query)
    * @returns TProjectsSummaryWithCursorPaginationResponse[]
    */
-  static fetchUserProjects = asyncHandler(async (req: Request, res: Response) => {
+  static fetchUserProjectsByProfileUrls = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
 
-    const { profileId } = req.params;
+    const { profileUrl } = req.params;
     const { limit, cursor } = req.query;
 
-    const projects = await ProjectService.fetchUserProjects(
+    const projects = await ProjectService.fetchUserProjectsByProfileUrls(
       {
-        profileId: profileId as string,
+        profileUrl: profileUrl as string,
       },
       limit ? Number(limit) : 10,
       typeof cursor === 'string' ? cursor : undefined,

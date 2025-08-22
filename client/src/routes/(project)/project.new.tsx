@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { requireAuth } from '@/lib/requireAuth';
 import { CreateProjectForm } from '@/features/project/components/CreateProjectForm';
+import { requireAuth } from '@/lib/requireAuth';
 
-export const Route = createFileRoute('/project/new')({
+export const Route = createFileRoute('/(project)/project/new')({
   component: RouteComponent,
   loader: requireAuth,
 });

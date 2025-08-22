@@ -19,6 +19,7 @@ import mongoose from 'mongoose';
 import { ApiError } from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 import { uploadMultipleImages } from '../utils/uploadImages.js';
+import { ProfileService } from './profile.service.js';
 
 export class ProjectService {
   static async createProject(projectData: TCreateProjectBackend): Promise<TProjectResponse> {
@@ -186,12 +187,18 @@ export class ProjectService {
     return this.fetchPaginatedProjectsSummary({ filter, limit, cursor });
   }
 
-  static async fetchUserProjects(
-    profileId: TProjectsOfUser,
+  /**
+   * Retrieves a user's profile using the provided profile URL,
+   * then fetches all projects created by that user.
+   */
+  static async fetchUserProjectsByProfileUrls(
+    profileUrl: TProjectsOfUser,
     limit: number = 15,
     cursor?: string,
   ): Promise<TProjectsSummaryWithCursorPaginationResponse> {
-    const filter: any = { createdBy: profileId.profileId };
+    const profile = await ProfileService.getUserProfileSummary(profileUrl.profileUrl);
+
+    const filter: any = { createdBy: profile._id };
 
     return this.fetchPaginatedProjectsSummary({ filter, limit, cursor });
   }

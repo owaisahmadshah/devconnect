@@ -12,7 +12,7 @@ export const projectByTitleSchema = z.object({
 
 // Get all projects of a particular user
 export const projectsOfUserSchema = z.object({
-  profileId: z.string(),
+  profileUrl: z.string(),
 });
 
 // Get project by tech stacks

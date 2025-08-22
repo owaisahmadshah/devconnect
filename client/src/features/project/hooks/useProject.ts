@@ -9,21 +9,20 @@ export const useCreateProject = () => {
   });
 };
 
-export const useInfiniteFetchProjectsProfileUrl = (profileId?: string, pageSize: number = 10) => {
-  const { profileId: routeId } = useParams({ strict: false });
+export const useInfiniteFetchProjectsProfileUrl = (profileUrl?: string, pageSize: number = 10) => {
+  const { profileUrl: routeUrl } = useParams({ strict: false });
 
-  const finalId = profileId ?? routeId;
-
+  const finalUrl = profileUrl ?? routeUrl;
   return useInfiniteQuery({
-    queryKey: ['infinite-projects', finalId],
+    queryKey: ['infinite-projects', finalUrl],
     queryFn: ({ pageParam = null }: { pageParam: string | null }) => {
       return projectService.fetchUserProjectsService(
-        { profileId: finalId },
+        { profileUrl: finalUrl },
         { limit: pageSize, cursor: pageParam },
       );
     },
     getNextPageParam: lastPage => lastPage.nextCursor,
-    enabled: !!finalId,
+    enabled: !!finalUrl,
     initialPageParam: null,
     staleTime: 3 * 60 * 1000,
   });

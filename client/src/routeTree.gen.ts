@@ -15,8 +15,9 @@ import { Route as IndexImport } from './routes/index'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authSigninImport } from './routes/(auth)/signin'
-import { Route as ProjectNewRouteImport } from './routes/project/new/route'
 import { Route as ProfileIdentifierRouteImport } from './routes/profile/$identifier/route'
+import { Route as projectProjectsProfileUrlImport } from './routes/(project)/projects.$profileUrl'
+import { Route as projectProjectNewImport } from './routes/(project)/project.new'
 
 // Create/Update Routes
 
@@ -44,15 +45,21 @@ const authSigninRoute = authSigninImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProjectNewRouteRoute = ProjectNewRouteImport.update({
-  id: '/project/new',
-  path: '/project/new',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const ProfileIdentifierRouteRoute = ProfileIdentifierRouteImport.update({
   id: '/profile/$identifier',
   path: '/profile/$identifier',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const projectProjectsProfileUrlRoute = projectProjectsProfileUrlImport.update({
+  id: '/(project)/projects/$profileUrl',
+  path: '/projects/$profileUrl',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const projectProjectNewRoute = projectProjectNewImport.update({
+  id: '/(project)/project/new',
+  path: '/project/new',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -72,13 +79,6 @@ declare module '@tanstack/react-router' {
       path: '/profile/$identifier'
       fullPath: '/profile/$identifier'
       preLoaderRoute: typeof ProfileIdentifierRouteImport
-      parentRoute: typeof rootRoute
-    }
-    '/project/new': {
-      id: '/project/new'
-      path: '/project/new'
-      fullPath: '/project/new'
-      preLoaderRoute: typeof ProjectNewRouteImport
       parentRoute: typeof rootRoute
     }
     '/(auth)/signin': {
@@ -102,6 +102,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authVerifyOtpImport
       parentRoute: typeof rootRoute
     }
+    '/(project)/project/new': {
+      id: '/(project)/project/new'
+      path: '/project/new'
+      fullPath: '/project/new'
+      preLoaderRoute: typeof projectProjectNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/(project)/projects/$profileUrl': {
+      id: '/(project)/projects/$profileUrl'
+      path: '/projects/$profileUrl'
+      fullPath: '/projects/$profileUrl'
+      preLoaderRoute: typeof projectProjectsProfileUrlImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -110,29 +124,32 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
-  '/project/new': typeof ProjectNewRouteRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
+  '/project/new': typeof projectProjectNewRoute
+  '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
-  '/project/new': typeof ProjectNewRouteRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
+  '/project/new': typeof projectProjectNewRoute
+  '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
-  '/project/new': typeof ProjectNewRouteRoute
   '/(auth)/signin': typeof authSigninRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
+  '/(project)/project/new': typeof projectProjectNewRoute
+  '/(project)/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
 
 export interface FileRouteTypes {
@@ -140,45 +157,50 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/profile/$identifier'
-    | '/project/new'
     | '/signin'
     | '/signup'
     | '/verify-otp'
+    | '/project/new'
+    | '/projects/$profileUrl'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/profile/$identifier'
-    | '/project/new'
     | '/signin'
     | '/signup'
     | '/verify-otp'
+    | '/project/new'
+    | '/projects/$profileUrl'
   id:
     | '__root__'
     | '/'
     | '/profile/$identifier'
-    | '/project/new'
     | '/(auth)/signin'
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
+    | '/(project)/project/new'
+    | '/(project)/projects/$profileUrl'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProfileIdentifierRouteRoute: typeof ProfileIdentifierRouteRoute
-  ProjectNewRouteRoute: typeof ProjectNewRouteRoute
   authSigninRoute: typeof authSigninRoute
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
+  projectProjectNewRoute: typeof projectProjectNewRoute
+  projectProjectsProfileUrlRoute: typeof projectProjectsProfileUrlRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProfileIdentifierRouteRoute: ProfileIdentifierRouteRoute,
-  ProjectNewRouteRoute: ProjectNewRouteRoute,
   authSigninRoute: authSigninRoute,
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
+  projectProjectNewRoute: projectProjectNewRoute,
+  projectProjectsProfileUrlRoute: projectProjectsProfileUrlRoute,
 }
 
 export const routeTree = rootRoute
@@ -193,10 +215,11 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/profile/$identifier",
-        "/project/new",
         "/(auth)/signin",
         "/(auth)/signup",
-        "/(auth)/verify-otp"
+        "/(auth)/verify-otp",
+        "/(project)/project/new",
+        "/(project)/projects/$profileUrl"
       ]
     },
     "/": {
@@ -204,9 +227,6 @@ export const routeTree = rootRoute
     },
     "/profile/$identifier": {
       "filePath": "profile/$identifier/route.tsx"
-    },
-    "/project/new": {
-      "filePath": "project/new/route.tsx"
     },
     "/(auth)/signin": {
       "filePath": "(auth)/signin.tsx"
@@ -216,6 +236,12 @@ export const routeTree = rootRoute
     },
     "/(auth)/verify-otp": {
       "filePath": "(auth)/verify-otp.tsx"
+    },
+    "/(project)/project/new": {
+      "filePath": "(project)/project.new.tsx"
+    },
+    "/(project)/projects/$profileUrl": {
+      "filePath": "(project)/projects.$profileUrl.tsx"
     }
   }
 }

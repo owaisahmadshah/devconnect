@@ -56,10 +56,10 @@ router.get(
   ProjectController.fetchProjectById,
 );
 router.get(
-  '/user/:profileId',
+  '/user/:profileUrl',
   validateSchema(projectSchema.projectsOfUserParmsSchema),
   auth,
-  ProjectController.fetchUserProjects,
+  ProjectController.fetchUserProjectsByProfileUrls,
 );
 
 export default router;

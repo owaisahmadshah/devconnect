@@ -64,7 +64,7 @@ export const fetchUserProjectsService = async (
   pagination: TPagination,
 ): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
   return apiGet<TProjectsSummaryWithCursorPaginationResponse>(
-    `/api/v1/project/user/${data.profileId}`,
+    `/api/v1/project/user/${data.profileUrl}`,
     pagination,
   );
 };
