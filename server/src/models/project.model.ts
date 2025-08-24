@@ -73,6 +73,9 @@ const projectSchema = new Schema<IProjectSchema>({
     ],
     default: [],
   },
+}, 
+{
+  timestamps: true
 });
 
 projectSchema.index({ 'techStacks.tech': 1 });

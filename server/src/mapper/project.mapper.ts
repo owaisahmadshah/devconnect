@@ -17,7 +17,7 @@ export class ProjectMapper {
       collaborators: projectObj.collaborator,
       tags: projectObj.tags,
       media: projectObj.media,
-      techStacks: projectObj.techStack,
+      techStacks: projectObj.techStacks,
       createdAt: projectObj.createdAt,
       updatedAt: projectObj.updatedAt,
     };
@@ -32,7 +32,7 @@ export class ProjectMapper {
       createdBy: projectObj.createdBy,
       creationDate: projectObj.creationDate,
       tags: projectObj.tags,
-      techStacks: projectObj.techStack,
+      techStacks: projectObj.techStacks,
       createdAt: projectObj.createdAt,
     };
   };
