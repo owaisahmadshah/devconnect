@@ -17,6 +17,7 @@ export class ProfileMapper {
       role: profileObj.user.role,
       profilePictureUrl: profileObj.profilePictureUrl,
       bio: profileObj.bio,
+      profileUrls: profileObj.profileUrls,
       isVerified: profileObj.isVerified,
     };
   }

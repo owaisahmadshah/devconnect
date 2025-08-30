@@ -148,7 +148,7 @@ export class ProjectService {
       .limit(limit)
       .populate({
         path: 'createdBy',
-        select: '_id username email firstName lastName role profilePictureUrl bio isVerified',
+        select: '_id username email firstName lastName role profilePictureUrl bio isVerified profileUrls',
       })
       .select('_id title description createdBy tags techStacks creationDate createdAt');
 

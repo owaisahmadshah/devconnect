@@ -36,7 +36,7 @@ export class ProfileService {
         path: 'user',
         select: 'username email role',
       })
-      .select('_id user firstName lastName profilePictureUrl bio isVerified');
+      .select('_id user firstName lastName profilePictureUrl bio isVerified profileUrls');
 
     if (!profile) {
       throw new ApiError(HttpStatus.NO_CONTENT, 'Profile not found.');
@@ -245,6 +245,7 @@ export class ProfileService {
           username: 1,
           isVerified: 1,
           email: 1,
+          profileUrls: 1,
           user: 1,
           score: { $meta: 'searchScore' },
         },

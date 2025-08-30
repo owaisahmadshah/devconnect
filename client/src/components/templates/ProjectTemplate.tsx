@@ -17,11 +17,9 @@ export const ProjectTemplate = ({ children, title, user }: ProjectTemplateProps)
           <Link
             className="flex items-center gap-5"
             to={'/profile/$identifier'}
-            params={
-              {
-                // identifier: TODO User profile url
-              }
-            }
+            params={{
+              identifier: user.profileUrls[0].url,
+            }}
           >
             <p className="text-semi-bold hover:underline max-sm:hidden">
               {user.firstName} {user?.lastName}

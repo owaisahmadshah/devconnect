@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { TBaseProfile } from './profile';
+import { profileUrlsWithIdSchema } from './profileUrls';
 
 // User profile summary light weight response
 export const userProfileSummarySchema = z.object({
@@ -12,6 +13,7 @@ export const userProfileSummarySchema = z.object({
   role: z.string(),
   profilePictureUrl: z.string(),
   bio: z.string(),
+  profileUrls: z.array(profileUrlsWithIdSchema),
   isVerified: z.boolean(),
 });
 
