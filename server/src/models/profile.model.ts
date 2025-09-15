@@ -234,6 +234,9 @@ const profileSchema = new Schema<IProfile>(
       type: Boolean,
       default: false,
     },
+    github_avatar_url: { type: String, default: '' },
+    github_html_url: { type: String, default: '' },
+    github_email: { type: String, default: '' },
   },
   {
     timestamps: true,

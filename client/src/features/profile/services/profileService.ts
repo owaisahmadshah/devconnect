@@ -34,3 +34,8 @@ export const updateProfileFieldService = async (data: TUpdateProfileField) => {
   const response = await api.patch('/api/v1/profile/update-field', data);
   return response.data;
 };
+
+export const fetchRepoService = async () => {
+  const response = await api.get('/api/v1/github/repos');
+  return response.data;
+};

@@ -24,6 +24,9 @@ export const baseProfileSchema = z.object({
   profileUrls: z.array(profileUrlsWithIdSchema),
   socialMediaLinks: z.array(socialMediaLinkWithIdSchema),
   isVerified: z.boolean(),
+  github_avatar_url: z.string().url().or(z.literal('')).optional(),
+  github_html_url: z.string().url().or(z.literal('')).optional(),
+  github_email: z.string().email().or(z.literal('')).optional(),
 });
 
 // Export typescript types from schemas

@@ -83,3 +83,9 @@ export const useProfileFieldUpdate = () => {
     },
   });
 };
+
+export const useFetchRepos = () => {
+  return useMutation({
+    mutationFn: profileService.fetchRepoService,
+  })
+}

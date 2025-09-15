@@ -4,6 +4,7 @@
 
 export * from "./schemas/user";
 export * from "./schemas/cursorPagination/cusorPagination";
+export * from "./schemas/github/request";
 export * from "./schemas/image/image";
 export * from "./schemas/profile/achievement";
 export * from "./schemas/profile/certification";
@@ -29,3 +30,5 @@ export * from "./schemas/project/projectResponses";
 export * from "./schemas/project/tag";
 export * from "./schemas/project/techStack";
 export * from "./statusCode/statusCodes";
+export * from "./types/github/repo_api_response";
+export * from "./types/github/response";

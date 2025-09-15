@@ -45,12 +45,14 @@ import healthCheckRouter from './routes/health-check.route.js';
 import userRouter from './routes/user.route.js';
 import profileRouter from './routes/profile.route.js';
 import projectRouter from './routes/project.route.js';
+import githubRouter from './routes/github.route.js'
 
 // Register API routes
 app.use('/api/v1/health-check', healthCheckRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/profile', profileRouter);
 app.use('/api/v1/project', projectRouter);
+app.use('/api/v1/github', githubRouter);
 
 // Error middleware
 import { errorHandler } from './middleware/error.middleware.js';
