@@ -43,6 +43,9 @@ export class ProfileMapper {
       skills: profileObj.skills,
       socialMediaLinks: profileObj.socialMediaLinks,
       visibility: profileObj.visibility,
+      github_avatar_url: profileObj?.github_avatar_url ?? '',
+      github_html_url: profileObj?.github_html_url ?? '',
+      github_email: profileObj?.github_email ?? '',
     };
   }
 

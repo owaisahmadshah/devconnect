@@ -34,8 +34,8 @@ export const SkillItem = ({
           <div className="flex items-center gap-2">
             {!isEditable && <div className="bg-foreground h-2 w-2 rounded-full"></div>}
             <h1 className="font-bold">{skillName}</h1>
+            <p className="ml-2 text-xs">({skillProficiency})</p>
           </div>
-          <p className="ml-5 text-xs">({skillProficiency})</p>
         </div>
 
         <div className="flex justify-center gap-3">

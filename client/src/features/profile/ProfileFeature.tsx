@@ -7,12 +7,29 @@ import { AchievementsSection } from './components/organisms/AchievementsSection'
 import { CertificationSection } from './components/organisms/CertificationSection';
 import { ExperienceSection } from './components/organisms/ExperienceSection';
 import { EducationSection } from './components/organisms/EducationSection';
+import { SuggestionsSection } from './components/organisms/SuggestionsSection';
 
 export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   // Fetching user profile
   useProfile(identifier);
 
   const { profile, isCurrentUser } = useSelector((state: RootState) => state.profile);
+
+  const isGithubConnected = profile?.github_html_url ? true : false;
+
+  const hasSkills = profile.skills.length > 0;
+  const hasAchievements = profile.achievements.length > 0;
+  const hasCertfications = profile.certifications.length > 0;
+  const hasExperience = profile.experiences.length > 0;
+  const hasEducation = profile.educations.length > 0;
+
+  const showSuggestions =
+    !hasSkills ||
+    !hasAchievements ||
+    !hasCertfications ||
+    !hasExperience ||
+    !hasEducation ||
+    !isGithubConnected;
 
   return (
     <div className="mx-auto min-h-screen md:w-10/12">
@@ -26,8 +43,19 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto grid gap-6 md:w-11/12">
-          <div className="space-y-6">
+        <div className="mx-auto grid gap-2 md:w-11/12">
+          <div className="space-y-2">
+            {isCurrentUser && showSuggestions && (
+              <SuggestionsSection
+                showGithubAddButton={!isGithubConnected}
+                showAddSkillButton={!hasSkills}
+                showAddAchievementButton={!hasAchievements}
+                showAddCertficationButton={!hasCertfications}
+                showAddExperienceButton={!hasExperience}
+                showAddEducationButton={!hasEducation}
+              />
+            )}
+
             <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
 
             <AchievementsSection
@@ -41,7 +69,7 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
             />
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-2">
             <ExperienceSection experiences={profile.experiences} isCurrentUser={isCurrentUser} />
             <EducationSection educations={profile.educations} isCurrentUser={isCurrentUser} />
           </div>
