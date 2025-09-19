@@ -6,10 +6,14 @@ import mongoose from 'mongoose';
 import type { IRequestUser } from '../types/index.js';
 import { saveState, validateState } from '../utils/stateCache.js';
 import { ApiError } from '../utils/ApiError.js';
-import { HttpStatus, type TCreateGithubProject, type TProjectResponse, type TReposListResponse } from 'shared';
+import {
+  HttpStatus,
+  type TCreateGithubProject,
+  type TProjectResponse,
+  type TReposListResponse,
+} from 'shared';
 import { User } from '../models/user.model.js';
 import { Profile } from '../models/profile.model.js';
-import logger from '../utils/logger.js';
 import { GithubMapper } from '../mapper/github.mapper.js';
 import { ProfileService } from './profile.service.js';
 import { ProjectService } from './project.service.js';
@@ -114,6 +118,12 @@ export class GithubService {
     const repos = await axios.get('https://api.github.com/user/repos', {
       headers: { Authorization: `token ${user.github_access_token}` },
     });
+
+    const profile = await ProfileService.getUserProfileSummary(user._id as string);
+
+    // TODO: Filter all the added github projects using github_repo_id in project and repos.id
+    // TODO: 1) Fetch all projects
+    // TODO: 2) Filter added projects
 
     return GithubMapper.toGithubProjectsListResponse(repos.data);
   };

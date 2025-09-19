@@ -25,6 +25,7 @@ export class GithubMapper {
       tags: [],
       techStacks: data.language ? [{ tech: data.language }] : [],
       visibility: 'Public',
+      github_repo_id: data.id,
     };
   }
 }

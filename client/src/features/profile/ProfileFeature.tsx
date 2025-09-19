@@ -23,14 +23,6 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   const hasExperience = profile.experiences.length > 0;
   const hasEducation = profile.educations.length > 0;
 
-  const showSuggestions =
-    !hasSkills ||
-    !hasAchievements ||
-    !hasCertfications ||
-    !hasExperience ||
-    !hasEducation ||
-    !isGithubConnected;
-
   return (
     <div className="mx-auto min-h-screen md:w-10/12">
       <ProfileHeader
@@ -45,7 +37,7 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid gap-2 md:w-11/12">
           <div className="space-y-2">
-            {isCurrentUser && showSuggestions && (
+            {isCurrentUser && (
               <SuggestionsSection
                 showGithubAddButton={!isGithubConnected}
                 showAddSkillButton={!hasSkills}
@@ -53,25 +45,34 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
                 showAddCertficationButton={!hasCertfications}
                 showAddExperienceButton={!hasExperience}
                 showAddEducationButton={!hasEducation}
+                showAddGithubProject={isGithubConnected}
               />
             )}
 
-            <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
+            {hasSkills && <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />}
 
-            <AchievementsSection
-              achievements={profile.achievements}
-              isCurrentUser={isCurrentUser}
-            />
+            {hasAchievements && (
+              <AchievementsSection
+                achievements={profile.achievements}
+                isCurrentUser={isCurrentUser}
+              />
+            )}
 
-            <CertificationSection
-              certificates={profile.certifications}
-              isCurrentUser={isCurrentUser}
-            />
+            {hasCertfications && (
+              <CertificationSection
+                certificates={profile.certifications}
+                isCurrentUser={isCurrentUser}
+              />
+            )}
           </div>
 
           <div className="space-y-2">
-            <ExperienceSection experiences={profile.experiences} isCurrentUser={isCurrentUser} />
-            <EducationSection educations={profile.educations} isCurrentUser={isCurrentUser} />
+            {hasExperience && (
+              <ExperienceSection experiences={profile.experiences} isCurrentUser={isCurrentUser} />
+            )}
+            {hasEducation && (
+              <EducationSection educations={profile.educations} isCurrentUser={isCurrentUser} />
+            )}
           </div>
         </div>
       </div>

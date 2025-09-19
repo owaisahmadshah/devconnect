@@ -21,6 +21,7 @@ export const baseProjectSchema = z.object({
   tags: z.array(baseTagSchema),
   media: z.array(baseMediaSchema),
   techStacks: z.array(baseTechStackSchema),
+  github_repo_id: z.number().or(z.literal('')).optional(),
 });
 
 // For API request (create) - no _id needed

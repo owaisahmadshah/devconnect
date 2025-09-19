@@ -73,6 +73,10 @@ const projectSchema = new Schema<IProjectSchema>({
     ],
     default: [],
   },
+  github_repo_id: {
+    type: Number,
+    default: -1
+  }
 }, 
 {
   timestamps: true

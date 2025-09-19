@@ -5,6 +5,7 @@ import { AddAchivementForm } from './AddAchievementForm';
 import { AddCertificationForm } from './AddCertificationForm';
 import { AddExperienceForm } from './AddExperience';
 import { AddEducationForm } from './AddEducationForm';
+import { AddGithubProject } from './AddGithubProject';
 
 interface SuggestionsSectionProps {
   showGithubAddButton: boolean;
@@ -13,6 +14,7 @@ interface SuggestionsSectionProps {
   showAddCertficationButton: boolean;
   showAddExperienceButton: boolean;
   showAddEducationButton: boolean;
+  showAddGithubProject: boolean;
 }
 
 export const SuggestionsSection = ({
@@ -22,6 +24,7 @@ export const SuggestionsSection = ({
   showAddCertficationButton,
   showAddExperienceButton,
   showAddEducationButton,
+  showAddGithubProject,
 }: SuggestionsSectionProps) => {
   const RenderButton = ({ text, children }: { text: string; children: React.ReactNode }) => {
     return (
@@ -59,6 +62,12 @@ export const SuggestionsSection = ({
         {showAddEducationButton && (
           <RenderButton text="Education">
             <AddEducationForm />
+          </RenderButton>
+        )}
+        {showAddGithubProject && (
+          <RenderButton text="Add Github Repo">
+            {' '}
+            <AddGithubProject />{' '}
           </RenderButton>
         )}
       </div>
