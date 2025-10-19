@@ -6,6 +6,7 @@ import { AddCertificationForm } from './AddCertificationForm';
 import { AddExperienceForm } from './AddExperience';
 import { AddEducationForm } from './AddEducationForm';
 import { AddGithubProject } from './AddGithubProject';
+import { Link } from '@tanstack/react-router';
 
 interface SuggestionsSectionProps {
   showGithubAddButton: boolean;
@@ -15,6 +16,7 @@ interface SuggestionsSectionProps {
   showAddExperienceButton: boolean;
   showAddEducationButton: boolean;
   showAddGithubProject: boolean;
+  navigateProfileUrl?: string;
 }
 
 export const SuggestionsSection = ({
@@ -25,6 +27,7 @@ export const SuggestionsSection = ({
   showAddExperienceButton,
   showAddEducationButton,
   showAddGithubProject,
+  navigateProfileUrl,
 }: SuggestionsSectionProps) => {
   const RenderButton = ({ text, children }: { text: string; children: React.ReactNode }) => {
     return (
@@ -38,6 +41,14 @@ export const SuggestionsSection = ({
   return (
     <ProfileSectionCard title="Suggestions">
       <div className="flex flex-wrap gap-4">
+        {navigateProfileUrl && (
+          <Link
+            to={`/projects/${navigateProfileUrl}`}
+            className="group bg-secondary flex items-center justify-center rounded-sm p-4 hover:cursor-pointer"
+          >
+            Projects
+          </Link>
+        )}
         {showGithubAddButton && <ConnectGithub />}
         {showAddSkillButton && (
           <RenderButton text="Skill">
