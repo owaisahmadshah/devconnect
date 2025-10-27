@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { baseMediaSchema } from '../project/media';
-import { multipleBackendImagesSchema } from '../image/image';
+import { multipleBackendImagesSchema, multipleImagesSchema } from '../image/image';
 
 // Base schema for post
 export const basePostSchema = z.object({
@@ -21,9 +21,23 @@ export const createPostSchema = basePostSchema
   })
   .extend({
     description: z.string().optional(),
-    links: z.array(z.string().url()),
+    links: z.array(z.string().url()).optional(),
     createdBy: z.string().optional(), // Directly add it in frontend or just added the authenticated user from the backend
     media: multipleBackendImagesSchema.optional(),
+  });
+
+export const createPostFrontendSchema = basePostSchema
+  .omit({
+    description: true,
+    media: true,
+    links: true,
+    createdBy: true,
+  })
+  .extend({
+    description: z.string().optional(),
+    links: z.array(z.string().url()),
+    createdBy: z.string().optional(), // Directly add it in frontend or just added the authenticated user from the backend
+    media: multipleImagesSchema.optional(),
   })
   .refine(data => data.description || (data.media && data.media.length > 0), {
     message: 'At least one of description or media is required',
@@ -40,4 +54,5 @@ export const deletePostSchema = z.object({
 // For typescript types
 export type TBasePost = z.infer<typeof basePostSchema>;
 export type TCreatePost = z.infer<typeof createPostSchema>;
+export type TCreatePostFrontend = z.infer<typeof createPostFrontendSchema>;
 export type TDeletePost = z.infer<typeof deletePostSchema>;

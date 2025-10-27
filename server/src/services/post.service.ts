@@ -15,7 +15,7 @@ import logger from '../utils/logger.js';
 import { ProfileService } from './profile.service.js';
 
 export class PostService {
-  static async createPost(postData: TCreatePost): Promise<TPostResponse> {
+  static async createPost(postData: TCreatePost, userId: string): Promise<TPostResponse> {
     let paths: string[] = [];
     if (postData?.media) {
       postData.media.forEach(path => paths.push(path.path));
@@ -23,11 +23,13 @@ export class PostService {
     // Uploading images to cloudinary
     const { urls: media, success } = await uploadMultipleImages(paths);
 
+    const profile = await ProfileService.getUserProfileSummary(userId);
+
     if (!success) {
       throw new ApiError(401, 'Error uploading project images');
     }
 
-    const post = await Post.create({ ...postData, media });
+    const post = await Post.create({ ...postData, media, createdBy: profile._id });
 
     const responsePost = PostMapper.toPublicPost(post);
 

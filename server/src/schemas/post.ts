@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import {
-  basePostSchema,
+  createPostSchema as cps,
   deletePostSchema,
   multipleBackendImagesSchema,
   paginationSchema,
@@ -10,8 +10,8 @@ import {
 } from 'shared';
 
 export const createPostSchema = z.object({
-  body: basePostSchema.omit({ media: true }),
-  files: z.object({ media: multipleBackendImagesSchema }),
+  body: cps,
+  files: z.object({ media: multipleBackendImagesSchema.optional() }).optional(),
 });
 
 export const deletePostQuerySchema = z.object({

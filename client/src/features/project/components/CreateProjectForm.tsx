@@ -12,10 +12,10 @@ import { useCreateProject } from '../hooks/useProject';
 import { getErrorDetails } from '@/lib/errorHanldling';
 import { useCreateProjectForm } from '../hooks/useCreateProjectForm';
 import { useArrayField } from '../hooks/useArrayField';
-import { useImageUpload } from '../hooks/useImageUpload';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import { ArrayFieldInput } from './organisms/ArrayFieldInput';
 import { CollaboratorSearch } from './organisms/CollaboratorSearch';
-import { ImageUploadSection } from './organisms/ImageUploadSection';
+import { ImageUploadSection } from '@/components/organisms/ImageUploadSection';
 import { buildProjectFormData } from '../utils/formDataBuilder';
 import type { TUserProfileSummary, TCreateProject } from 'shared';
 

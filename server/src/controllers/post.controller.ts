@@ -33,7 +33,7 @@ export class PostController {
       media,
     };
 
-    const post = await PostService.createPost(createPost);
+    const post = await PostService.createPost(createPost, req.user._id);
 
     return res
       .status(HttpStatus.CREATED)

@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AppImport } from './routes/_app'
 import { Route as IndexImport } from './routes/index'
+import { Route as PostNewImport } from './routes/post/new'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authSigninImport } from './routes/(auth)/signin'
@@ -30,6 +31,12 @@ const AppRoute = AppImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PostNewRoute = PostNewImport.update({
+  id: '/post/new',
+  path: '/post/new',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -115,6 +122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authVerifyOtpImport
       parentRoute: typeof rootRoute
     }
+    '/post/new': {
+      id: '/post/new'
+      path: '/post/new'
+      fullPath: '/post/new'
+      preLoaderRoute: typeof PostNewImport
+      parentRoute: typeof rootRoute
+    }
     '/(project)/project/new': {
       id: '/(project)/project/new'
       path: '/project/new'
@@ -141,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
+  '/post/new': typeof PostNewRoute
   '/project/new': typeof projectProjectNewRoute
   '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
@@ -152,6 +167,7 @@ export interface FileRoutesByTo {
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
+  '/post/new': typeof PostNewRoute
   '/project/new': typeof projectProjectNewRoute
   '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
@@ -164,6 +180,7 @@ export interface FileRoutesById {
   '/(auth)/signin': typeof authSigninRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
+  '/post/new': typeof PostNewRoute
   '/(project)/project/new': typeof projectProjectNewRoute
   '/(project)/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
@@ -177,6 +194,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/signup'
     | '/verify-otp'
+    | '/post/new'
     | '/project/new'
     | '/projects/$profileUrl'
   fileRoutesByTo: FileRoutesByTo
@@ -187,6 +205,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/signup'
     | '/verify-otp'
+    | '/post/new'
     | '/project/new'
     | '/projects/$profileUrl'
   id:
@@ -197,6 +216,7 @@ export interface FileRouteTypes {
     | '/(auth)/signin'
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
+    | '/post/new'
     | '/(project)/project/new'
     | '/(project)/projects/$profileUrl'
   fileRoutesById: FileRoutesById
@@ -209,6 +229,7 @@ export interface RootRouteChildren {
   authSigninRoute: typeof authSigninRoute
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
+  PostNewRoute: typeof PostNewRoute
   projectProjectNewRoute: typeof projectProjectNewRoute
   projectProjectsProfileUrlRoute: typeof projectProjectsProfileUrlRoute
 }
@@ -220,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   authSigninRoute: authSigninRoute,
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
+  PostNewRoute: PostNewRoute,
   projectProjectNewRoute: projectProjectNewRoute,
   projectProjectsProfileUrlRoute: projectProjectsProfileUrlRoute,
 }
@@ -240,6 +262,7 @@ export const routeTree = rootRoute
         "/(auth)/signin",
         "/(auth)/signup",
         "/(auth)/verify-otp",
+        "/post/new",
         "/(project)/project/new",
         "/(project)/projects/$profileUrl"
       ]
@@ -261,6 +284,9 @@ export const routeTree = rootRoute
     },
     "/(auth)/verify-otp": {
       "filePath": "(auth)/verify-otp.tsx"
+    },
+    "/post/new": {
+      "filePath": "post/new.tsx"
     },
     "/(project)/project/new": {
       "filePath": "(project)/project.new.tsx"

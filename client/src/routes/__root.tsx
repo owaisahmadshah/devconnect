@@ -15,7 +15,7 @@ function RootLayout() {
   const router = useRouterState();
   const path = router.location.pathname;
 
-  const noNavbarPaths = ['/signin', '/signup', '/project/new'];
+  const noNavbarPaths = ['/signin', '/signup', '/project/new', '/post/new'];
   const hideNavbar = noNavbarPaths.some(p => path.startsWith(p));
 
   return (
