@@ -6,17 +6,17 @@ export async function uploadSingleImage(path: string): Promise<{ url: string; su
 }
 
 export async function uploadMultipleImages(
-  path: string[],
+  paths: string[],
 ): Promise<{ urls: string[]; success: boolean }> {
-  let urls: string[] = [];
-  let success = true;
-  path.forEach(async pathValue => {
-    const { url, success: isUploaded } = await uploadSingleImage(pathValue);
-    if (!isUploaded) {
-      success = false;
-    } else {
-      urls.push(url);
-    }
-  });
-  return { urls, success };
+  try {
+    const results = await Promise.all(paths.map(path => uploadSingleImage(path)));
+
+    const urls = results.filter(r => r.success).map(r => r.url);
+
+    const success = results.every(r => r.success);
+
+    return { urls, success };
+  } catch (error) {
+    return { urls: [], success: false };
+  }
 }

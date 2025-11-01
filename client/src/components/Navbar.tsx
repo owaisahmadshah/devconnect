@@ -26,7 +26,7 @@ function RenderElementWithText({
       }}
     >
       <div>{element}</div>
-      <h3>{text}</h3>
+      <h3 className="text-xs">{text}</h3>
     </Link>
   );
 }
@@ -36,20 +36,18 @@ export function Navbar() {
 
   return (
     <nav>
-      <ul className="bg-secondary fixed z-1000 flex h-[70px] w-full items-center justify-center gap-8 max-sm:gap-4">
-        <li className="flex items-center space-x-4">
-          <span className="font-bold underline hover:cursor-pointer">DevC</span>
-          <span>
-            <input
-              type="text"
-              placeholder="Search"
-              className="rounded border p-2 text-sm max-sm:hidden min-sm:w-[30vw]"
-            />
-            <span className="min-sm:hidden">
-              <IoSearch />
-              {/* Hide all the other links(li) and make the input field appear and allow searching, and if searh or back then reset it */}
-            </span>
-          </span>
+      <ul className="bg-secondary fixed z-1000 flex h-[70px] w-full items-center justify-center gap-8 max-sm:justify-around max-sm:gap-4">
+        <li>
+          <input
+            type="text"
+            placeholder="Search"
+            className="rounded-2xl border px-3 py-2 text-xs max-sm:hidden min-sm:w-[30vw]"
+          />
+          <div className="flex flex-col items-center justify-center min-sm:hidden">
+            <IoSearch />
+            <h3 className="text-xs">Search</h3>
+            {/* Hide all the other links(li) and make the input field appear and allow searching, and if searh or back then reset it */}
+          </div>
         </li>
         <li>
           <RenderElementWithText element={<MdHome />} text="Home" />

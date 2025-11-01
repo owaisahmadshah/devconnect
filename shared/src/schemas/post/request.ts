@@ -7,7 +7,7 @@ export const postByIdSchema = z.object({
 
 // Gell all posts of a unique user
 export const postsOfUserSchema = z.object({
-  profileUrl: z.string(),
+  profileUrl: z.string().optional(),
 });
 
 // Types for typescript

@@ -23,6 +23,6 @@ export const postByIdParamsSchema = z.object({
 });
 
 export const postsOfUserParamsSchema = z.object({
-  params: postsOfUserSchema.optional().nullable(),
+  params: postsOfUserSchema,
   query: paginationSchema,
 });

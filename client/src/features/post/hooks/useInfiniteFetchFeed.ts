@@ -5,7 +5,7 @@ export function useInfiniteFetchPosts() {
   return useInfiniteQuery({
     queryKey: ['feed-posts'],
     queryFn: ({ pageParam = null }: { pageParam: string | null }) => {
-      return fetchFeedService({ limit: 10, cursor: pageParam });
+      return fetchFeedService({ limit: 10, cursor: pageParam ?? '' });
     },
     getNextPageParam: lastPage => lastPage.nextCursor,
     initialPageParam: null,

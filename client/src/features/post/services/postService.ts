@@ -33,5 +33,5 @@ export const fetchUserPostsService = async (
 };
 
 export const fetchPost = async (params: TPostById): Promise<TPostResponse> => {
-  return apiGet<TPostResponse>('/api/v1/posts/post/:postId', params);
+  return apiGet<TPostResponse>(`/api/v1/posts/post/${params.postId}`);
 };

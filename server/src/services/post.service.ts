@@ -21,7 +21,7 @@ export class PostService {
       postData.media.forEach(path => paths.push(path.path));
     }
     // Uploading images to cloudinary
-    const { urls: media, success } = await uploadMultipleImages(paths);
+    const { urls, success } = await uploadMultipleImages(paths);
 
     const profile = await ProfileService.getUserProfileSummary(userId);
 
@@ -29,7 +29,16 @@ export class PostService {
       throw new ApiError(401, 'Error uploading project images');
     }
 
-    const post = await Post.create({ ...postData, media, createdBy: profile._id });
+    let uploadedMedia: { url: string; mediaType: string }[] = [];
+
+    urls.forEach(url => {
+      uploadedMedia.push({
+        url,
+        mediaType: 'image',
+      });
+    });
+
+    const post = await Post.create({ ...postData, media: uploadedMedia, createdBy: profile._id });
 
     const responsePost = PostMapper.toPublicPost(post);
 

@@ -27,13 +27,22 @@ export class ProjectService {
     projectData.media.forEach(path => paths.push(path.path));
 
     // Uploading images to cloudinary
-    const { urls: media, success } = await uploadMultipleImages(paths);
+    const { urls, success } = await uploadMultipleImages(paths);
 
     if (!success) {
       throw new ApiError(401, 'Error uploading project images');
     }
 
-    const project = await Project.create({ ...projectData, media });
+    let uploadedMedia: { url: string; mediaType: string }[] = [];
+
+    urls.forEach(url => {
+      uploadedMedia.push({
+        url,
+        mediaType: 'image',
+      });
+    });
+
+    const project = await Project.create({ ...projectData, media: uploadedMedia });
 
     const responseProject = ProjectMapper.toPublicProject(project);
 
@@ -94,7 +103,6 @@ export class ProjectService {
     if (!project) {
       throw new ApiError(404, 'Project not found');
     }
-    console.log('projects after', project);
 
     const responseProject = ProjectMapper.toPublicProject(project);
 
@@ -148,7 +156,8 @@ export class ProjectService {
       .limit(limit)
       .populate({
         path: 'createdBy',
-        select: '_id username email firstName lastName role profilePictureUrl bio isVerified profileUrls',
+        select:
+          '_id username email firstName lastName role profilePictureUrl bio isVerified profileUrls',
       })
       .select('_id title description createdBy tags techStacks creationDate createdAt');
 
