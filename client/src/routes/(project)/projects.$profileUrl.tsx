@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { requireAuth } from '@/lib/requireAuth';
-import { ProjectList } from '@/features/project/components/ProjectList';
+import { ProjectList } from './-components/ProjectList';
 
 export const Route = createFileRoute('/(project)/projects/$profileUrl')({
   component: RouteComponent,

@@ -1,11 +1,11 @@
 import ErrorFallback from '@/components/ErrorFallback';
 import ProfileLoader from '@/components/ProfileLoader';
 import { ProfileTemplate } from '@/components/templates/ProfileTemplate';
-import { ProfileFeature } from '@/features/profile/ProfileFeature';
 import { requireAuth } from '@/lib/requireAuth';
 import { createFileRoute } from '@tanstack/react-router';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ProfileFeature } from '../-components/ProfileFeature';
 
 export const Route = createFileRoute('/profile/$identifier')({
   component: RouteComponent,

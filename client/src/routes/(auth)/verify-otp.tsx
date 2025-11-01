@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { AuthTemplate } from '@/components/templates/AuthTemplate';
-import { VerifyOtpContent } from '@/features/auth/component/VerifyOtpContent';
+import { VerifyOtpContent } from './-component/VerifyOtpContent';
 
 export const Route = createFileRoute('/(auth)/verify-otp')({
   component: RouteComponent,
