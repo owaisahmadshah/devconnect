@@ -2,13 +2,14 @@ import { ProjectTemplate } from '@/components/templates/ProjectTemplate';
 import { useInfiniteFetchProjectsProfileUrl } from '../hooks/useProject';
 import { ProjectItem } from './organisms/ProjectItem';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ProjectListSkeleton } from '@/components/ProjectListSkeleton';
 
 export const ProjectList = () => {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
     useInfiniteFetchProjectsProfileUrl();
 
   if (isLoading) {
-    return <div>'Loading...'</div>;
+    return <ProjectListSkeleton />;
   }
 
   const projects = data?.pages.flatMap(page => page.projects) || [];

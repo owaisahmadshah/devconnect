@@ -3,6 +3,8 @@ import { useInfiniteFetchPosts } from '../hooks/useInfiniteFetchFeed';
 import { Post } from './organisms/Post';
 import { Button } from '@/components/ui/button';
 import { FaPlus } from 'react-icons/fa';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PostSkeleton } from '@/components/PostSkeleton';
 
 export const Posts = () => {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
@@ -11,7 +13,14 @@ export const Posts = () => {
   const posts = data?.pages.flatMap(page => page.posts) ?? [];
 
   if (isLoading) {
-    return <div>Fetching Posts...</div>;
+    return (
+      <div className="mt-2 space-y-3">
+        <div>
+          <Skeleton className="mx-auto h-10 w-3xl max-sm:w-full" />
+        </div>
+        <PostSkeleton />
+      </div>
+    );
   }
 
   return (

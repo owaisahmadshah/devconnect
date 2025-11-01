@@ -9,6 +9,7 @@ import { useAuth } from './hooks/useAuth';
 import { useSyncUserToRedux } from './hooks/useSyncUserToRedux';
 import { shouldRetry } from './lib/shouldRetry';
 import { Suspense } from 'react';
+import { HomeScreenSkeleton } from './components/HomeScreenSkeleton';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,11 +42,7 @@ function InnerApp() {
   const authentication = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <span className="text-muted-foreground">Loading...</span>
-      </div>
-    );
+    return <HomeScreenSkeleton />;
   }
 
   router = createRouter({
@@ -68,7 +65,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReduxProvider store={store}>
-        <Suspense fallback={<div>Loading page...</div>}>
+        <Suspense fallback={<HomeScreenSkeleton />}>
           <InnerApp />
         </Suspense>
       </ReduxProvider>
