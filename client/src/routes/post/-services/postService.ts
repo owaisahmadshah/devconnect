@@ -1,6 +1,5 @@
-import { apiDelete, apiGet, apiPost } from '@/lib/api-client';
+import { apiGet, apiPost } from '@/lib/api-client';
 import type {
-  TDeletePost,
   TPagination,
   TPostById,
   TPostOfUser,
@@ -10,10 +9,6 @@ import type {
 
 export const createPostService = async (data: FormData): Promise<TPostResponse> => {
   return apiPost<TPostResponse>('/api/v1/posts/create', data);
-};
-
-export const deletePostService = async (query: TDeletePost) => {
-  return apiDelete('/api/v1/posts/delete', query);
 };
 
 export const fetchFeedService = async (

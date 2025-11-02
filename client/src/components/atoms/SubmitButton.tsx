@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface SubmitButtonProps {
   children: React.ReactNode;
   isLoading?: boolean;
   loadingText?: string;
   disabled?: boolean;
+  customClasses?: string;
 }
 
 export const SubmitButton = ({
@@ -12,11 +14,12 @@ export const SubmitButton = ({
   isLoading = false,
   loadingText = 'Loading...',
   disabled = false,
+  customClasses = '',
 }: SubmitButtonProps) => {
   return (
     <Button
       type="submit"
-      className="w-full bg-blue-600 text-white hover:bg-blue-700"
+      className={cn('w-full bg-blue-600 text-white hover:bg-blue-700', customClasses)}
       disabled={disabled || isLoading}
     >
       {isLoading ? (

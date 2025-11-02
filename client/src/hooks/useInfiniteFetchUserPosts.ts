@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 
-import { fetchUserPostsService } from '../-services/postService';
+import { fetchUserPostsService } from '../routes/post/-services/postService';
 
 export function useInfiniteFetchUserPosts(profileUrl?: string) {
   const { profileUrl: routeUrl } = useParams({ strict: false });
@@ -10,7 +10,7 @@ export function useInfiniteFetchUserPosts(profileUrl?: string) {
   return useInfiniteQuery({
     queryKey: ['user-posts', finalUrl],
     queryFn: ({ pageParam = null }: { pageParam: string | null }) =>
-      fetchUserPostsService(finalUrl, { limit: 10, cursor: pageParam }),
+      fetchUserPostsService({ profileUrl: finalUrl }, { limit: 10, cursor: pageParam }),
     getNextPageParam: lastPage => lastPage.nextCursor,
     initialPageParam: null,
     enabled: !!finalUrl,

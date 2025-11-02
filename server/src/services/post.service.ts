@@ -66,8 +66,10 @@ export class PostService {
     const session = await mongoose.startSession();
     session.startTransaction();
 
+    const profile = await ProfileService.getUserProfileSummary(user._id)
+
     try {
-      await Post.deleteOne({ _id: deletePost._id, createdBy: user._id }, { session });
+      await Post.deleteOne({ _id: deletePost._id, createdBy: profile._id }, { session });
       // TODO: Delete all the documents from all the collections(like likes, comments etc.) related to this particular document
 
       // Explicitly commit the transaction

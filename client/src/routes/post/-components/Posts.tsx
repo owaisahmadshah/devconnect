@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useInfiniteFetchPosts } from '../-hooks/useInfiniteFetchFeed';
-import { Post } from './organisms/Post';
+import { Post } from '@/components/organisms/Post';
 import { Button } from '@/components/ui/button';
 import { FaPlus } from 'react-icons/fa';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -44,7 +44,7 @@ export const SuggestionsSection = ({
         {navigateProfileUrl && (
           <Link
             to={`/projects/${navigateProfileUrl}`}
-            className="group bg-secondary flex items-center justify-center rounded-sm p-4 hover:cursor-pointer"
+            className="group bg-secondary flex items-center justify-center rounded-sm px-4 hover:cursor-pointer"
           >
             Projects
           </Link>

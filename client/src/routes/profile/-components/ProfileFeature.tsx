@@ -8,6 +8,8 @@ import { CertificationSection } from './organisms/CertificationSection';
 import { ExperienceSection } from './organisms/ExperienceSection';
 import { EducationSection } from './organisms/EducationSection';
 import { SuggestionsSection } from './organisms/SuggestionsSection';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UserPosts } from './UserPosts';
 
 export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   // Fetching user profile
@@ -24,15 +26,17 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   const hasEducation = profile.educations.length > 0;
 
   return (
-    <div className="mx-auto min-h-screen md:w-10/12">
-      <ProfileHeader
-        firstName={profile.firstName}
-        lastName={profile.lastName || ''}
-        role={profile.role}
-        bio={profile.bio}
-        profilePictureUrl={profile.profilePictureUrl}
-        isEditable={isCurrentUser}
-      />
+    <div className="mx-auto min-h-screen space-y-2 md:w-10/12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <ProfileHeader
+          firstName={profile.firstName}
+          lastName={profile.lastName || ''}
+          role={profile.role}
+          bio={profile.bio}
+          profilePictureUrl={profile.profilePictureUrl}
+          isEditable={isCurrentUser}
+        />
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid gap-2 md:w-11/12">
@@ -50,30 +54,45 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
               />
             )}
 
-            {hasSkills && <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />}
+            <Tabs defaultValue="profile">
+              <TabsList>
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="posts">Posts</TabsTrigger>
+              </TabsList>
+              <TabsContent value="posts">
+                {' '}
+                <UserPosts profileUrl={identifier} isCurrentUser={isCurrentUser} />{' '}
+              </TabsContent>
+              <TabsContent value="profile" className="space-y-2">
+                {hasSkills && (
+                  <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
+                )}
 
-            {hasAchievements && (
-              <AchievementsSection
-                achievements={profile.achievements}
-                isCurrentUser={isCurrentUser}
-              />
-            )}
+                {hasAchievements && (
+                  <AchievementsSection
+                    achievements={profile.achievements}
+                    isCurrentUser={isCurrentUser}
+                  />
+                )}
 
-            {hasCertfications && (
-              <CertificationSection
-                certificates={profile.certifications}
-                isCurrentUser={isCurrentUser}
-              />
-            )}
-          </div>
+                {hasCertfications && (
+                  <CertificationSection
+                    certificates={profile.certifications}
+                    isCurrentUser={isCurrentUser}
+                  />
+                )}
 
-          <div className="space-y-2">
-            {hasExperience && (
-              <ExperienceSection experiences={profile.experiences} isCurrentUser={isCurrentUser} />
-            )}
-            {hasEducation && (
-              <EducationSection educations={profile.educations} isCurrentUser={isCurrentUser} />
-            )}
+                {hasExperience && (
+                  <ExperienceSection
+                    experiences={profile.experiences}
+                    isCurrentUser={isCurrentUser}
+                  />
+                )}
+                {hasEducation && (
+                  <EducationSection educations={profile.educations} isCurrentUser={isCurrentUser} />
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
