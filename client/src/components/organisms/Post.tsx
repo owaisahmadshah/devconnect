@@ -33,10 +33,22 @@ export const Post = ({ post, isEditable = false, onDelete }: PostProps) => {
       ? post.description.substring(0, MAX_DESCRIPTION_LENGTH) + '...'
       : post.description;
 
+  // const displayDescription =
+  //   descriptionTooLong && !isExpanded
+  //     ? truncateHtml(post.description, MAX_DESCRIPTION_LENGTH)
+  //     : post.description;
+
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikesCount(prev => (isLiked ? prev - 1 : prev + 1));
   };
+
+  // function truncateHtml(html: string, maxLength: number) {
+  //   const div = document.createElement('div');
+  //   div.innerHTML = html;
+  //   const text = div.textContent || div.innerText || '';
+  //   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  // }
 
   return (
     <Card className="mx-auto w-full rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg">
@@ -78,9 +90,10 @@ export const Post = ({ post, isEditable = false, onDelete }: PostProps) => {
       {/* Description */}
       {post.description && (
         <CardContent className="px-5 py-0">
-          <p className="text-sm leading-relaxed whitespace-pre-line text-slate-700 dark:text-slate-300">
-            {displayDescription}
-          </p>
+          <div
+            className="text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+            dangerouslySetInnerHTML={{ __html: displayDescription }}
+          />
           {descriptionTooLong && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}

@@ -1,20 +1,18 @@
+import { Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Link2, X, ImagePlus } from 'lucide-react';
+import { ImagePlus } from 'lucide-react';
 import { FiX } from 'react-icons/fi';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 import { createPostFrontendSchema, type TCreatePostFrontend } from 'shared';
 import { Form } from '@/components/ui/form';
-import { TextAreaField } from '@/components/molecules/TextAreaField';
 import { ImageUploadSection } from '@/components/organisms/ImageUploadSection';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
 import { getErrorDetails } from '@/lib/errorHanldling';
 import { useCreatePost } from '../-hooks/useCreatePost';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { DismissibleBadge } from '@/components/molecules/DismissibleBadge';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import {
   Card,
@@ -28,7 +26,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
 export const CreatePostForm = () => {
-  const [inputValue, setInputValue] = useState('');
   const navigate = useNavigate();
 
   const form = useForm<TCreatePostFrontend>({
@@ -42,7 +39,6 @@ export const CreatePostForm = () => {
 
   const { mutateAsync, isPending, isSuccess, error, isError } = useCreatePost();
   const imageUpload = useImageUpload(form);
-  const watchedLinks = form.watch('links');
 
   const onSubmit = async (data: TCreatePostFrontend) => {
     const formData = new FormData();
@@ -62,34 +58,6 @@ export const CreatePostForm = () => {
     }
 
     await mutateAsync(formData);
-  };
-
-  const handleAdd = () => {
-    const link = inputValue.trim().toLowerCase();
-
-    if (!link) return;
-
-    const addedLinks = form.getValues('links');
-
-    if (addedLinks.includes(link)) {
-      setInputValue('');
-      return;
-    }
-
-    form.setValue('links', [link, ...addedLinks]);
-    setInputValue('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAdd();
-    }
-  };
-
-  const onDelete = (link: string) => {
-    const filteredLinks = form.getValues('links').filter(lnk => lnk !== link);
-    form.setValue('links', filteredLinks);
   };
 
   if (isSuccess) {
@@ -127,68 +95,19 @@ export const CreatePostForm = () => {
                   <Label htmlFor="description" className="text-base font-semibold">
                     Description
                   </Label>
-                  <TextAreaField
-                    form={form}
-                    placeholder="What's on your mind? Share your thoughts here..."
-                    id="description"
+                  <Controller
                     name="description"
-                  />
-                </div>
-
-                {/* Links Section */}
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-base font-semibold">
-                    <Link2 className="h-4 w-4" />
-                    Links
-                  </Label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        placeholder="Paste a link and press Enter or click Add"
-                        onChange={e => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        value={inputValue}
-                        className="pr-8"
+                    control={form.control}
+                    render={({ field }) => (
+                      <ReactQuill
+                        theme="snow"
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="What's on your mind? Share your thoughts here..."
+                        className="min-h-[150px]"
                       />
-                      {inputValue && (
-                        <button
-                          type="button"
-                          onClick={() => setInputValue('')}
-                          className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={handleAdd}
-                      disabled={!inputValue.trim()}
-                      className="px-6"
-                    >
-                      Add
-                    </Button>
-                  </div>
-
-                  {/* Links Display */}
-                  <div className="min-h-[60px] rounded-lg border border-slate-200 bg-slate-50/50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                    {watchedLinks.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {watchedLinks.map((link: string) => (
-                          <DismissibleBadge
-                            key={link}
-                            text={link}
-                            onRemove={() => onDelete(link)}
-                            customClasses="rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="py-2 text-center text-sm text-slate-400 dark:text-slate-500">
-                        No links added yet
-                      </p>
                     )}
-                  </div>
+                  />
                 </div>
 
                 {/* Images Section */}
