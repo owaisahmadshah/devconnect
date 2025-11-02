@@ -115,15 +115,12 @@ export function Navbar() {
           {/* Profile / Sign In */}
           <li className="flex flex-1 items-center justify-end sm:flex-initial">
             {userSummary.isLoggedIn && userSummary.user ? (
-              <Link
-                to="/profile"
-                className="hover:bg-accent flex items-center gap-2 rounded-lg px-2 py-1 transition-colors"
-              >
+              <div className="hover:bg-accent flex items-center gap-2 rounded-lg px-2 py-1 transition-colors">
                 <ProfileWithUrl user={userSummary.user} profileSize="s" showName={false} />
                 <span className="text-muted-foreground text-[11px] font-medium max-sm:hidden">
                   Me
                 </span>
-              </Link>
+              </div>
             ) : (
               <Button size="sm" asChild>
                 <Link to="/signin">Sign In</Link>
