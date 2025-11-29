@@ -1,8 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { ProfileWithUrl } from '@/components/organisms/ProfileWithUrl';
 import { Button } from '@/components/ui/button';
-import type { TPostResponse } from 'shared';
-import { FaHeart, FaRegCommentDots, FaShare } from 'react-icons/fa';
+import type { TCreateLike, TPostResponse } from 'shared';
+import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { HiDotsHorizontal } from 'react-icons/hi';
 import { ImagesCarousel } from '@/components/organisms/ImagesCarousel';
 import { useState } from 'react';
@@ -13,19 +13,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ReactionButton } from './ReactionButton';
 
 interface PostProps {
   post: TPostResponse;
   isEditable?: boolean;
   onDelete?: ({ _id }: { _id: string }) => void;
+  onReaction: ({ postId, value }: TCreateLike) => void;
 }
 
 const MAX_DESCRIPTION_LENGTH = 280;
 
-export const Post = ({ post, isEditable = false, onDelete }: PostProps) => {
+export const Post = ({ post, isEditable = false, onDelete, onReaction }: PostProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
 
   const descriptionTooLong = post.description && post.description.length > MAX_DESCRIPTION_LENGTH;
   const displayDescription =
@@ -37,11 +37,6 @@ export const Post = ({ post, isEditable = false, onDelete }: PostProps) => {
   //   descriptionTooLong && !isExpanded
   //     ? truncateHtml(post.description, MAX_DESCRIPTION_LENGTH)
   //     : post.description;
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikesCount(prev => (isLiked ? prev - 1 : prev + 1));
-  };
 
   // function truncateHtml(html: string, maxLength: number) {
   //   const div = document.createElement('div');
@@ -115,10 +110,13 @@ export const Post = ({ post, isEditable = false, onDelete }: PostProps) => {
       )}
 
       {/* Stats Bar */}
-      {likesCount > 0 && (
+      {post?.totalLikes && post.totalLikes > 0 ? (
         <div className="px-5 text-sm text-slate-600 dark:text-slate-400">
-          <span className="font-medium">{likesCount}</span> {likesCount === 1 ? 'like' : 'likes'}
+          <span className="font-medium">{post.totalLikes}</span>{' '}
+          {post.totalLikes === 1 ? 'reaction' : 'reactions'}
         </div>
+      ) : (
+        ''
       )}
 
       {/* Divider */}
@@ -128,21 +126,7 @@ export const Post = ({ post, isEditable = false, onDelete }: PostProps) => {
       <CardFooter className="px-3 py-0">
         <div className="flex w-full justify-between gap-1">
           {/* Like */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLike}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              isLiked
-                ? 'text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-red-500 dark:text-slate-400 dark:hover:bg-slate-800'
-            }`}
-          >
-            <FaHeart
-              className={`h-[18px] w-[18px] transition-transform duration-200 ${isLiked ? 'scale-110' : ''}`}
-            />
-            <span className="hidden sm:inline">Like</span>
-          </Button>
+          <ReactionButton postId={post._id} onAction={onReaction} likeType={post.likeType} />
 
           {/* Comment */}
           <Button

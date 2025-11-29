@@ -1,10 +1,12 @@
 import { apiGet, apiPost } from '@/lib/api-client';
-import type {
-  TPagination,
-  TPostById,
-  TPostOfUser,
-  TPostResponse,
-  TPostsResponseWithCursorPaginationResponse,
+import {
+  type TLikeResponse,
+  type TCreateLike,
+  type TPagination,
+  type TPostById,
+  type TPostOfUser,
+  type TPostResponse,
+  type TPostsResponseWithCursorPaginationResponse,
 } from 'shared';
 
 export const createPostService = async (data: FormData): Promise<TPostResponse> => {
@@ -29,4 +31,8 @@ export const fetchUserPostsService = async (
 
 export const fetchPost = async (params: TPostById): Promise<TPostResponse> => {
   return apiGet<TPostResponse>(`/api/v1/posts/post/${params.postId}`);
+};
+
+export const reactionService = async (body: TCreateLike) => {
+  return apiPost<TLikeResponse>('/api/v1/reaction/react', body);
 };

@@ -10,7 +10,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { PostMapper } from '../mapper/post.mapper.js';
 import { Post } from '../models/post.model.js';
 import type { IRequestUser } from '../types/index.js';
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import logger from '../utils/logger.js';
 import { ProfileService } from './profile.service.js';
 
@@ -66,7 +66,7 @@ export class PostService {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    const profile = await ProfileService.getUserProfileSummary(user._id)
+    const profile = await ProfileService.getUserProfileSummary(user._id);
 
     try {
       await Post.deleteOne({ _id: deletePost._id, createdBy: profile._id }, { session });
@@ -96,20 +96,137 @@ export class PostService {
     filter,
     limit = 10,
     cursor,
+    profile_userId,
   }: {
     filter: any;
     limit: number;
     cursor: string | null;
+    profile_userId?: string;
   }) {
     if (cursor) {
       filter.createdAt = { $lt: new Date(cursor) };
     }
 
-    const posts = await Post.find(filter).sort({ createdAt: -1 }).limit(limit).populate({
-      path: 'createdBy',
-      select:
-        '_id username email firstName lastName role profilePictureUrl bio isVerified profileUrls',
-    });
+    // TODO: Change with who is currently signed in?
+    const profileId = profile_userId ? new mongoose.Types.ObjectId(profile_userId) : null;
+
+    const posts = await Post.aggregate([
+      {
+        $match: filter,
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: limit,
+      },
+      {
+        $lookup: {
+          from: 'profiles',
+          let: {
+            creatorId: '$createdBy',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$_id', '$$creatorId'],
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                username: 1,
+                email: 1,
+                firstName: 1,
+                lastName: 1,
+                role: 1,
+                profilePictureUrl: 1,
+                bio: 1,
+                profileUrls: 1,
+                isVerified: 1,
+              },
+            },
+          ],
+          as: 'createdBy',
+        },
+      },
+      {
+        $addFields: {
+          createdBy: {
+            $arrayElemAt: ['$createdBy', 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'likes',
+          let: { postId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$postId', '$$postId'],
+                    },
+                    {
+                      $eq: ['$likedBy', profileId],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $project: {
+                value: 1,
+              },
+            },
+          ],
+          as: 'currentUserLike',
+        },
+      },
+      {
+        $lookup: {
+          from: 'likes',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'allLikes',
+        },
+      },
+      {
+        $addFields: {
+          totalLikes: {
+            $size: '$allLikes',
+          },
+          likeType: {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: '$currentUserLike',
+                  },
+                  0,
+                ],
+              },
+              then: {
+                $arrayElemAt: ['$currentUserLike.value', 0],
+              },
+              else: '$$REMOVE',
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          allLikes: 0,
+          // currentUserLike: 0,
+        },
+      },
+    ]);
 
     const responsePosts: TPostResponse[] = posts.map(post => PostMapper.toPublicPost(post));
 
@@ -124,16 +241,17 @@ export class PostService {
    * Retrieves a user's profile using the provided profile URL,
    * then fetches all post created by that user.
    */
-  static async fetchUserProjectsByProfileUrls(
+  static async fetchUserPostsByProfileUrls(
     profileUrl: string,
     limit: number = 10,
     cursor: string | null,
+    profile_userId: string,
   ): Promise<TPostsResponseWithCursorPaginationResponse> {
     const profile = await ProfileService.getUserProfileSummary(profileUrl);
 
     const filter: any = { createdBy: profile._id };
 
-    return this.fetchPaginatedPosts({ filter, limit, cursor });
+    return this.fetchPaginatedPosts({ filter, limit, cursor, profile_userId });
   }
 
   static async fetchPost(postId: string): Promise<TPostResponse> {

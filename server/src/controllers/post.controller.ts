@@ -11,6 +11,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { PostService } from '../services/post.service.js';
+import { ProfileService } from '../services/profile.service.js';
 
 export class PostController {
   /**
@@ -78,17 +79,21 @@ export class PostController {
 
     let posts: TPostsResponseWithCursorPaginationResponse;
 
+    const { _id: profile_userId } = await ProfileService.getUserProfileSummary(req.user._id);
+
     if (profileUrl) {
-      posts = await PostService.fetchUserProjectsByProfileUrls(
+      posts = await PostService.fetchUserPostsByProfileUrls(
         profileUrl,
         Number(limit),
         cursor ? String(cursor) : null,
+        profile_userId.toString(),
       );
     } else {
       posts = await PostService.fetchPaginatedPosts({
         filter: {},
         limit: Number(limit),
         cursor: cursor ? String(cursor) : null,
+        profile_userId: profile_userId.toString(),
       });
     }
 

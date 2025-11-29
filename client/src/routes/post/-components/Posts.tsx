@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { FaPlus } from 'react-icons/fa';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PostSkeleton } from '@/components/PostSkeleton';
+import { useReaction } from '../-hooks/useReaction';
 
 export const Posts = () => {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
     useInfiniteFetchPosts();
+
+  const { mutateAsync: onReaction } = useReaction();
 
   const posts = data?.pages.flatMap(page => page.posts) ?? [];
 
@@ -33,7 +36,7 @@ export const Posts = () => {
         </Button>
       </Link>
       {posts.map(post => (
-        <Post key={post._id} post={post} />
+        <Post key={post._id} post={post} onReaction={onReaction} />
       ))}
       {hasNextPage && (
         <div className="px-4 py-2">

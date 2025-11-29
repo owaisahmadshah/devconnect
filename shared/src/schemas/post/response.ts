@@ -1,3 +1,4 @@
+import { TlikeEnum } from '../like/like';
 import { TUserProfileSummaryResponse } from '../profile/profileResponse';
 import { TBasePost } from './post';
 
@@ -6,6 +7,8 @@ export type TPostResponse = Omit<TBasePost, 'createdBy'> & {
   createdBy: TUserProfileSummaryResponse;
   createdAt: Date;
   updatedAt: Date;
+  likeType?: TlikeEnum;
+  totalLikes?: number;
 };
 
 export type TPostsResponseWithCursorPaginationResponse = {
