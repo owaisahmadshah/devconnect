@@ -33,6 +33,10 @@ export const fetchPost = async (params: TPostById): Promise<TPostResponse> => {
   return apiGet<TPostResponse>(`/api/v1/posts/post/${params.postId}`);
 };
 
-export const reactionService = async (body: TCreateLike) => {
-  return apiPost<TLikeResponse>('/api/v1/reaction/react', body);
+export const reactionService = async (body: TCreateLike & { profileUrl?: string }) => {
+  return apiPost<TLikeResponse>('/api/v1/reaction/react', {
+    value: body.value,
+    postId: body.postId,
+    likedBy: body.likedBy,
+  });
 };

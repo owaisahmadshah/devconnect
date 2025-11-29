@@ -19,12 +19,19 @@ interface PostProps {
   post: TPostResponse;
   isEditable?: boolean;
   onDelete?: ({ _id }: { _id: string }) => void;
-  onReaction: ({ postId, value }: TCreateLike) => void;
+  onReaction: (data: TCreateLike & { profileUrl?: string }) => void;
+  currentUserProfileUrl?: string;
 }
 
 const MAX_DESCRIPTION_LENGTH = 280;
 
-export const Post = ({ post, isEditable = false, onDelete, onReaction }: PostProps) => {
+export const Post = ({
+  post,
+  isEditable = false,
+  onDelete,
+  onReaction,
+  currentUserProfileUrl,
+}: PostProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const descriptionTooLong = post.description && post.description.length > MAX_DESCRIPTION_LENGTH;
@@ -126,7 +133,12 @@ export const Post = ({ post, isEditable = false, onDelete, onReaction }: PostPro
       <CardFooter className="px-3 py-0">
         <div className="flex w-full justify-between gap-1">
           {/* Like */}
-          <ReactionButton postId={post._id} onAction={onReaction} likeType={post.likeType} />
+          <ReactionButton
+            postId={post._id}
+            onAction={onReaction}
+            likeType={post.likeType}
+            currentUserProfileUrl={currentUserProfileUrl}
+          />
 
           {/* Comment */}
           <Button

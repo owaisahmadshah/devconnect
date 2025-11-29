@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 
 interface ReactionButtonProps {
   postId: string;
-  onAction: ({ postId, value }: TCreateLike) => void;
+  onAction: ({ postId, value }: TCreateLike & { profileUrl?: string }) => void;
   likeType?: TlikeEnum;
+  currentUserProfileUrl?: string;
 }
 
 const reactions = [
@@ -34,7 +35,12 @@ const reactions = [
   },
 ];
 
-export function ReactionButton({ postId, onAction, likeType }: ReactionButtonProps) {
+export function ReactionButton({
+  postId,
+  onAction,
+  likeType,
+  currentUserProfileUrl,
+}: ReactionButtonProps) {
   const [showReactions, setShowReactions] = useState(false);
   const [hoveredReaction, setHoveredReaction] = useState<TlikeEnum | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout>(null);
@@ -66,14 +72,14 @@ export function ReactionButton({ postId, onAction, likeType }: ReactionButtonPro
   };
 
   const handleReactionClick = (TlikeEnum: TlikeEnum) => {
-    onAction({ postId, value: TlikeEnum });
+    onAction({ postId, value: TlikeEnum, profileUrl: currentUserProfileUrl });
     setShowReactions(false);
     setHoveredReaction(null);
   };
 
   const handleButtonClick = () => {
     if (likeType) {
-      onAction({ postId, value: 'delete' });
+      onAction({ postId, value: 'delete', profileUrl: currentUserProfileUrl });
     }
   };
 
