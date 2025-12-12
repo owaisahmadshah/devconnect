@@ -9,6 +9,7 @@ export type TPostResponse = Omit<TBasePost, 'createdBy'> & {
   updatedAt: Date;
   likeType?: TlikeEnum;
   totalLikes?: number;
+  totalComments?: number;
 };
 
 export type TPostsResponseWithCursorPaginationResponse = {

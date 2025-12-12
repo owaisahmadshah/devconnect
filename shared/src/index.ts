@@ -3,6 +3,9 @@
  */
 
 export * from "./schemas/user";
+export * from "./schemas/comment/comment";
+export * from "./schemas/comment/request";
+export * from "./schemas/comment/response";
 export * from "./schemas/cursorPagination/cusorPagination";
 export * from "./schemas/github/request";
 export * from "./schemas/image/image";
