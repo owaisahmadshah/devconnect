@@ -8,10 +8,19 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 
 export class GithubController {
   /**
-   * Just redirects to github login page with client_id and client_secret
+   * Redirects the authenticated user to GitHub for OAuth authentication.
    *
    * @route GET /api/v1/github/connect
-   * @redirect To github login page
+   *
+   * @param {Request} req - Contains authenticated user (req.user)
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<void>} - Redirects user to GitHub login page
+   *
+   * @description
+   * Initiates the GitHub OAuth flow by generating the authorization URL
+   * using the client ID and client secret. The user is then redirected
+   * to GitHub to grant access.
    */
   static connectGithub = asyncHandler(async (req: Request, res: Response) => {
     const user = req.user;
@@ -23,11 +32,19 @@ export class GithubController {
   });
 
   /**
-   * Github will hit this end point after user gives permission.
+   * Handles the GitHub OAuth callback after user authorization.
    *
    * @route GET /api/v1/github/callback
-   * @param {Request} req contains IRequestUser and user github info
-   * @redirect To a page where user can see it's github account it connect
+   *
+   * @param {Request} req - Contains authenticated user (req.user) and GitHub callback query parameters
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<void>} - Redirects user to a page showing connected GitHub account
+   *
+   * @description
+   * GitHub calls this endpoint after the user grants or denies permissions.
+   * Processes the callback, exchanges code for an access token, and redirects
+   * the user to the application page displaying their GitHub account details.
    */
   static githubCallback = asyncHandler(async (req: Request, res: Response) => {
     const { redirectUrl } = await GithubService.githubCallback(req, res);
@@ -35,11 +52,18 @@ export class GithubController {
   });
 
   /**
-   * To get user github repositories
+   * Retrieves the authenticated user's GitHub repositories.
    *
    * @route GET /api/v1/github/repos
-   * @param {Request} req contains IRequestUser
-   * @return List of repositories with their names
+   *
+   * @param {Request} req - Contains authenticated user (req.user)
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<any>>} - Returns a list of repositories with names and details
+   *
+   * @description
+   * Fetches all repositories from GitHub for the connected user using
+   * the stored OAuth token.
    */
   static githubRepos = asyncHandler(async (req: Request, res: Response) => {
     if (!req?.user) {
@@ -51,11 +75,18 @@ export class GithubController {
   });
 
   /**
-   * To add a github repository
+   * Adds a new GitHub repository project to the user's account.
    *
    * @route POST /api/v1/github/repo/add
-   * @param {Request} req contains IRequestUser and TCreateGithubProject
-   * @return Added project
+   *
+   * @param {Request} req - Contains authenticated user (req.user) and project data (TCreateGithubProject)
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<any>>} - Returns the added GitHub project
+   *
+   * @description
+   * Adds a new project to the authenticated user's GitHub account and
+   * returns the project information. Requires OAuth authentication.
    */
   static addRepoProject = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {

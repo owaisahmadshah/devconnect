@@ -15,11 +15,22 @@ import { ProfileService } from '../services/profile.service.js';
 
 export class PostController {
   /**
-   * Creates a post.
+   * Creates a new post for the authenticated user.
    *
    * @route POST /api/v1/posts/create
-   * @param {Request} req.user contains authenticated user TCreatePost(req.body)
-   * @returns TPostResponse
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.body: TCreatePost (post data excluding media)
+   *   - req.files.media?: TMultipleBackendImages (optional media files)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TPostResponse>>}
+   *
+   * @description
+   * Validates the authenticated user, processes media files if provided,
+   * creates a new post in the database, and returns the created post.
    */
   static createPost = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
@@ -42,12 +53,23 @@ export class PostController {
   });
 
   /**
-   * Deletes a post.
+   * Deletes a post by ID for the authenticated user.
    *
    * @route DELETE /api/v1/posts/delete
-   * @param {Request} req.user contains authenticated user and postId(req.query)
-   * @returns
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.query._id: string (ID of the post to delete)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<void>>}
+   *
+   * @description
+   * Deletes the specified post if the authenticated user is authorized.
+   * Returns HTTP 204 (No Content) on successful deletion.
    */
+
   static deleteProject = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
@@ -63,11 +85,25 @@ export class PostController {
   });
 
   /**
-   * Get all posts(feed).
+   * Retrieves paginated posts (feed) for the authenticated user.
    *
-   * @route GET (/api/v1/posts/user/:profileUrl OR /api/v1/posts/feed)
-   * @param {Request} req contains authenticated user(req.user) profileUrl(req.params)? and {limit, cursor}(req.query)
-   * @returns TProjectsSummaryWithCursorPaginationResponse[]
+   * @route GET /api/v1/posts/feed
+   * @route GET /api/v1/posts/user/:profileUrl
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.params.profileUrl?: string (optional user profile URL)
+   *   - req.query.limit?: number
+   *   - req.query.cursor?: string (ISO timestamp for cursor-based pagination)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TPostsResponseWithCursorPaginationResponse>>}
+   *
+   * @description
+   * Fetches posts either for a specific user's profile (if `profileUrl` is provided)
+   * or for the authenticated user's main feed.
+   * Supports cursor-based pagination with `limit` and `cursor` parameters.
    */
   static fetchPosts = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
@@ -103,11 +139,21 @@ export class PostController {
   });
 
   /**
-   * Get a specific post by id.
+   * Retrieves a specific post by its ID.
    *
    * @route GET /api/v1/posts/post/:postId
-   * @param {Request} req contains authenticated user(req.user) postId(req.params)
-   * @returns TPostResponse
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.params.postId: string (ID of the post to fetch)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TPostResponse>>}
+   *
+   * @description
+   * Fetches a single post by its ID.
+   * Returns the post details in a public-safe response format.
    */
   static fetchPost = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {

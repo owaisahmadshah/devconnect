@@ -16,9 +16,17 @@ export class ProfileController {
    * Retrieves a summary of the authenticated user's profile.
    *
    * @route GET /api/v1/users/profile
-   * @param {Request} req.user contains authenticated user
-   * @returns User profile summary data
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user)
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileSummaryResponse>>}
+   *
+   * @description
+   * Fetches the minimal profile summary (name, picture, URLs, verification, etc.)
+   * for the currently authenticated user.
    */
+
   static getSignedInUserProfileSummary = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
@@ -32,12 +40,24 @@ export class ProfileController {
   });
 
   /**
-   * Retrieves user's profile.
+   * Retrieves a user's public profile by username or URL identifier.
    *
-   * @route GET /api/v1/users/:username
-   * @param {Request} req.params.url contains username or email
-   * @returns User profile of type TUserProfileResponse
+   * @route GET /api/v1/users/:url
+   *
+   * @param {Request} req - Contains:
+   *   - req.params.url: username or profile URL
+   *   - req.user?: authenticated user (optional)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileResponse>>}
+   *
+   * @description
+   * Looks up a user's public profile using a username or profile URL.
+   * Returns full public profile information, optionally adjusted based
+   * on whether the requester is authenticated.
    */
+
   static getUserProfile = asyncHandler(async (req: Request, res: Response) => {
     const params = req.params;
 
@@ -53,12 +73,23 @@ export class ProfileController {
   });
 
   /**
-   * Retrieves user's profile.
+   * Adds an item to an array field in the authenticated user's profile.
    *
    * @route PATCH /api/v1/profile/add-array-item
-   * @param {Request} req.params.identifier contains IRequestUser
-   * @returns User profile of type TUserProfileResponse
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.body: TAddProfileArrayField
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileResponse>>}
+   *
+   * @description
+   * Adds a new entry (e.g., social link, experience, project link) to an
+   * array-type profile field such as `profileUrls`.
    */
+
   static addArrayItem = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
@@ -74,11 +105,19 @@ export class ProfileController {
   });
 
   /**
-   * Retrieves user's profile.
+   * Removes an item from an array field in the authenticated user's profile.
    *
    * @route DELETE /api/v1/profile/remove-array-item
-   * @param {Request} req contains IRequestUser and TDeleteProfileArrayItem
-   * @returns
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.query: TDeleteProfileArrayItem
+   *
+   * @returns {Promise<void>}
+   *
+   * @description
+   * Removes an existing array item from a profile field.
+   * Responds with HTTP 204 (No Content) on success.
    */
   static removeArrayItem = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
@@ -93,12 +132,22 @@ export class ProfileController {
   });
 
   /**
-   * Retrieves user's profile.
+   * Updates the authenticated user's profile picture.
    *
    * @route PATCH /api/v1/profile/update-profile-image
-   * @param {Request} req contains IRequestUser and TSingleImageBackend
-   * @returns User profile of type TUserProfileResponse
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.file: TSingleImageBackend
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileResponse>>}
+   *
+   * @description
+   * Replaces the user's current profile picture with a new uploaded image.
    */
+
   static updateProfilePicture = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
@@ -112,12 +161,22 @@ export class ProfileController {
   });
 
   /**
-   * Updates user's profile single field.
+   * Updates a single field in the authenticated user's profile.
    *
    * @route PATCH /api/v1/profile/update-field
-   * @param {Request} req contains IRequestUser and TUpdateProfileField
-   * @returns User profile of type TUserProfileResponse
+   *
+   * @param {Request} req - Contains:
+   *   - req.user: authenticated user
+   *   - req.body: TUpdateProfileField
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileResponse>>}
+   *
+   * @description
+   * Updates a single profile attribute (e.g., bio, firstName, lastName).
    */
+
   static updateProfileField = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
@@ -132,11 +191,22 @@ export class ProfileController {
   });
 
   /**
-   * Fetches user profiles using first and last name.
+   * Searches for user profiles by full name with pagination.
    *
    * @route GET /api/v1/profile/fetch-profiles-by-names
-   * @param {Request} req contains TFullNameSearch & TPagination
-   * @returns User profile of type TUserProfileResponse
+   *
+   * @param {Request} req - Contains:
+   *   - req.query.fullName: string
+   *   - req.query.limit?: number
+   *   - req.query.cursor?: string (ISO timestamp)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileResponse[]>>}
+   *
+   * @description
+   * Performs a full-name based search (first + last name) and returns
+   * results using cursor-based pagination for efficient feed loading.
    */
   static fullNameSearch = asyncHandler(async (req: Request, res: Response) => {
     const { fullName, limit, cursor } = req.query;
