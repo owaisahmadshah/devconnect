@@ -12,48 +12,58 @@ import {
 import attachUser from '../middleware/attachUser.middleware.js';
 import { userProfileParamsSchema } from '../schemas/profile.js';
 import { upload } from '../middleware/multer.middleware.js';
+import { ProfileRepository } from '../repositories/profile.repository.js';
+import { ProfileService } from '../services/profile.service.js';
+import { UserService } from '../services/user.service.js';
+import { UserRepository } from '../repositories/user.repository.js';
 
 const router = Router();
+
+const repository = new ProfileRepository();
+const userRepo = new UserRepository();
+const userService = new UserService(userRepo);
+const service = new ProfileService(repository, userService);
+const controller = new ProfileController(service);
 
 // Public routes
 router.get(
   '/fetch-profiles-by-names',
   validateSchema(fullNameSearchSchemas),
-  ProfileController.fullNameSearch,
+  controller.fullNameSearch,
 );
 router.get(
   '/:url',
   validateSchema(userProfileParamsSchema),
   attachUser, // User or null, authentication is'nt required.
-  ProfileController.getUserProfile,
+  controller.getUserProfile,
 );
 
 // Protected routes
-router.get('/', auth, ProfileController.getSignedInUserProfileSummary);
+router.get('/', auth, controller.getSignedInUserProfileSummary);
 router.patch(
   '/add-array-item',
   validateSchema(userProfileUpdateArrayDataBodySchema),
   auth,
-  ProfileController.addArrayItem,
+  controller.addArrayItem,
 );
 router.patch(
   '/update-field',
   validateSchema(userProfileFieldUpdateSchema),
   auth,
-  ProfileController.updateProfileField,
+  controller.updateProfileField,
 );
 router.delete(
   '/remove-array-item',
   validateSchema(userProfileDeleteArrayDataBodySchema),
   auth,
-  ProfileController.removeArrayItem,
+  controller.removeArrayItem,
 );
 router.patch(
   '/update-profile-image',
   auth,
   upload.single('profilePicture'),
   validateSchema(userProfilePictureUpdateSchema),
-  ProfileController.updateProfilePicture,
+  controller.updateProfilePicture,
 );
 
 export default router;

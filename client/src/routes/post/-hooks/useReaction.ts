@@ -8,7 +8,7 @@ export const useReaction = () => {
     mutationFn: reactionService,
     onSuccess: (data, variables) => {
       const { postId, value, profileUrl } = variables;
-      const isCreated = data.isCreated.isCreated;
+      const isCreated = data.isCreated;
 
       queryClient.setQueryData(['feed-posts'], oldData => {
         if (!oldData) return oldData;

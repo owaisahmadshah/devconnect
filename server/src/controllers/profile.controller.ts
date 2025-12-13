@@ -12,6 +12,8 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 
 export class ProfileController {
+  constructor(private service: ProfileService) {}
+
   /**
    * Retrieves a summary of the authenticated user's profile.
    *
@@ -27,12 +29,12 @@ export class ProfileController {
    * for the currently authenticated user.
    */
 
-  static getSignedInUserProfileSummary = asyncHandler(async (req: Request, res: Response) => {
+  getSignedInUserProfileSummary = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
 
-    const profile = await ProfileService.getUserProfileSummary(req.user._id);
+    const profile = await this.service.getUserProfileSummary(req.user._id);
 
     return res
       .status(HttpStatus.OK)
@@ -58,14 +60,14 @@ export class ProfileController {
    * on whether the requester is authenticated.
    */
 
-  static getUserProfile = asyncHandler(async (req: Request, res: Response) => {
+  getUserProfile = asyncHandler(async (req: Request, res: Response) => {
     const params = req.params;
 
     if (!params.url) {
       throw new ApiError(HttpStatus.BAD_REQUEST, 'Username is not provided.');
     }
 
-    const profile = await ProfileService.getUsersProfile(params.url, req?.user ?? null);
+    const profile = await this.service.getUsersProfile(params.url, req?.user ?? null);
 
     return res
       .status(HttpStatus.OK)
@@ -90,14 +92,12 @@ export class ProfileController {
    * array-type profile field such as `profileUrls`.
    */
 
-  static addArrayItem = asyncHandler(async (req: Request, res: Response) => {
+  addArrayItem = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
-    const updateData: TAddProfileArrayField = req.body;
-
-    const profile = await ProfileService.addArrayItem(updateData, req.user);
+    const profile = await this.service.addArrayItem(req.body, req.user);
 
     return res
       .status(HttpStatus.OK)
@@ -119,14 +119,12 @@ export class ProfileController {
    * Removes an existing array item from a profile field.
    * Responds with HTTP 204 (No Content) on success.
    */
-  static removeArrayItem = asyncHandler(async (req: Request, res: Response) => {
+  removeArrayItem = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
-    const updateData: TDeleteProfileArrayItem = req.query as TDeleteProfileArrayItem;
-
-    await ProfileService.removeArrayItem(updateData, req.user);
+    await this.service.removeArrayItem(req.query as TDeleteProfileArrayItem, req.user);
 
     return res.status(HttpStatus.NO_CONTENT).end();
   });
@@ -147,13 +145,12 @@ export class ProfileController {
    * @description
    * Replaces the user's current profile picture with a new uploaded image.
    */
-
-  static updateProfilePicture = asyncHandler(async (req: Request, res: Response) => {
+  updateProfilePicture = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
     }
     const updateData: TSingleImageBackend = req.file as TSingleImageBackend;
-    const profile = await ProfileService.updateProfileImage(updateData, req.user);
+    const profile = await this.service.updateProfileImage(updateData, req.user);
 
     return res
       .status(HttpStatus.OK)
@@ -177,13 +174,13 @@ export class ProfileController {
    * Updates a single profile attribute (e.g., bio, firstName, lastName).
    */
 
-  static updateProfileField = asyncHandler(async (req: Request, res: Response) => {
+  updateProfileField = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Unauthorized');
     }
 
     const updateData: TUpdateProfileField = req.body as TUpdateProfileField;
-    const profile = await ProfileService.updateProfileField(updateData, req.user);
+    const profile = await this.service.updateProfileField(updateData, req.user);
 
     return res
       .status(HttpStatus.OK)
@@ -208,10 +205,10 @@ export class ProfileController {
    * Performs a full-name based search (first + last name) and returns
    * results using cursor-based pagination for efficient feed loading.
    */
-  static fullNameSearch = asyncHandler(async (req: Request, res: Response) => {
+  fullNameSearch = asyncHandler(async (req: Request, res: Response) => {
     const { fullName, limit, cursor } = req.query;
 
-    const profiles = await ProfileService.fetchUsersByName(
+    const profiles = await this.service.fetchUsersByName(
       { fullName: fullName as string },
       { limit: Number(limit), cursor: typeof cursor === 'string' ? cursor : null },
     );

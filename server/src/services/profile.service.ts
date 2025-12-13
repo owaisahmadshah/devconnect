@@ -1,4 +1,5 @@
-import { Profile } from '../models/profile.model.js';
+import mongoose from 'mongoose';
+
 import {
   HttpStatus,
   type TDeleteProfileArrayItem,
@@ -16,27 +17,14 @@ import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
 import { UserService } from './user.service.js';
 import type { IRequestUser } from '../types/index.js';
-import mongoose from 'mongoose';
 import { uploadSingleImage } from '../utils/uploadImages.js';
+import type { ProfileRepository } from '../repositories/profile.repository.js';
 
 export class ProfileService {
-  static async getUserProfileSummary(queryText: string): Promise<TUserProfileSummaryResponse> {
-    const conditions: any[] = [];
+  constructor(private repo: ProfileRepository, private userServ: UserService) {}
 
-    if (mongoose.Types.ObjectId.isValid(queryText)) {
-      conditions.push({ user: queryText });
-    }
-
-    conditions.push({ 'profileUrls.url': queryText });
-
-    const profile = await Profile.findOne({
-      $or: conditions,
-    })
-      .populate({
-        path: 'user',
-        select: 'username email role',
-      })
-      .select('_id user firstName lastName profilePictureUrl bio isVerified profileUrls');
+  getUserProfileSummary = async (queryText: string): Promise<TUserProfileSummaryResponse> => {
+    const profile = await this.repo.findByUserIdOrProfileUrl(queryText);
 
     if (!profile) {
       throw new ApiError(HttpStatus.NO_CONTENT, 'Profile not found.');
@@ -45,18 +33,13 @@ export class ProfileService {
     const profileRes = ProfileMapper.toUserProfileSummary(profile);
 
     return profileRes;
-  }
+  };
 
-  static async getUsersProfile(
+  getUsersProfile = async (
     profileUrl: string,
     reqUser: IRequestUser | null,
-  ): Promise<TUserProfileResponse> {
-    const user = await UserService.getUser(reqUser?.email ?? '');
-
-    const profile = await Profile.findOne({ 'profileUrls.url': profileUrl }).populate({
-      path: 'user',
-      select: 'username email role',
-    });
+  ): Promise<TUserProfileResponse> => {
+    const profile = await this.repo.findByProfileUrl(profileUrl);
 
     if (!profile) {
       throw new ApiError(HttpStatus.NO_CONTENT, 'Profile not found.');
@@ -64,7 +47,9 @@ export class ProfileService {
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
 
-    // If user is requesting his/her profile
+    const user = await this.userServ.getUser(reqUser?.email ?? '');
+
+    // If user requesting his own profile
     if (reqUser?._id === user?._id) {
       return responseProfile;
     }
@@ -75,88 +60,71 @@ export class ProfileService {
     // TODO: If user is not in connections filter connections-only
 
     return privateProfile;
-  }
+  };
 
-  static async addArrayItem(
+  addArrayItem = async (
     updateData: TAddProfileArrayField,
     user: IRequestUser,
-  ): Promise<TAddNewItemToProfileWithIdResponse> {
-    const { fieldName, fieldData } = updateData;
-
-    const profile = await Profile.findOne({ user: user._id });
+  ): Promise<TAddNewItemToProfileWithIdResponse> => {
+    const profile = await this.repo.addArrayItem(user._id, updateData);
 
     if (!profile) {
       throw new ApiError(404, 'Profile not found.');
     }
 
-    // Add item to array
-    (profile as any)[fieldName].unshift(fieldData);
+    const newlyAddedItem: TAddNewItemToProfileWithIdResponse = (profile as any)[
+      updateData.fieldName
+    ][0];
 
-    await profile.save();
-
-    const newlyAddedItem: TAddNewItemToProfileWithIdResponse = (profile as any)[fieldName][0];
     return newlyAddedItem;
-  }
+  };
 
-  static async removeArrayItem(
+  removeArrayItem = async (
     removeData: TDeleteProfileArrayItem,
     user: IRequestUser,
-  ): Promise<TUserProfileResponse> {
-    const profile = await Profile.findOne({ user: user._id });
+  ): Promise<TUserProfileResponse> => {
+    const { fieldName, deleteObjectId } = removeData;
+
+    const profile = await this.repo.removeArrayItem(user._id, fieldName, deleteObjectId);
 
     if (!profile) {
       throw new ApiError(404, 'Profile not found.');
     }
-
-    const { fieldName, deleteObjectId } = removeData;
-
-    (profile as any)[fieldName] = (profile as any)[fieldName].filter(
-      (field: any) => String(field._id) !== String(deleteObjectId),
-    );
-
-    await profile.save();
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
 
     return responseProfile;
-  }
+  };
 
-  static async updateProfileImage(
+  updateProfileImage = async (
     image: TSingleImageBackend,
     user: IRequestUser,
-  ): Promise<TUserProfileResponse> {
+  ): Promise<TUserProfileResponse> => {
+    // TODO: Add DI for uploads
     const { url, success } = await uploadSingleImage(image.path);
 
     if (!success) {
       throw new ApiError(401, 'Error uploading proilfe picture to cloudinary.');
     }
 
-    const profile = await Profile.findOne({ user: user._id }).populate({
-      path: 'user',
-      select: 'username email role',
-    });
+    const profile = await this.repo.updateField(user._id, 'profilePictureUrl', url);
 
     if (!profile) {
       throw new ApiError(401, 'User not found.');
     }
 
-    profile.profilePictureUrl = url;
-    await profile.save();
-
     const responseProfile = ProfileMapper.toUserProfile(profile);
-    return responseProfile;
-  }
 
-  static async updateProfileField(
+    return responseProfile;
+  };
+
+  updateProfileField = async (
     updateData: TUpdateProfileField,
     user: IRequestUser,
-  ): Promise<TUserProfileResponse> {
+  ): Promise<TUserProfileResponse> => {
     const { fieldName, fieldData } = updateData;
 
-    const profile = await Profile.findOne({ user: user._id }).populate({
-      path: 'user',
-      select: 'username email role',
-    });
+    const profile = await this.repo.findByUserId(user._id);
 
     if (!profile) {
       throw new ApiError(401, 'User not found.');
@@ -181,16 +149,16 @@ export class ProfileService {
       (profile.profileUrls as any[]).unshift({ url: newSlug });
     }
 
-    await profile.save();
+    await this.repo.save(profile);
 
     const responseProfile = ProfileMapper.toUserProfile(profile);
     return responseProfile;
-  }
+  };
 
-  static async searchProfiles(
+  searchProfiles = async (
     input: string,
     pagination: TValidateSearchParamsPagination,
-  ): Promise<TUserProfileSummaryresponseWithPagination> {
+  ): Promise<TUserProfileSummaryresponseWithPagination> => {
     const { limit, cursor } = pagination;
 
     // TODO: Change all createdAt cursors' to _id
@@ -198,61 +166,7 @@ export class ProfileService {
       ? { $match: { _id: { $lt: new mongoose.Types.ObjectId(cursor) } } }
       : null;
 
-    const pipeline: any[] = [
-      {
-        $search: {
-          index: 'name_autocomplete',
-          compound: {
-            should: [
-              {
-                autocomplete: {
-                  query: input,
-                  path: 'firstName',
-                  fuzzy: { maxEdits: 1, prefixLength: 1 },
-                },
-              },
-              {
-                autocomplete: {
-                  query: input,
-                  path: 'lastName',
-                  fuzzy: { maxEdits: 1, prefixLength: 1 },
-                },
-              },
-            ],
-          },
-        },
-      },
-      { $sort: { _id: -1 } }, // Ensure descending order for pagination
-      ...(matchStage ? [matchStage] : []),
-      { $limit: limit + 1 }, // Fetch one extra to determine if there's a next page
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'user',
-          foreignField: '_id',
-          as: 'user',
-        },
-      },
-      { $unwind: '$user' },
-      {
-        $project: {
-          _id: 1,
-          firstName: 1,
-          lastName: 1,
-          profilePictureUrl: 1,
-          bio: 1,
-          role: 1,
-          username: 1,
-          isVerified: 1,
-          email: 1,
-          profileUrls: 1,
-          user: 1,
-          score: { $meta: 'searchScore' },
-        },
-      },
-    ];
-
-    const results = await Profile.aggregate(pipeline);
+    const results = await this.repo.searchProfiles(input, matchStage, limit);
 
     const hasMore = results.length > limit;
     const items = hasMore
@@ -265,12 +179,12 @@ export class ProfileService {
       hasMore,
       nextCursor,
     };
-  }
+  };
 
-  static async fetchUsersByName(
+  fetchUsersByName = async (
     { fullName }: TFullNameSearch,
     pagination: TValidateSearchParamsPagination,
-  ): Promise<TUserProfileSummaryresponseWithPagination> {
+  ): Promise<TUserProfileSummaryresponseWithPagination> => {
     return this.searchProfiles(fullName, pagination);
-  }
+  };
 }

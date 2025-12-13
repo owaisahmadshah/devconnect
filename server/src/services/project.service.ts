@@ -13,16 +13,21 @@ import {
   type TUpdateProjectField,
 } from 'shared';
 import type { IRequestUser } from '../types/index.js';
-import { Project } from '../models/project.model.js';
 import { ProjectMapper } from '../mapper/project.mapper.js';
 import mongoose from 'mongoose';
 import { ApiError } from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 import { uploadMultipleImages } from '../utils/uploadImages.js';
-import { ProfileService } from './profile.service.js';
+import type { ProfileService } from './profile.service.js';
+import type { ProjectRepository } from '../repositories/project.repository.js';
 
 export class ProjectService {
-  static async createProject(projectData: TCreateProjectBackend): Promise<TProjectResponse> {
+  constructor(
+    private repo: ProjectRepository,
+    private profileServ: ProfileService,
+  ) {}
+
+  createProject = async (projectData: TCreateProjectBackend): Promise<TProjectResponse> => {
     let paths: string[] = [];
     projectData.media.forEach(path => paths.push(path.path));
 
@@ -30,7 +35,7 @@ export class ProjectService {
     const { urls, success } = await uploadMultipleImages(paths);
 
     if (!success) {
-      throw new ApiError(401, 'Error uploading project images');
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Error uploading project images');
     }
 
     let uploadedMedia: { url: string; mediaType: string }[] = [];
@@ -42,20 +47,17 @@ export class ProjectService {
       });
     });
 
-    const project = await Project.create({ ...projectData, media: uploadedMedia });
+    const project = await this.repo.create({ ...projectData, media: uploadedMedia });
 
     const responseProject = ProjectMapper.toPublicProject(project);
 
     return responseProject;
-  }
+  };
 
-  static async deleteProject(deleteProject: TDeleteProject, user: IRequestUser) {
+  deleteProject = async (deleteProject: TDeleteProject, user: IRequestUser) => {
     // TODO Update validation
     // ------Start validation
-    const project = await Project.findById(deleteProject._id).populate({
-      path: 'createdBy',
-      select: 'user', // Get user for update validation
-    });
+    const project = await this.repo.findByIdWithUserOnly(deleteProject._id);
 
     if (!project) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found');
@@ -71,7 +73,7 @@ export class ProjectService {
     session.startTransaction();
 
     try {
-      await Project.deleteOne({ _id: deleteProject._id, createdBy: user._id }, { session });
+      await this.repo.deleteOne({ _id: deleteProject._id, createdBy: user._id }, session);
       // TODO: Delete all the documents from all the collections related to this particular document
 
       // Explicitly commit the transaction
@@ -83,33 +85,30 @@ export class ProjectService {
       if (error instanceof ApiError) {
         throw error;
       } else {
-        logger.error('Error in user creation transaction:', error);
+        logger.error('Error in project delete transaction:', error);
         throw new ApiError(
           HttpStatus.INTERNAL_SERVER_ERROR,
-          'Faild to create user. Please try again',
+          'Failed to delete project. Please try again',
         );
       }
     } finally {
       session.endSession();
     }
-  }
+  };
 
-  static async fetchProjectById(projectId: TProjectById): Promise<TProjectResponse> {
-    const project = await Project.findById(projectId.projectId).populate({
-      path: 'createdBy',
-      select: '_id username email firstName lastName role profilePictureUrl bio isVerified',
-    });
+  fetchProjectById = async (projectId: TProjectById): Promise<TProjectResponse> => {
+    const project = await this.repo.findById(projectId.projectId);
 
     if (!project) {
-      throw new ApiError(404, 'Project not found');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found');
     }
 
     const responseProject = ProjectMapper.toPublicProject(project);
 
     return responseProject;
-  }
+  };
 
-  static async fetchPaginatedProjectsSummary({
+  fetchPaginatedProjectsSummary = async ({
     filter,
     limit = 10,
     cursor,
@@ -117,7 +116,7 @@ export class ProjectService {
     filter: any;
     limit: number;
     cursor?: string;
-  }): Promise<TProjectsSummaryWithCursorPaginationResponse> {
+  }): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
     /**
      * Cursor-Based Pagination Explained
      *
@@ -151,15 +150,7 @@ export class ProjectService {
       filter.createdAt = { $lt: new Date(cursor) };
     }
 
-    const projects = await Project.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .populate({
-        path: 'createdBy',
-        select:
-          '_id username email firstName lastName role profilePictureUrl bio isVerified profileUrls',
-      })
-      .select('_id title description createdBy tags techStacks creationDate createdAt');
+    const projects = await this.repo.findPaginated(filter, limit);
 
     const responseProjects = projects.map(project => ProjectMapper.toProjectSummary(project));
 
@@ -170,58 +161,55 @@ export class ProjectService {
       : null;
 
     return { projects: responseProjects, hasMore, nextCursor };
-  }
+  };
 
-  static async searchProjectsByTitle(
+  searchProjectsByTitle = async (
     projectTitle: TProjectByTitle,
     limit = 10,
     cursor?: string,
-  ): Promise<TProjectsSummaryWithCursorPaginationResponse> {
+  ): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
     const filter: any = {
       title: { $regex: projectTitle.title, $options: 'i' },
     };
 
     return this.fetchPaginatedProjectsSummary({ filter, limit, cursor });
-  }
+  };
 
-  static async filterProjectsByTechStack(
+  filterProjectsByTechStack = async (
     techStacks: TProjectByTechStack,
     limit: number = 10,
     cursor?: string,
-  ): Promise<TProjectsSummaryWithCursorPaginationResponse> {
+  ): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
     const filter: any = {
       'techStacks.tech': { $in: techStacks.techStacks },
     };
 
     return this.fetchPaginatedProjectsSummary({ filter, limit, cursor });
-  }
+  };
 
   /**
    * Retrieves a user's profile using the provided profile URL,
    * then fetches all projects created by that user.
    */
-  static async fetchUserProjectsByProfileUrls(
+  fetchUserProjectsByProfileUrls = async (
     profileUrl: TProjectsOfUser,
     limit: number = 15,
     cursor?: string,
-  ): Promise<TProjectsSummaryWithCursorPaginationResponse> {
-    const profile = await ProfileService.getUserProfileSummary(profileUrl.profileUrl);
+  ): Promise<TProjectsSummaryWithCursorPaginationResponse> => {
+    const profile = await this.profileServ.getUserProfileSummary(profileUrl.profileUrl);
 
     const filter: any = { createdBy: profile._id };
 
     return this.fetchPaginatedProjectsSummary({ filter, limit, cursor });
-  }
+  };
 
-  static async createProjectArrayFieldItem(
+  createProjectArrayFieldItem = async (
     addData: TAddProjectArrayItem,
     user: IRequestUser,
-  ): Promise<TProjectResponse> {
+  ): Promise<TProjectResponse> => {
     const { fieldName, fieldData, projectId } = addData;
 
-    const project = await Project.findById(projectId).populate({
-      path: 'createdBy',
-      select: '_id username email firstName lastName role profilePictureUrl bio isVerified user', // Get user too for update validation
-    });
+    const project = await this.repo.findByIdWithUser(projectId);
 
     if (!project) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found');
@@ -233,18 +221,15 @@ export class ProjectService {
 
     (project as any)[fieldName].unshift(fieldData);
 
-    await project.save();
+    await this.repo.save(project);
 
     return ProjectMapper.toPublicProject(project);
-  }
+  };
 
-  static async updateProjectFieldItem(updateData: TUpdateProjectField, user: IRequestUser) {
+  updateProjectFieldItem = async (updateData: TUpdateProjectField, user: IRequestUser) => {
     const { fieldName, fieldData, projectId } = updateData;
 
-    const project = await Project.findById(projectId).populate({
-      path: 'createdBy',
-      select: '_id username email firstName lastName role profilePictureUrl bio isVerified user', // Get user too for update validation
-    });
+    const project = await this.repo.findByIdWithUser(projectId);
 
     if (!project) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found');
@@ -263,18 +248,15 @@ export class ProjectService {
       project[fieldName] = fieldData;
     }
 
-    await project.save();
+    await this.repo.save(project);
 
     return ProjectMapper.toPublicProject(project);
-  }
+  };
 
-  static async deleteProjectArrayItem(deleteData: TDeleteProjectArrayItem, user: IRequestUser) {
+  deleteProjectArrayItem = async (deleteData: TDeleteProjectArrayItem, user: IRequestUser) => {
     const { fieldName, deleteObjectId, projectId } = deleteData;
 
-    const project = await Project.findById(projectId).populate({
-      path: 'createdBy',
-      select: 'user', // Get user for update validation
-    });
+    const project = await this.repo.findByIdWithUserOnly(projectId);
 
     if (!project) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found');
@@ -284,21 +266,16 @@ export class ProjectService {
       throw new ApiError(HttpStatus.FORBIDDEN, 'You are not authorized to modify this project');
     }
 
-    const updatedProject = await Project.findOneAndUpdate(
-      {
-        _id: projectId,
-      },
+    const updatedProject = await this.repo.findOneAndUpdate(
+      { _id: projectId },
       { $pull: { [fieldName]: { _id: deleteObjectId } } },
       { new: true },
-    ).populate({
-      path: 'createdBy',
-      select: '_id username email firstName lastName role profilePictureUrl bio isVerified',
-    });
+    );
 
     if (!updatedProject) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found in findOneAndUpdate');
     }
 
     return ProjectMapper.toPublicProject(updatedProject);
-  }
+  };
 }

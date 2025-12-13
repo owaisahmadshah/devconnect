@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-
 import slugify from 'slugify';
-import { User } from '../models/user.model.js';
+
 import { UserMapper } from '../mapper/user.mapper.js';
 import { ApiError } from '../utils/ApiError.js';
 import sendEmail from '../utils/emailSender.js';
@@ -20,12 +19,15 @@ import {
   type TUniqueIdentifier,
   type TPublicUser,
 } from 'shared';
+import type { UserRepository } from '../repositories/user.repository.js';
 
 export class UserService {
-  static async generateAccessAndRefreshToken(
+  constructor(private repo: UserRepository) {}
+
+  generateAccessAndRefreshToken = async (
     userId: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const user = await User.findById(userId);
+  ): Promise<{ accessToken: string; refreshToken: string }> => {
+    const user = await this.repo.findById(userId);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, getDefaultMessageForStatus(HttpStatus.NOT_FOUND));
@@ -34,15 +36,13 @@ export class UserService {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    await User.updateOne({ _id: user._id }, { refreshToken });
+    await this.repo.updateRefreshToken(user._id as string, refreshToken);
 
     return { accessToken, refreshToken };
-  }
+  };
 
-  static async verifyOtp(userData: TVerifyOtp): Promise<{ isValidOtp: boolean }> {
-    const user = await User.findOne({
-      $or: [{ email: userData.identifier }, { username: userData.identifier }],
-    });
+  verifyOtp = async (userData: TVerifyOtp): Promise<{ isValidOtp: boolean }> => {
+    const user = await this.repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, getDefaultMessageForStatus(HttpStatus.NOT_FOUND));
@@ -59,21 +59,19 @@ export class UserService {
     }
 
     if (!user.isVerified) {
-      await User.updateOne({ _id: user._id }, { isVerified: true });
+      await this.repo.updateVerificationStatus(user._id as string, true);
     }
 
     return { isValidOtp: true };
-  }
+  };
 
   /**
    * Resends OTP to the user's email
    * Returns void as this operation doesn't need to return any data
    * The controller should use HttpStatus.NO_CONTENT (204) for the response
    */
-  static async resendOtp(userData: TResendOtp): Promise<void> {
-    const user = await User.findOne({
-      $or: [{ username: userData.identifier }, { email: userData.identifier }],
-    });
+  resendOtp = async (userData: TResendOtp): Promise<void> => {
+    const user = await this.repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, getDefaultMessageForStatus(HttpStatus.NOT_FOUND));
@@ -94,21 +92,19 @@ export class UserService {
     user.otp = otpCode;
     user.otpExpiry = otpExpiry;
 
-    await user.save({ validateBeforeSave: false });
+    await this.repo.save(user);
 
     return;
-  }
+  };
 
   /**
    * Creates a new user and associated profile
    * Returns void as this operation doesn't need to return data
    * The controller should use HttpStatus.CREATED (201) for the response
    */
-  static async createUser(userData: TAuthUserServer): Promise<void> {
+  createUser = async (userData: TAuthUserServer): Promise<void> => {
     // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email: userData.email }, { username: userData.username }],
-    });
+    const existingUser = await this.repo.findByEmailOrUsername(userData.email, userData.username);
 
     if (existingUser) {
       throw new ApiError(HttpStatus.CONFLICT, 'User with this email or username already exists');
@@ -116,7 +112,6 @@ export class UserService {
 
     const otpCode = generateOTP();
     const otpExpiry = generateExpiryTime();
-    // const hashedPassword = await this.#hashPassword(userData.password);
 
     // Sending otp email
     const isOtpSent = await sendEmail(userData.email, otpCode);
@@ -136,7 +131,7 @@ export class UserService {
     try {
       // The destructuring syntax [user] is used to get the first element from the array
       // that Mongoose's create() returns when used with a transaction
-      const [user] = await User.create([dbUserData], { session });
+      const [user] = await this.repo.create(dbUserData, session);
 
       if (!user) {
         throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Unable to create user.');
@@ -199,20 +194,18 @@ export class UserService {
         logger.error('Error in user creation transaction:', error);
         throw new ApiError(
           HttpStatus.INTERNAL_SERVER_ERROR,
-          'Faild to create user. Please try again',
+          'Failed to create user. Please try again',
         );
       }
     } finally {
       session.endSession();
     }
-  }
+  };
 
-  static async signInUser(
+  signInUser = async (
     userData: TSignInUser,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const user = await User.findOne({
-      $or: [{ email: userData.identifier }, { username: userData.identifier }],
-    });
+  ): Promise<{ accessToken: string; refreshToken: string }> => {
+    const user = await this.repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'User not found.');
@@ -238,19 +231,17 @@ export class UserService {
     );
 
     return { accessToken, refreshToken };
-  }
+  };
 
-  static async forgetPassword(
+  forgetPassword = async (
     userData: TForgetPassword,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> => {
     await this.verifyOtp({ identifier: userData.identifier, otp: userData.otp });
 
-    const user = await User.findOne({
-      $or: [{ username: userData.identifier }, { email: userData.identifier }],
-    });
+    const user = await this.repo.findByIdentifier(userData.identifier);
 
     if (!user) {
-      throw new ApiError(404, 'Usern not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'User not found.');
     }
 
     if (userData.password) {
@@ -262,40 +253,38 @@ export class UserService {
     );
 
     user.refreshToken = refreshToken;
-    user.save();
+    await this.repo.saveWithValidation(user);
 
     return { accessToken, refreshToken };
-  }
+  };
 
-  static async isIdentifierUnique(userData: TUniqueIdentifier): Promise<boolean> {
-    const user = await User.findOne({
-      $or: [{ username: userData.identifier }, { email: userData.identifier }],
-    });
+  isIdentifierUnique = async (userData: TUniqueIdentifier): Promise<boolean> => {
+    const user = await this.repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       return true;
     }
 
     return false;
-  }
+  };
 
-  static async generateRefreshAccessToken(
+  generateRefreshAccessToken = async (
     token: string | null,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> => {
     if (!token) {
-      throw new ApiError(401, 'Refresh token is required');
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Refresh token is required');
     }
 
     const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!);
 
-    const user = await User.findById((decodedToken as any)._id);
+    const user = await this.repo.findById((decodedToken as any)._id);
 
     if (!user) {
-      throw new ApiError(401, 'Invalid refresh token');
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token');
     }
 
     if (token !== user.refreshToken) {
-      throw new ApiError(401, 'Invalid refresh token');
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token');
     }
 
     const { accessToken, refreshToken } = await this.generateAccessAndRefreshToken(
@@ -303,19 +292,17 @@ export class UserService {
     );
 
     return { accessToken, refreshToken };
-  }
+  };
 
-  static async getUser(identifier: string): Promise<TPublicUser> {
-    const user = await User.findOne({
-      $or: [{ email: identifier }, { username: identifier }],
-    });
+  getUser = async (identifier: string): Promise<TPublicUser> => {
+    const user = await this.repo.findByIdentifier(identifier);
 
     if (!user) {
-      throw new ApiError(404, 'User with this email or username not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'User with this email or username not found.');
     }
 
     const responseUser: TPublicUser = UserMapper.toPublicUser(user);
 
     return responseUser;
-  }
+  };
 }

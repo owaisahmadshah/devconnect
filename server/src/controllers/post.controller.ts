@@ -10,10 +10,12 @@ import {
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/AsyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
-import { PostService } from '../services/post.service.js';
-import { ProfileService } from '../services/profile.service.js';
+import type { PostService } from '../services/post.service.js';
+import type { ProfileService } from '../services/profile.service.js';
 
 export class PostController {
+  constructor(private service: PostService, private profileServ: ProfileService) {}
+
   /**
    * Creates a new post for the authenticated user.
    *
@@ -32,7 +34,7 @@ export class PostController {
    * Validates the authenticated user, processes media files if provided,
    * creates a new post in the database, and returns the created post.
    */
-  static createPost = asyncHandler(async (req: Request, res: Response) => {
+  createPost = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
@@ -45,11 +47,11 @@ export class PostController {
       media,
     };
 
-    const post = await PostService.createPost(createPost, req.user._id);
+    const post = await this.service.createPost(createPost, req.user._id);
 
     return res
       .status(HttpStatus.CREATED)
-      .json(new ApiResponse(HttpStatus.OK, post, 'Created post sucessfully.'));
+      .json(new ApiResponse(HttpStatus.CREATED, post, 'Created post sucessfully.'));
   });
 
   /**
@@ -63,25 +65,23 @@ export class PostController {
    *
    * @param {Response} res - Express response object
    *
-   * @returns {Promise<ApiResponse<void>>}
+   * @returns {Promise<void>}
    *
    * @description
    * Deletes the specified post if the authenticated user is authorized.
    * Returns HTTP 204 (No Content) on successful deletion.
    */
 
-  static deleteProject = asyncHandler(async (req: Request, res: Response) => {
+  deleteProject = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
     const { _id } = req.query;
     const data: TDeletePost = { _id: _id as string };
 
-    await PostService.deletePost(data, req.user);
+    await this.service.deletePost(data, req.user);
 
-    return res
-      .status(HttpStatus.NO_CONTENT)
-      .json(new ApiResponse(HttpStatus.NO_CONTENT, {}, 'Deleted post sucessfully.'));
+    return res.status(HttpStatus.NO_CONTENT).end();
   });
 
   /**
@@ -105,7 +105,7 @@ export class PostController {
    * or for the authenticated user's main feed.
    * Supports cursor-based pagination with `limit` and `cursor` parameters.
    */
-  static fetchPosts = asyncHandler(async (req: Request, res: Response) => {
+  fetchPosts = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
@@ -115,17 +115,17 @@ export class PostController {
 
     let posts: TPostsResponseWithCursorPaginationResponse;
 
-    const { _id: profile_userId } = await ProfileService.getUserProfileSummary(req.user._id);
+    const { _id: profile_userId } = await this.profileServ.getUserProfileSummary(req.user._id);
 
     if (profileUrl) {
-      posts = await PostService.fetchUserPostsByProfileUrls(
+      posts = await this.service.fetchUserPostsByProfileUrls(
         profileUrl,
         Number(limit),
         cursor ? String(cursor) : null,
         profile_userId.toString(),
       );
     } else {
-      posts = await PostService.fetchPaginatedPosts({
+      posts = await this.service.fetchPaginatedPosts({
         filter: {},
         limit: Number(limit),
         cursor: cursor ? String(cursor) : null,
@@ -155,14 +155,14 @@ export class PostController {
    * Fetches a single post by its ID.
    * Returns the post details in a public-safe response format.
    */
-  static fetchPost = asyncHandler(async (req: Request, res: Response) => {
+  fetchPost = asyncHandler(async (req: Request, res: Response) => {
     if (!req.user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
 
     const { postId } = req.params;
 
-    const post = await PostService.fetchPost(String(postId));
+    const post = await this.service.fetchPost(String(postId));
 
     return res
       .status(HttpStatus.OK)

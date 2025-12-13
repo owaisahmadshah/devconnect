@@ -5,8 +5,24 @@ import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import { ProjectController } from '../controllers/project.controller.js';
 import * as projectSchema from '../schemas/project.js';
 import { upload } from '../middleware/multer.middleware.js';
+import { ProjectRepository } from '../repositories/project.repository.js';
+import { ProfileRepository } from '../repositories/profile.repository.js';
+import { UserRepository } from '../repositories/user.repository.js';
+import { UserService } from '../services/user.service.js';
+import { ProfileService } from '../services/profile.service.js';
+import { ProjectService } from '../services/project.service.js';
 
 const router = Router();
+
+const projectRepository = new ProjectRepository();
+const profileRepository = new ProfileRepository();
+const userRepository = new UserRepository();
+
+const userService = new UserService(userRepository);
+const profileService = new ProfileService(profileRepository, userService);
+const projectService = new ProjectService(projectRepository, profileService);
+
+const controller = new ProjectController(projectService);
 
 // Protected routes
 router.post(
@@ -14,52 +30,52 @@ router.post(
   auth,
   upload.fields([{ name: 'media', maxCount: 15 }]),
   validateSchema(projectSchema.createProjectBodySchema),
-  ProjectController.createProject,
+  controller.createProject,
 );
 router.delete(
   '/delete',
   auth,
   validateSchema(projectSchema.deleteProjectQuerySchema),
-  ProjectController.deleteProject,
+  controller.deleteProject,
 );
 router.post(
   '/add-array-item',
   auth,
   validateSchema(projectSchema.addProjectArrayItemFieldBodySchema),
-  ProjectController.addArrayItem,
+  controller.addArrayItem,
 );
 router.delete(
   '/delete-array-item',
   auth,
   validateSchema(projectSchema.deleteProjectArrayFieldItemQuerySchema),
-  ProjectController.deleteProjectArrayItem,
+  controller.deleteProjectArrayItem,
 );
 router.patch(
   '/update-field-item',
   auth,
   validateSchema(projectSchema.updateProjectItemFieldBodySchema),
-  ProjectController.updateProjectItemField,
+  controller.updateProjectItemField,
 );
 router.get(
   '/by-title',
   validateSchema(projectSchema.projectsByTitleQuerySchema),
-  ProjectController.searchProjectByTitle,
+  controller.searchProjectByTitle,
 );
 router.get(
   '/by-techstack',
   validateSchema(projectSchema.projectsByTechStacksQuerySchema),
-  ProjectController.filterProjectsByTechStacks,
+  controller.filterProjectsByTechStacks,
 );
 router.get(
   '/:projectId',
   validateSchema(projectSchema.projectByIdParamsSchema),
-  ProjectController.fetchProjectById,
+  controller.fetchProjectById,
 );
 router.get(
   '/user/:profileUrl',
   validateSchema(projectSchema.projectsOfUserParmsSchema),
   auth,
-  ProjectController.fetchUserProjectsByProfileUrls,
+  controller.fetchUserProjectsByProfileUrls,
 );
 
 export default router;
