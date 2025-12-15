@@ -1,21 +1,29 @@
-export const formatDate = (date: Date | string) => {
-  if (!date) return '';
+export const formatDate = (updatedAt: Date | string) => {
+  if (!updatedAt) return '';
 
-  // Handle different date formats - just display what we receive
-  if (typeof date === 'string') {
-    return date;
-  }
+  const date = new Date(updatedAt);
+  const now = new Date();
 
-  // If it's a Date object, format it
-  if (date instanceof Date) {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      year: 'numeric',
+  const isToday = date.toDateString() === now.toDateString();
+
+  if (isToday) {
+    // Display time if it's today
+    return date.toLocaleTimeString('en-PK', {
+      hour: '2-digit',
+      minute: '2-digit',
     });
   }
 
-  // For any other format, convert to string
-  return String(date);
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(now.getDate() - 7);
+
+  if (date > oneWeekAgo) {
+    // Display weekday name if it's within a week
+    return date.toLocaleDateString('en-PK', { weekday: 'long' });
+  }
+
+  // Display date in DD/MM/YYYY format if itF's older than a week
+  return date.toLocaleDateString('en-PK');
 };
 
 export const getDateRange = (started: Date, ended: Date) => {
