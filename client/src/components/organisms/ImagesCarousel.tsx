@@ -12,7 +12,13 @@ interface ImagesCarouselProps {
   mediaType: string;
 }
 
-export const ImagesCarousel = ({ images }: { images: ImagesCarouselProps[] }) => {
+export const ImagesCarousel = ({
+  images,
+  openImages = true,
+}: {
+  images: ImagesCarouselProps[];
+  openImages?: boolean;
+}) => {
   const slides = images.map(image => ({ src: image.url }));
 
   const [open, setOpen] = useState(false);
@@ -59,7 +65,7 @@ export const ImagesCarousel = ({ images }: { images: ImagesCarouselProps[] }) =>
 
       {/* Fullscreen lightbox */}
       <Lightbox
-        open={open}
+        open={open && openImages}
         close={toggleOpen(false)}
         plugins={[Counter, Download, Zoom]}
         index={index}

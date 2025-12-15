@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { ProfileWithUrl } from '@/components/organisms/ProfileWithUrl';
 import { Button } from '@/components/ui/button';
 import type { TCreateLike, TPostResponse } from 'shared';
-import { FaRegCommentDots, FaShare } from 'react-icons/fa';
+import { FaShare } from 'react-icons/fa';
 import { HiDotsHorizontal } from 'react-icons/hi';
 import { ImagesCarousel } from '@/components/organisms/ImagesCarousel';
 import { useState } from 'react';
@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ReactionButton } from './ReactionButton';
+import { PostComments } from './PostComments';
+import { cn } from '@/lib/utils';
 
 interface PostProps {
   post: TPostResponse;
@@ -21,6 +23,8 @@ interface PostProps {
   onDelete?: ({ _id }: { _id: string }) => void;
   onReaction: (data: TCreateLike & { profileUrl?: string }) => void;
   currentUserProfileUrl?: string;
+  showProfile?: boolean;
+  openImages?: boolean;
 }
 
 const MAX_DESCRIPTION_LENGTH = 280;
@@ -31,6 +35,8 @@ export const Post = ({
   onDelete,
   onReaction,
   currentUserProfileUrl,
+  showProfile = true,
+  openImages = true,
 }: PostProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -53,41 +59,48 @@ export const Post = ({
   // }
 
   return (
-    <Card className="mx-auto w-full rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg">
+    <Card
+      className={cn(
+        'mx-auto w-full rounded-xl border-none shadow-sm transition-all duration-300 hover:shadow-lg',
+        showProfile === false && 'rounded-sm shadow-none',
+      )}
+    >
       {/* Header */}
-      <CardHeader className="flex flex-row items-center justify-between px-5">
-        <div className="flex flex-1 items-center gap-3">
-          <ProfileWithUrl
-            user={post.createdBy}
-            profileSize="m"
-            reverse={true}
-            underlineOnHover={false}
-            postDate={post.createdAt}
-          />
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-            >
-              <HiDotsHorizontal className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {isEditable && (
-              <DropdownMenuItem
-                onClick={() => onDelete?.({ _id: post._id })}
-                className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-950/30 dark:focus:text-red-400"
+      {showProfile && (
+        <CardHeader className="flex flex-row items-center justify-between px-5">
+          <div className="flex flex-1 items-center gap-3">
+            <ProfileWithUrl
+              user={post.createdBy}
+              profileSize="m"
+              reverse={true}
+              underlineOnHover={false}
+              postDate={post.createdAt}
+            />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
               >
-                Delete Post
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem className="cursor-pointer">Report Post</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </CardHeader>
+                <HiDotsHorizontal className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {isEditable && (
+                <DropdownMenuItem
+                  onClick={() => onDelete?.({ _id: post._id })}
+                  className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-950/30 dark:focus:text-red-400"
+                >
+                  Delete Post
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem className="cursor-pointer">Report Post</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CardHeader>
+      )}
 
       {/* Description */}
       {post.description && (
@@ -105,14 +118,14 @@ export const Post = ({
             </button>
           )}
           {/* Divider */}
-          <div className="mx-5 border-t border-slate-200 dark:border-slate-800" />
+          {showProfile && <div className="mx-5 border-t border-slate-200 dark:border-slate-800" />}
         </CardContent>
       )}
 
       {/* Media */}
       {post.media && post.media.length > 0 && (
         <div className="px-0 py-0">
-          <ImagesCarousel images={post.media} />
+          <ImagesCarousel images={post.media} openImages={openImages} />
         </div>
       )}
 
@@ -127,7 +140,7 @@ export const Post = ({
       )}
 
       {/* Divider */}
-      <div className="mx-5 border-t border-slate-200 dark:border-slate-800" />
+      {showProfile && <div className="mx-5 border-t border-slate-200 dark:border-slate-800" />}
 
       {/* Actions */}
       <CardFooter className="px-3 py-0">
@@ -141,15 +154,12 @@ export const Post = ({
           />
 
           {/* Comment */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-blue-500 dark:text-slate-400 dark:hover:bg-slate-800"
-          >
-            <FaRegCommentDots className="h-[18px] w-[18px]" />
-            <span className="hidden sm:inline">Comment</span>
-          </Button>
-
+          <PostComments
+            post={post}
+            onReaction={onReaction}
+            currentUserProfileUrl={currentUserProfileUrl}
+            onDelete={onDelete}
+          />
           {/* Share */}
           <Button
             variant="ghost"
