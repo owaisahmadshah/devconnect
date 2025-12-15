@@ -1,8 +1,9 @@
+import { TUserProfileSummary } from '../profile/profileResponse';
 import { TBaseComment } from './comment';
 
 export type TCommentResponse = Omit<TBaseComment, 'commentBy'> & {
   _id: string;
-  commentBy: string;
+  commentBy: TUserProfileSummary;
   createdAt: Date;
   updatedAt: Date;
 };

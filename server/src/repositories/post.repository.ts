@@ -152,8 +152,29 @@ export class PostRepository {
         },
       },
       {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'postId',
+          pipeline: [
+            {
+              $count: 'count',
+            },
+          ],
+          as: 'commentCount',
+        },
+      },
+      {
+        $addFields: {
+          totalComments: {
+            $ifNull: [{ $arrayElemAt: ['$commentCount.count', 0] }, 0],
+          },
+        },
+      },
+      {
         $project: {
           allLikes: 0,
+          commentCount: 0,
         },
       },
     ]);

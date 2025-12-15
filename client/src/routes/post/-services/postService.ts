@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/lib/api-client';
+import { apiDelete, apiGet, apiPost } from '@/lib/api-client';
 import {
   type TLikeResponse,
   type TCreateLike,
@@ -7,6 +7,12 @@ import {
   type TPostOfUser,
   type TPostResponse,
   type TPostsResponseWithCursorPaginationResponse,
+  type TCreateComment,
+  type TCommentResponse,
+  type TDeleteCommentSchema,
+  type TCommentDeleteResponse,
+  type TPostCommentsByIdSchema,
+  type TCommentsResponseWithCursorPaginationResponse,
 } from 'shared';
 
 export const createPostService = async (data: FormData): Promise<TPostResponse> => {
@@ -39,4 +45,25 @@ export const reactionService = async (body: TCreateLike & { profileUrl?: string 
     postId: body.postId,
     likedBy: body.likedBy,
   });
+};
+
+export const createComment = async (body: TCreateComment & { profileUrl?: string }) => {
+  return apiPost<TCommentResponse>('/api/v1/comment/create', {
+    postId: body.postId,
+    body: body.body,
+    commentBy: body.commentBy,
+  });
+};
+
+export const deleteComment = async (query: TDeleteCommentSchema & { profileUrl?: string }) => {
+  return apiDelete<TCommentDeleteResponse>('/api/v1/comment/delete', {
+    _id: query._id,
+  });
+};
+
+export const fetchComments = async (params: TPostCommentsByIdSchema, query: TPagination) => {
+  return apiGet<TCommentsResponseWithCursorPaginationResponse>(
+    `/api/v1/comment/comments/${params.postId}`,
+    query,
+  );
 };

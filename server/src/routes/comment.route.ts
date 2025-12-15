@@ -12,19 +12,28 @@ import { CommentService } from '../services/comment.service.js';
 import { CommentController } from '../controllers/comment.controller.js';
 import { CommentMapper } from '../mapper/comment.mapper.js';
 import { ProfileService } from '../services/profile.service.js';
+import { ProfileRepository } from '../repositories/profile.repository.js';
+import { UserService } from '../services/user.service.js';
+import { UserRepository } from '../repositories/user.repository.js';
 
 const router = Router();
 
 const mapper = new CommentMapper();
+
 const repo = new CommentRepository();
-const profileService = new ProfileService();
+const profileRepo = new ProfileRepository();
+const userRepo = new UserRepository();
+
+const userService = new UserService(userRepo);
+const profileService = new ProfileService(profileRepo, userService);
 const service = new CommentService(repo, mapper, profileService);
+
 const controller = new CommentController(service);
 
 router.post('/create', auth, validateSchema(createCommentBodySchema), controller.createComment);
 router.delete('/delete', auth, validateSchema(deleteCommentQuerySchema), controller.deleteComment);
 router.get(
-  '/comments',
+  '/comments/:postId',
   auth,
   validateSchema(postCommentsByIdQuerySchema),
   controller.fetchPaginatedComments,

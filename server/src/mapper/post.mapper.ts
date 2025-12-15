@@ -14,6 +14,7 @@ export class PostMapper {
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       totalLikes: post?.totalLikes,
+      totalComments: post?.totalComments,
     };
 
     if (post?.likeType) {

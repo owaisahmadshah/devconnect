@@ -1,5 +1,6 @@
 import type { TCreateComment } from 'shared';
 import { Comment } from '../models/comment.model.js';
+import mongoose from 'mongoose';
 // import mongoose from 'mongoose';
 
 export class CommentRepository {
@@ -22,12 +23,14 @@ export class CommentRepository {
     limit: number;
     cursor: string | null;
   }) {
-    const filter: any = { postId };
+    const filter: any = {};
     if (cursor) {
       filter.createdAt = { $lt: new Date(cursor) };
     }
 
     // const mongooseProfileId = new mongoose.Types.ObjectId(profileId);
+    const mongoosePostId = new mongoose.Types.ObjectId(postId);
+    filter.postId = mongoosePostId;
 
     return Comment.aggregate([
       { $match: filter },

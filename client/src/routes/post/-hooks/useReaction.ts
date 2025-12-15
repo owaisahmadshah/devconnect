@@ -10,7 +10,7 @@ export const useReaction = () => {
       const { postId, value, profileUrl } = variables;
       const isCreated = data.isCreated;
 
-      queryClient.setQueryData(['feed-posts'], oldData => {
+      const updatePostCache = (oldData: any) => {
         if (!oldData) return oldData;
 
         return {
@@ -20,7 +20,6 @@ export const useReaction = () => {
             posts: page.posts.map(post => {
               if (post._id !== postId) return post;
 
-              // 👍 Update likes
               const updatedTotalLikes = isCreated ? post.totalLikes + 1 : post.totalLikes - 1;
 
               const updatedLikeType = isCreated ? value : undefined;
@@ -33,33 +32,12 @@ export const useReaction = () => {
             }),
           })),
         };
-      });
+      };
+
+      queryClient.setQueryData(['feed-posts'], updatePostCache);
 
       if (profileUrl) {
-        queryClient.setQueryData(['user-posts', profileUrl], oldData => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            pages: oldData.pages.map(page => ({
-              ...page,
-              posts: page.posts.map(post => {
-                if (post._id !== postId) return post;
-
-                // 👍 Update likes
-                const updatedTotalLikes = isCreated ? post.totalLikes + 1 : post.totalLikes - 1;
-
-                const updatedLikeType = isCreated ? value : undefined;
-
-                return {
-                  ...post,
-                  totalLikes: updatedTotalLikes,
-                  likeType: updatedLikeType,
-                };
-              }),
-            })),
-          };
-        });
+        queryClient.setQueryData(['user-posts', profileUrl], updatePostCache);
       }
     },
   });

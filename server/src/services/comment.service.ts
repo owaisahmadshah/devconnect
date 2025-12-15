@@ -12,15 +12,14 @@ export class CommentService {
   ) {}
 
   async createComment(data: TCreateComment, userId: string): Promise<TCommentResponse> {
-    // const profile = await this.proService.getUserProfileSummary(userId);
-    const profile = await ProfileService.getUserProfileSummary(userId);
+    const profile = await this.proService.getUserProfileSummary(userId);
 
     data.commentBy = profile._id;
 
     const dbComment = await this.repo.createComment(data);
     const responseComment = this.mapper.toPublicComment(dbComment);
 
-    return responseComment;
+    return { ...responseComment, commentBy: profile };
   }
 
   async deleteComment(commentId: string): Promise<TCommentDeleteResponse> {
@@ -48,7 +47,7 @@ export class CommentService {
     limit: number;
     cursor: string | null;
   }) {
-    const profile = await ProfileService.getUserProfileSummary(userId);
+    const profile = await this.proService.getUserProfileSummary(userId);
 
     const comments = await this.repo.fetchPaginatedComments({
       postId,
