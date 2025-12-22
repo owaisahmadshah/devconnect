@@ -2,7 +2,7 @@ import type { TPostResponse } from 'shared';
 import type { Document } from 'mongoose';
 
 export class PostMapper {
-  static toPublicPost = (postData: Document): TPostResponse => {
+  toPublicPost = (postData: Document): TPostResponse => {
     const post = postData;
 
     const response: TPostResponse = {

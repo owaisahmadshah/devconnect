@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 import {
   dbUserSchema,
-  publicUserSchema,
   type TAuthUserServer,
   type TDbUser,
   type TPublicUser,
@@ -15,7 +14,7 @@ export class UserMapper {
   /**
    * Transforms a database user to a public user (safe for client exposure)
    */
-  static toPublicUser(user: TDbUser | mongoose.Document): TPublicUser {
+  toPublicUser(user: TDbUser | mongoose.Document): TPublicUser {
     const userObj = user instanceof mongoose.Document ? user.toObject() : user;
     return {
       _id: userObj._id,
@@ -29,7 +28,7 @@ export class UserMapper {
   /**
    * Transforms an auth user to db user
    */
-  static toDbUser(user: TAuthUserServer, otp: string, otpExpiry: Date): TDbUser {
+  toDbUser(user: TAuthUserServer, otp: string, otpExpiry: Date): TDbUser {
     const dbUser = dbUserSchema.parse({
       username: user.username,
       email: user.email,

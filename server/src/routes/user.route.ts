@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import auth from '../middleware/auth.middleware.js';
+
 import {
   authUserBodySchema,
   forgetPasswordBodySchema,
@@ -10,28 +11,27 @@ import {
   uniqueIdentifierParamsSchema,
   verifyOtpBodySchema,
 } from '../schemas/user.js';
-import { UserRepository } from '../repositories/user.repository.js';
-import { UserService } from '../services/user.service.js';
-import { UserController } from '../controllers/user.controller.js';
+
+import { userController } from '../di/user.container.js';
 
 const router = Router();
 
-const repository = new UserRepository();
-const service = new UserService(repository);
-const controller = new UserController(service);
-
 // Public routes
-router.post('/signup', validateSchema(authUserBodySchema), controller.signUpUser);
-router.post('/signin', validateSchema(signInUserBodySchema), controller.signInUser);
-router.post('/verify-otp', validateSchema(verifyOtpBodySchema), controller.verifyOtp);
-router.post('/resend-otp', validateSchema(resendOtpBodySchema), controller.resendOtp);
-router.post('/signout', auth, controller.signOutUser);
-router.post('/forget-password', validateSchema(forgetPasswordBodySchema), controller.forgetUserPassword);
+router.post('/signup', validateSchema(authUserBodySchema), userController.signUpUser);
+router.post('/signin', validateSchema(signInUserBodySchema), userController.signInUser);
+router.post('/verify-otp', validateSchema(verifyOtpBodySchema), userController.verifyOtp);
+router.post('/resend-otp', validateSchema(resendOtpBodySchema), userController.resendOtp);
+router.post('/signout', auth, userController.signOutUser);
+router.post(
+  '/forget-password',
+  validateSchema(forgetPasswordBodySchema),
+  userController.forgetUserPassword,
+);
 router.get(
   '/unique-identifier/:identifier',
   validateSchema(uniqueIdentifierParamsSchema),
-  controller.uniqueIdentifier,
+  userController.uniqueIdentifier,
 );
-router.post('/refresh-token', controller.refreshAccessToken);
+router.post('/refresh-token', userController.refreshAccessToken);
 
 export default router;

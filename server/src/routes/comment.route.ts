@@ -1,42 +1,35 @@
 import { Router } from 'express';
 
 import auth from '../middleware/auth.middleware.js';
-import { validateSchema } from '../middleware/validateRequest.middleware.js';
+
 import {
   createCommentBodySchema,
   deleteCommentQuerySchema,
   postCommentsByIdQuerySchema,
 } from '../schemas/comment.js';
-import { CommentRepository } from '../repositories/comment.repository.js';
-import { CommentService } from '../services/comment.service.js';
-import { CommentController } from '../controllers/comment.controller.js';
-import { CommentMapper } from '../mapper/comment.mapper.js';
-import { ProfileService } from '../services/profile.service.js';
-import { ProfileRepository } from '../repositories/profile.repository.js';
-import { UserService } from '../services/user.service.js';
-import { UserRepository } from '../repositories/user.repository.js';
+import { validateSchema } from '../middleware/validateRequest.middleware.js';
+
+import { commentController } from '../di/comment.container.js';
 
 const router = Router();
 
-const mapper = new CommentMapper();
-
-const repo = new CommentRepository();
-const profileRepo = new ProfileRepository();
-const userRepo = new UserRepository();
-
-const userService = new UserService(userRepo);
-const profileService = new ProfileService(profileRepo, userService);
-const service = new CommentService(repo, mapper, profileService);
-
-const controller = new CommentController(service);
-
-router.post('/create', auth, validateSchema(createCommentBodySchema), controller.createComment);
-router.delete('/delete', auth, validateSchema(deleteCommentQuerySchema), controller.deleteComment);
+router.post(
+  '/create',
+  auth,
+  validateSchema(createCommentBodySchema),
+  commentController.createComment,
+);
+router.delete(
+  '/delete',
+  auth,
+  validateSchema(deleteCommentQuerySchema),
+  commentController.deleteComment,
+);
 router.get(
   '/comments/:postId',
   auth,
   validateSchema(postCommentsByIdQuerySchema),
-  controller.fetchPaginatedComments,
+  commentController.fetchPaginatedComments,
 );
 
 export default router;

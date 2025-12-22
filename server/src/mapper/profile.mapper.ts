@@ -6,7 +6,7 @@ import {
 import { Document } from 'mongoose';
 
 export class ProfileMapper {
-  static toUserProfileSummary(profileData: TBaseProfile | Document): TUserProfileSummaryResponse {
+  toUserProfileSummary(profileData: TBaseProfile | Document): TUserProfileSummaryResponse {
     const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
     return {
       _id: profileObj._id,
@@ -22,7 +22,7 @@ export class ProfileMapper {
     };
   }
 
-  static toUserProfile(profileData: TBaseProfile | Document): TUserProfileResponse {
+  toUserProfile(profileData: TBaseProfile | Document): TUserProfileResponse {
     const profileObj = profileData instanceof Document ? profileData.toObject() : profileData;
     return {
       _id: profileObj._id,
@@ -49,7 +49,7 @@ export class ProfileMapper {
     };
   }
 
-  static toFilterPrivateProfile(profileObj: TUserProfileResponse): TUserProfileResponse {
+  toFilterPrivateProfile(profileObj: TUserProfileResponse): TUserProfileResponse {
     const educations = profileObj.visibility.education === 'Private' ? [] : profileObj.educations;
     const skills = profileObj.visibility.skills === 'Private' ? [] : profileObj.skills;
     const experiences =
@@ -67,7 +67,7 @@ export class ProfileMapper {
     };
   }
 
-  static toFilterConnectionsOnlyProfile(profileData: TUserProfileResponse): TUserProfileResponse {
+  toFilterConnectionsOnlyProfile(profileData: TUserProfileResponse): TUserProfileResponse {
     const profileObj = profileData;
 
     const educations =

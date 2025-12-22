@@ -13,24 +13,36 @@ import {
   type TUserProfileSummaryresponseWithPagination,
   type TFullNameSearch,
 } from 'shared';
+import type { IRequestUser } from '../types/index.js';
+
 import { ApiError } from '../utils/ApiError.js';
 import { ProfileMapper } from '../mapper/profile.mapper.js';
 import { UserService } from './user.service.js';
-import type { IRequestUser } from '../types/index.js';
+import { ProfileRepository } from '../repositories/profile.repository.js';
+
 import { uploadSingleImage } from '../utils/uploadImages.js';
-import type { ProfileRepository } from '../repositories/profile.repository.js';
+
+interface IProfileServiceDeps {
+  repo: ProfileRepository;
+  userService: UserService;
+  profileMapper: ProfileMapper;
+  uploadSingleImage: typeof uploadSingleImage;
+  objectId: typeof mongoose.Types.ObjectId;
+}
 
 export class ProfileService {
-  constructor(private repo: ProfileRepository, private userServ: UserService) {}
+  constructor(private deps: IProfileServiceDeps) {}
 
   getUserProfileSummary = async (queryText: string): Promise<TUserProfileSummaryResponse> => {
-    const profile = await this.repo.findByUserIdOrProfileUrl(queryText);
+    const { repo, profileMapper } = this.deps;
+
+    const profile = await repo.findByUserIdOrProfileUrl(queryText);
 
     if (!profile) {
-      throw new ApiError(HttpStatus.NO_CONTENT, 'Profile not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
     }
 
-    const profileRes = ProfileMapper.toUserProfileSummary(profile);
+    const profileRes = profileMapper.toUserProfileSummary(profile);
 
     return profileRes;
   };
@@ -39,15 +51,17 @@ export class ProfileService {
     profileUrl: string,
     reqUser: IRequestUser | null,
   ): Promise<TUserProfileResponse> => {
-    const profile = await this.repo.findByProfileUrl(profileUrl);
+    const { repo, userService, profileMapper } = this.deps;
+
+    const profile = await repo.findByProfileUrl(profileUrl);
 
     if (!profile) {
-      throw new ApiError(HttpStatus.NO_CONTENT, 'Profile not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
     }
 
-    const responseProfile = ProfileMapper.toUserProfile(profile);
+    const responseProfile = profileMapper.toUserProfile(profile);
 
-    const user = await this.userServ.getUser(reqUser?.email ?? '');
+    const user = await userService.getUser(reqUser?.email ?? '');
 
     // If user requesting his own profile
     if (reqUser?._id === user?._id) {
@@ -55,7 +69,7 @@ export class ProfileService {
     }
 
     // Removing all privates
-    const privateProfile = ProfileMapper.toFilterPrivateProfile(responseProfile);
+    const privateProfile = profileMapper.toFilterPrivateProfile(responseProfile);
 
     // TODO: If user is not in connections filter connections-only
 
@@ -66,10 +80,11 @@ export class ProfileService {
     updateData: TAddProfileArrayField,
     user: IRequestUser,
   ): Promise<TAddNewItemToProfileWithIdResponse> => {
-    const profile = await this.repo.addArrayItem(user._id, updateData);
+    const { repo } = this.deps;
+    const profile = await repo.addArrayItem(user._id, updateData);
 
     if (!profile) {
-      throw new ApiError(404, 'Profile not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
     }
 
     const newlyAddedItem: TAddNewItemToProfileWithIdResponse = (profile as any)[
@@ -83,15 +98,17 @@ export class ProfileService {
     removeData: TDeleteProfileArrayItem,
     user: IRequestUser,
   ): Promise<TUserProfileResponse> => {
+    const { repo, profileMapper } = this.deps;
+
     const { fieldName, deleteObjectId } = removeData;
 
-    const profile = await this.repo.removeArrayItem(user._id, fieldName, deleteObjectId);
+    const profile = await repo.removeArrayItem(user._id, fieldName, deleteObjectId);
 
     if (!profile) {
-      throw new ApiError(404, 'Profile not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
     }
 
-    const responseProfile = ProfileMapper.toUserProfile(profile);
+    const responseProfile = profileMapper.toUserProfile(profile);
 
     return responseProfile;
   };
@@ -100,20 +117,23 @@ export class ProfileService {
     image: TSingleImageBackend,
     user: IRequestUser,
   ): Promise<TUserProfileResponse> => {
-    // TODO: Add DI for uploads
+    const { repo, uploadSingleImage, profileMapper } = this.deps;
     const { url, success } = await uploadSingleImage(image.path);
 
     if (!success) {
-      throw new ApiError(401, 'Error uploading proilfe picture to cloudinary.');
+      throw new ApiError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error uploading profile picture to cloudinary.',
+      );
     }
 
-    const profile = await this.repo.updateField(user._id, 'profilePictureUrl', url);
+    const profile = await repo.updateField(user._id, 'profilePictureUrl', url);
 
     if (!profile) {
-      throw new ApiError(401, 'User not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
     }
 
-    const responseProfile = ProfileMapper.toUserProfile(profile);
+    const responseProfile = profileMapper.toUserProfile(profile);
 
     return responseProfile;
   };
@@ -122,12 +142,14 @@ export class ProfileService {
     updateData: TUpdateProfileField,
     user: IRequestUser,
   ): Promise<TUserProfileResponse> => {
+    const { repo, profileMapper } = this.deps;
+
     const { fieldName, fieldData } = updateData;
 
-    const profile = await this.repo.findByUserId(user._id);
+    const profile = await repo.findByUserId(user._id);
 
     if (!profile) {
-      throw new ApiError(401, 'User not found.');
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
     }
 
     profile[fieldName] = fieldData;
@@ -149,9 +171,9 @@ export class ProfileService {
       (profile.profileUrls as any[]).unshift({ url: newSlug });
     }
 
-    await this.repo.save(profile);
+    await repo.save(profile);
 
-    const responseProfile = ProfileMapper.toUserProfile(profile);
+    const responseProfile = profileMapper.toUserProfile(profile);
     return responseProfile;
   };
 
@@ -159,18 +181,18 @@ export class ProfileService {
     input: string,
     pagination: TValidateSearchParamsPagination,
   ): Promise<TUserProfileSummaryresponseWithPagination> => {
+    const { repo, profileMapper, objectId } = this.deps;
+
     const { limit, cursor } = pagination;
 
     // TODO: Change all createdAt cursors' to _id
-    const matchStage = cursor
-      ? { $match: { _id: { $lt: new mongoose.Types.ObjectId(cursor) } } }
-      : null;
+    const matchStage = cursor ? { $match: { _id: { $lt: new objectId(cursor) } } } : null;
 
-    const results = await this.repo.searchProfiles(input, matchStage, limit);
+    const results = await repo.searchProfiles(input, matchStage, limit);
 
     const hasMore = results.length > limit;
     const items = hasMore
-      ? results.slice(0, -1).map(item => ProfileMapper.toUserProfileSummary(item))
+      ? results.slice(0, -1).map(item => profileMapper.toUserProfileSummary(item))
       : results;
     const nextCursor = hasMore ? items[items.length - 1]._id.toString() : null;
 

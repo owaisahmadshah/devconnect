@@ -14,10 +14,21 @@ import logger from '../utils/logger.js';
 import type { ProfileService } from './profile.service.js';
 import type { PostRepository } from '../repositories/post.repository.js';
 
+interface IPostServiceDeps {
+  repo: PostRepository;
+  profileService: ProfileService;
+  uploadMultipleImages: typeof uploadMultipleImages;
+  postMapper: PostMapper;
+  startSession: typeof mongoose.startSession;
+  objectId: typeof mongoose.Types.ObjectId;
+}
+
 export class PostService {
-  constructor(private repo: PostRepository, private profileServ: ProfileService) {}
+  constructor(private deps: IPostServiceDeps) {}
 
   createPost = async (postData: TCreatePost, userId: string): Promise<TPostResponse> => {
+    const { repo, uploadMultipleImages, profileService, postMapper } = this.deps;
+
     let paths: string[] = [];
     if (postData?.media) {
       postData.media.forEach(path => paths.push(path.path));
@@ -25,7 +36,7 @@ export class PostService {
     // Uploading images to cloudinary
     const { urls, success } = await uploadMultipleImages(paths);
 
-    const profile = await this.profileServ.getUserProfileSummary(userId);
+    const profile = await profileService.getUserProfileSummary(userId);
 
     if (!success) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Error uploading project images');
@@ -40,21 +51,23 @@ export class PostService {
       });
     });
 
-    const post = await this.repo.create({
+    const post = await repo.create({
       ...postData,
       media: uploadedMedia,
       createdBy: profile._id,
     });
 
-    const responsePost = PostMapper.toPublicPost(post);
+    const responsePost = postMapper.toPublicPost(post);
 
     return responsePost;
   };
 
   deletePost = async (deletePost: TDeletePost, user: IRequestUser) => {
+    const { repo, profileService, startSession } = this.deps;
+
     // TODO Update validation
     // ------Start validation
-    const project = await this.repo.findByIdWithUser(deletePost._id);
+    const project = await repo.findByIdWithUser(deletePost._id);
 
     if (!project) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Project not found');
@@ -66,13 +79,13 @@ export class PostService {
     // ------End Validation
 
     // Start transaction
-    const session = await mongoose.startSession();
+    const session = await startSession();
     session.startTransaction();
 
-    const profile = await this.profileServ.getUserProfileSummary(user._id);
+    const profile = await profileService.getUserProfileSummary(user._id);
 
     try {
-      await this.repo.deleteOne({ _id: deletePost._id, createdBy: profile._id }, session);
+      await repo.deleteOne({ _id: deletePost._id, createdBy: profile._id }, session);
       // TODO: Delete all the documents from all the collections(like likes, comments etc.) related to this particular document
 
       // Explicitly commit the transaction
@@ -110,16 +123,18 @@ export class PostService {
       filter.createdAt = { $lt: new Date(cursor) };
     }
 
-    // TODO: Change with who is currently signed in?
-    const profileId = profile_userId ? new mongoose.Types.ObjectId(profile_userId) : null;
+    const { repo, postMapper, objectId } = this.deps;
 
-    const posts = await this.repo.fetchPaginatedPostsAggregate({
+    // TODO: Change with who is currently signed in?
+    const profileId = profile_userId ? new objectId(profile_userId) : null;
+
+    const posts = await repo.fetchPaginatedPostsAggregate({
       filter,
       limit,
       profileId,
     });
 
-    const responsePosts: TPostResponse[] = posts.map(post => PostMapper.toPublicPost(post));
+    const responsePosts: TPostResponse[] = posts.map(post => postMapper.toPublicPost(post));
 
     const hasMore = responsePosts.length === limit;
     const lastPost = responsePosts.at(-1);
@@ -138,7 +153,9 @@ export class PostService {
     cursor: string | null,
     profile_userId: string,
   ): Promise<TPostsResponseWithCursorPaginationResponse> => {
-    const profile = await this.profileServ.getUserProfileSummary(profileUrl);
+    const { profileService } = this.deps;
+
+    const profile = await profileService.getUserProfileSummary(profileUrl);
 
     const filter: any = { createdBy: profile._id };
 
@@ -146,13 +163,15 @@ export class PostService {
   };
 
   fetchPost = async (postId: string): Promise<TPostResponse> => {
-    const post = await this.repo.findById(postId);
+    const { repo, postMapper } = this.deps;
+
+    const post = await repo.findById(postId);
 
     if (!post) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Post not found.');
     }
 
-    const responsePost = PostMapper.toPublicPost(post);
+    const responsePost = postMapper.toPublicPost(post);
 
     return responsePost;
   };

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
 import slugify from 'slugify';
 
 import { UserMapper } from '../mapper/user.mapper.js';
@@ -21,13 +20,27 @@ import {
 } from 'shared';
 import type { UserRepository } from '../repositories/user.repository.js';
 
+export interface IUserServiceProps {
+  repo: UserRepository;
+  userMapper: UserMapper;
+  sendEmail: typeof sendEmail;
+  generateOTP: typeof generateOTP;
+  generateExpiryTime: typeof generateExpiryTime;
+  startSession: typeof mongoose.startSession;
+  profileModel: typeof Profile;
+  jwt: typeof import('jsonwebtoken');
+  slugifyFn: typeof slugify;
+}
+
 export class UserService {
-  constructor(private repo: UserRepository) {}
+  constructor(private deps: IUserServiceProps) {}
 
   generateAccessAndRefreshToken = async (
     userId: string,
   ): Promise<{ accessToken: string; refreshToken: string }> => {
-    const user = await this.repo.findById(userId);
+    const { repo } = this.deps;
+
+    const user = await repo.findById(userId);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, getDefaultMessageForStatus(HttpStatus.NOT_FOUND));
@@ -36,13 +49,14 @@ export class UserService {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    await this.repo.updateRefreshToken(user._id as string, refreshToken);
+    await repo.updateRefreshToken(user._id as string, refreshToken);
 
     return { accessToken, refreshToken };
   };
 
   verifyOtp = async (userData: TVerifyOtp): Promise<{ isValidOtp: boolean }> => {
-    const user = await this.repo.findByIdentifier(userData.identifier);
+    const { repo } = this.deps;
+    const user = await repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, getDefaultMessageForStatus(HttpStatus.NOT_FOUND));
@@ -59,7 +73,7 @@ export class UserService {
     }
 
     if (!user.isVerified) {
-      await this.repo.updateVerificationStatus(user._id as string, true);
+      await repo.updateVerificationStatus(user._id as string, true);
     }
 
     return { isValidOtp: true };
@@ -70,8 +84,10 @@ export class UserService {
    * Returns void as this operation doesn't need to return any data
    * The controller should use HttpStatus.NO_CONTENT (204) for the response
    */
-  resendOtp = async (userData: TResendOtp): Promise<void> => {
-    const user = await this.repo.findByIdentifier(userData.identifier);
+  resendOtp = async (userData: TResendOtp): Promise<boolean> => {
+    const { repo, sendEmail, generateOTP, generateExpiryTime } = this.deps;
+
+    const user = await repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, getDefaultMessageForStatus(HttpStatus.NOT_FOUND));
@@ -92,9 +108,9 @@ export class UserService {
     user.otp = otpCode;
     user.otpExpiry = otpExpiry;
 
-    await this.repo.save(user);
+    await repo.save(user);
 
-    return;
+    return true;
   };
 
   /**
@@ -103,8 +119,19 @@ export class UserService {
    * The controller should use HttpStatus.CREATED (201) for the response
    */
   createUser = async (userData: TAuthUserServer): Promise<void> => {
+    const {
+      repo,
+      sendEmail,
+      userMapper,
+      generateOTP,
+      generateExpiryTime,
+      startSession,
+      profileModel,
+      slugifyFn,
+    } = this.deps;
+
     // Check if user already exists
-    const existingUser = await this.repo.findByEmailOrUsername(userData.email, userData.username);
+    const existingUser = await repo.findByEmailOrUsername(userData.email, userData.username);
 
     if (existingUser) {
       throw new ApiError(HttpStatus.CONFLICT, 'User with this email or username already exists');
@@ -122,22 +149,23 @@ export class UserService {
       );
     }
 
-    const dbUserData = UserMapper.toDbUser(userData, otpCode, otpExpiry);
+    const dbUserData = userMapper.toDbUser(userData, otpCode, otpExpiry);
 
     // Start transaction session
-    const session = await mongoose.startSession();
+    const session = await startSession();
     session.startTransaction();
 
     try {
       // The destructuring syntax [user] is used to get the first element from the array
       // that Mongoose's create() returns when used with a transaction
-      const [user] = await this.repo.create(dbUserData, session);
+      // @ts-ignore
+      const [user] = await repo.create(dbUserData, session);
 
       if (!user) {
         throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Unable to create user.');
       }
 
-      const baseSlug = (slugify as any)(`${userData.firstName} ${userData.lastName || ''}`, {
+      const baseSlug = (slugifyFn as any)(`${userData.firstName} ${userData.lastName || ''}`, {
         lower: true,
         strict: true,
       });
@@ -148,7 +176,7 @@ export class UserService {
 
       while (!uniqueSlugFound) {
         try {
-          await Profile.create(
+          await profileModel.create(
             [
               {
                 user: user._id,
@@ -205,7 +233,9 @@ export class UserService {
   signInUser = async (
     userData: TSignInUser,
   ): Promise<{ accessToken: string; refreshToken: string }> => {
-    const user = await this.repo.findByIdentifier(userData.identifier);
+    const { repo } = this.deps;
+
+    const user = await repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'User not found.');
@@ -236,9 +266,11 @@ export class UserService {
   forgetPassword = async (
     userData: TForgetPassword,
   ): Promise<{ accessToken: string; refreshToken: string }> => {
+    const { repo } = this.deps;
+
     await this.verifyOtp({ identifier: userData.identifier, otp: userData.otp });
 
-    const user = await this.repo.findByIdentifier(userData.identifier);
+    const user = await repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'User not found.');
@@ -253,13 +285,15 @@ export class UserService {
     );
 
     user.refreshToken = refreshToken;
-    await this.repo.saveWithValidation(user);
+    await repo.saveWithValidation(user);
 
     return { accessToken, refreshToken };
   };
 
   isIdentifierUnique = async (userData: TUniqueIdentifier): Promise<boolean> => {
-    const user = await this.repo.findByIdentifier(userData.identifier);
+    const { repo } = this.deps;
+
+    const user = await repo.findByIdentifier(userData.identifier);
 
     if (!user) {
       return true;
@@ -275,9 +309,11 @@ export class UserService {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Refresh token is required');
     }
 
+    const { repo, jwt } = this.deps;
+
     const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET!);
 
-    const user = await this.repo.findById((decodedToken as any)._id);
+    const user = await repo.findById((decodedToken as any)._id);
 
     if (!user) {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Invalid refresh token');
@@ -295,13 +331,14 @@ export class UserService {
   };
 
   getUser = async (identifier: string): Promise<TPublicUser> => {
-    const user = await this.repo.findByIdentifier(identifier);
+    const { repo, userMapper } = this.deps;
+    const user = await repo.findByIdentifier(identifier);
 
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'User with this email or username not found.');
     }
 
-    const responseUser: TPublicUser = UserMapper.toPublicUser(user);
+    const responseUser: TPublicUser = userMapper.toPublicUser(user);
 
     return responseUser;
   };
