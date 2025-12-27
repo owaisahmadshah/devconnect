@@ -660,4 +660,6 @@ describe('UserService', () => {
       expect(repo.findByIdentifier).toHaveBeenCalledWith(mockedUser.email);
     });
   });
+
+  
 });
