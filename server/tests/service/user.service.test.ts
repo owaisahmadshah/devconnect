@@ -1,12 +1,59 @@
 import { HttpStatus, type TAuthUserServer } from 'shared';
+
 import { UserService, type IUserServiceProps } from '../../src/services/user.service.js';
+
 import type { UserRepository } from '../../src/repositories/user.repository.js';
+
 import { ApiError } from '../../src/utils/ApiError.js';
 
 describe('UserService', () => {
   let service: UserService;
   let repo: jest.Mocked<UserRepository>;
   let mockDeps: jest.Mocked<IUserServiceProps>;
+
+  const expectApiError = async (promise: Promise<any>, statusCode: number) => {
+    await expect(promise).rejects.toBeInstanceOf(ApiError);
+    await expect(promise).rejects.toMatchObject({ statusCode });
+  };
+
+  const createMockedSession = () => ({
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    abortTransaction: jest.fn(),
+    endSession: jest.fn(),
+  });
+
+  const mockUsers = {
+    basic: {
+      _id: 'user-id',
+      email: 'one@example.com',
+      username: 'github',
+      firstName: 'Git',
+      lastName: 'Hub',
+      password: '1234567890',
+      role: 'developer' as const,
+    },
+    withTokens: {
+      _id: 'user-id',
+      generateAccessToken: jest.fn().mockReturnValue('access-token'),
+      generateRefreshToken: jest.fn().mockReturnValue('refresh-token'),
+    },
+    withOtp: {
+      _id: 'user-id',
+      otp: '123',
+      otpExpiry: new Date(Date.now() + 5 * 60 * 1000),
+      isVerified: false,
+    },
+    withAuth: {
+      _id: 'user-id',
+      email: 'one@example.com',
+      password: '1234',
+      isVerified: true,
+      isPasswordCorrect: jest.fn(),
+      generateAccessToken: jest.fn(),
+      generateRefreshToken: jest.fn(),
+    },
+  };
 
   beforeEach(() => {
     mockDeps = {
@@ -32,17 +79,13 @@ describe('UserService', () => {
       saveWithValidation: jest.fn(),
     } as unknown as jest.Mocked<UserRepository>;
 
-    Object.assign(mockDeps, { repo }); // inject updated repo mock
+    Object.assign(mockDeps, { repo });
     service = new UserService(mockDeps);
   });
 
   describe('generateAccessAndRefreshToken', () => {
     it('should generate and persist tokens for a valid user', async () => {
-      const mockedUser = {
-        _id: 'user-id',
-        generateAccessToken: jest.fn().mockReturnValue('access-token'),
-        generateRefreshToken: jest.fn().mockReturnValue('refresh-token'),
-      } as any;
+      const mockedUser = mockUsers.withTokens as any;
 
       repo.findById.mockResolvedValue(mockedUser);
       repo.updateRefreshToken.mockResolvedValue({} as any);
@@ -63,24 +106,16 @@ describe('UserService', () => {
     it('should throw NOT_FOUND if user does not exist', async () => {
       repo.findById.mockResolvedValue(null);
 
-      await expect(service.generateAccessAndRefreshToken('missing-id')).rejects.toBeInstanceOf(
-        ApiError,
+      await expectApiError(
+        service.generateAccessAndRefreshToken('missing-id'),
+        HttpStatus.NOT_FOUND,
       );
-
-      await expect(service.generateAccessAndRefreshToken('missing-id')).rejects.toMatchObject({
-        statusCode: HttpStatus.NOT_FOUND,
-      });
     });
   });
 
   describe('verifyOtp', () => {
     it('should verify otp and update user verification', async () => {
-      const mockedUser = {
-        _id: 'user-id',
-        otp: '123',
-        otpExpiry: new Date(Date.now() + 5 * 60 * 1000), // remains this much of time to expiry
-        isVerified: false,
-      } as any;
+      const mockedUser = mockUsers.withOtp as any;
 
       repo.findByIdentifier.mockResolvedValue(mockedUser);
       repo.updateVerificationStatus.mockResolvedValue({} as any);
@@ -89,60 +124,56 @@ describe('UserService', () => {
 
       expect(repo.findByIdentifier).toHaveBeenCalledWith('user-id');
       expect(repo.updateVerificationStatus).toHaveBeenCalledWith('user-id', true);
-
       expect(result).toEqual({ isValidOtp: true });
     });
 
     it('should throw NOT_FOUND if user does not exist', async () => {
       repo.findByIdentifier.mockResolvedValue(null);
 
-      const promise = service.verifyOtp({ otp: '123', identifier: 'missing-id' });
-
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await await expect(promise).rejects.toMatchObject({ statusCode: HttpStatus.NOT_FOUND });
+      await expectApiError(
+        service.verifyOtp({ otp: '123', identifier: 'missing-id' }),
+        HttpStatus.NOT_FOUND,
+      );
     });
 
     it('should throw GONE if otp is expired', async () => {
       const mockedUser = {
-        _id: 'user-id',
-        otp: '123',
+        ...mockUsers.withOtp,
         otpExpiry: new Date(Date.now() - 5 * 60 * 1000),
         isVerified: true,
       } as any;
 
       repo.findByIdentifier.mockResolvedValue(mockedUser);
 
-      const promise = service.verifyOtp({ otp: '123', identifier: 'user-id' });
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await await expect(promise).rejects.toMatchObject({ statusCode: HttpStatus.GONE });
+      await expectApiError(
+        service.verifyOtp({ otp: '123', identifier: 'user-id' }),
+        HttpStatus.GONE,
+      );
     });
 
-    it('should throw UNAUTHORIZED/INCORRECT if the otp is incorrect', async () => {
-      const mockedUser = {
-        _id: 'user-id',
-        otp: '123',
-        otpExpiry: new Date(Date.now() + 5 * 60 * 1000),
-        isVerified: true,
-      } as any;
+    it('should throw UNAUTHORIZED if the otp is incorrect', async () => {
+      const mockedUser = { ...mockUsers.withOtp, isVerified: true } as any;
 
       repo.findByIdentifier.mockResolvedValue(mockedUser);
 
-      const promise = service.verifyOtp({ otp: '1234', identifier: 'user-id' });
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await await expect(promise).rejects.toMatchObject({ statusCode: HttpStatus.UNAUTHORIZED });
+      await expectApiError(
+        service.verifyOtp({ otp: '1234', identifier: 'user-id' }),
+        HttpStatus.UNAUTHORIZED,
+      );
     });
   });
 
   describe('resendOtp', () => {
-    it('should find user, generate otp, send email and save in db', async () => {
-      const mockedUser = {
-        _id: 'user-id',
-        email: 'one@example.com',
-      } as any;
-
-      repo.findByIdentifier.mockResolvedValue(mockedUser);
+    const setupOtpMocks = () => {
       mockDeps.generateOTP.mockReturnValue('123456');
       mockDeps.generateExpiryTime.mockReturnValue(new Date());
+    };
+
+    it('should find user, generate otp, send email and save in db', async () => {
+      const mockedUser = { _id: 'user-id', email: 'one@example.com' } as any;
+
+      repo.findByIdentifier.mockResolvedValue(mockedUser);
+      setupOtpMocks();
       mockDeps.sendEmail.mockResolvedValue(true);
       repo.save.mockResolvedValue({} as any);
 
@@ -158,31 +189,22 @@ describe('UserService', () => {
     it('should throw NOT_FOUND if user does not exist', async () => {
       repo.findByIdentifier.mockResolvedValue(null);
 
-      await expect(service.resendOtp({ identifier: 'user-id' })).rejects.toBeInstanceOf(ApiError);
-
-      await expect(service.resendOtp({ identifier: 'user-id' })).rejects.toMatchObject({
-        statusCode: HttpStatus.NOT_FOUND,
-      });
+      await expectApiError(service.resendOtp({ identifier: 'user-id' }), HttpStatus.NOT_FOUND);
 
       expect(repo.findByIdentifier).toHaveBeenCalledWith('user-id');
     });
 
     it('should throw INTERNAL_SERVER_ERROR if unable to send otp email', async () => {
-      const mockedUser = {
-        _id: 'user-id',
-        email: 'one@example.com',
-      } as any;
+      const mockedUser = { _id: 'user-id', email: 'one@example.com' } as any;
 
       repo.findByIdentifier.mockResolvedValue(mockedUser);
-      mockDeps.generateOTP.mockReturnValue('123456');
-      mockDeps.generateExpiryTime.mockReturnValue(new Date());
+      setupOtpMocks();
       mockDeps.sendEmail.mockResolvedValue(false);
 
-      await expect(service.resendOtp({ identifier: 'user-id' })).rejects.toBeInstanceOf(ApiError);
-
-      await expect(service.resendOtp({ identifier: 'user-id' })).rejects.toMatchObject({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+      await expectApiError(
+        service.resendOtp({ identifier: 'user-id' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
 
       expect(repo.findByIdentifier).toHaveBeenCalledWith('user-id');
       expect(mockDeps.generateOTP).toHaveBeenCalled();
@@ -193,14 +215,7 @@ describe('UserService', () => {
   });
 
   describe('createUser', () => {
-    const mockedUser: TAuthUserServer = {
-      email: 'one@example.com',
-      username: 'github',
-      firstName: 'Git',
-      lastName: 'Hub',
-      password: '1234567890',
-      role: 'developer' as const,
-    };
+    const mockedUser: TAuthUserServer = mockUsers.basic;
 
     const mockedDbUser = {
       _id: 'user-id',
@@ -216,32 +231,23 @@ describe('UserService', () => {
       password: '1234567890',
     };
 
-    it('creates a user and profile within a transaction when data is valid', async () => {
-      const mockedSession = {
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        abortTransaction: jest.fn(),
-        endSession: jest.fn(),
-      };
-
+    const setupCreateUserMocks = (session = createMockedSession()) => {
       repo.findByEmailOrUsername.mockResolvedValue(null);
       mockDeps.generateOTP.mockReturnValue(mockedDbUser.otp);
       mockDeps.generateExpiryTime.mockReturnValue(mockedDbUser.otpExpiry);
       mockDeps.sendEmail.mockResolvedValue(true);
       (mockDeps.userMapper.toDbUser as jest.Mock).mockReturnValue(mockedDbUser);
-      mockDeps.startSession.mockResolvedValue(mockedSession as any);
+      mockDeps.startSession.mockResolvedValue(session as any);
       (mockDeps.slugifyFn as any).mockReturnValue('git-hub');
+      return session;
+    };
+
+    it('creates a user and profile within a transaction when data is valid', async () => {
+      const mockedSession = setupCreateUserMocks();
       repo.create.mockResolvedValue([{ ...mockedDbUser, user: 'user-id' }] as any);
       (mockDeps.profileModel.create as jest.Mock).mockResolvedValue([{ _id: 'profile-id' }] as any);
 
-      await service.createUser({
-        email: mockedUser.email,
-        username: mockedUser.username,
-        firstName: mockedUser.firstName,
-        lastName: mockedUser.lastName,
-        role: mockedUser.role,
-        password: mockedUser.password,
-      });
+      await service.createUser(mockedUser);
 
       expect(repo.findByEmailOrUsername).toHaveBeenCalledWith(
         mockedUser.email,
@@ -266,14 +272,12 @@ describe('UserService', () => {
     it('should throw CONFLICT if user exists', async () => {
       repo.findByEmailOrUsername.mockResolvedValue(mockedDbUser as any);
 
-      const promise = service.createUser(mockedUser);
+      await expectApiError(service.createUser(mockedUser), HttpStatus.CONFLICT);
 
       expect(repo.findByEmailOrUsername).toHaveBeenCalledWith(
         mockedUser.email,
         mockedUser.username,
       );
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await await expect(promise).rejects.toMatchObject({ statusCode: HttpStatus.CONFLICT });
     });
 
     it('should throw INTERNAL_SERVER_ERROR if unable to send email', async () => {
@@ -282,9 +286,7 @@ describe('UserService', () => {
       mockDeps.generateExpiryTime.mockReturnValue(mockedDbUser.otpExpiry);
       mockDeps.sendEmail.mockResolvedValue(false);
 
-      await expect(service.createUser(mockedUser)).rejects.toMatchObject({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+      await expectApiError(service.createUser(mockedUser), HttpStatus.INTERNAL_SERVER_ERROR);
 
       expect(repo.findByEmailOrUsername).toHaveBeenCalledWith(
         mockedUser.email,
@@ -296,24 +298,10 @@ describe('UserService', () => {
     });
 
     it('should throw INTERNAL_SERVER_ERROR if unable to create user', async () => {
-      const mockedSession = {
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        abortTransaction: jest.fn(),
-        endSession: jest.fn(),
-      };
-
-      repo.findByEmailOrUsername.mockResolvedValue(null);
-      mockDeps.generateOTP.mockReturnValue(mockedDbUser.otp);
-      mockDeps.generateExpiryTime.mockReturnValue(mockedDbUser.otpExpiry);
-      mockDeps.sendEmail.mockResolvedValue(true);
-      (mockDeps.userMapper.toDbUser as jest.Mock).mockReturnValue(mockedDbUser as any);
-      mockDeps.startSession.mockResolvedValue(mockedSession as any);
+      const mockedSession = setupCreateUserMocks();
       repo.create.mockResolvedValue([null] as any);
 
-      await expect(service.createUser(mockedUser)).rejects.toMatchObject({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+      await expectApiError(service.createUser(mockedUser), HttpStatus.INTERNAL_SERVER_ERROR);
 
       expect(repo.findByEmailOrUsername).toHaveBeenCalledWith(
         mockedUser.email,
@@ -332,19 +320,7 @@ describe('UserService', () => {
     });
 
     it('should abort transaction if profile creation fails with non-duplicate error', async () => {
-      const mockedSession = {
-        startTransaction: jest.fn(),
-        commitTransaction: jest.fn(),
-        abortTransaction: jest.fn(),
-        endSession: jest.fn(),
-      };
-
-      repo.findByEmailOrUsername.mockResolvedValue(null);
-      mockDeps.generateOTP.mockReturnValue(mockedDbUser.otp);
-      mockDeps.generateExpiryTime.mockReturnValue(mockedDbUser.otpExpiry);
-      mockDeps.sendEmail.mockResolvedValue(true);
-      (mockDeps.userMapper.toDbUser as jest.Mock).mockReturnValue(mockedDbUser as any);
-      mockDeps.startSession.mockResolvedValue(mockedSession as any);
+      const mockedSession = setupCreateUserMocks();
       repo.create.mockResolvedValue([{ ...mockedDbUser, _id: 'user-id' }] as any);
 
       const error = new Error('DB failure');
@@ -359,39 +335,33 @@ describe('UserService', () => {
   });
 
   describe('signInUser', () => {
-    const mockedUser = {
-      _id: 'user-id',
-      email: 'one@example.com',
-      password: '1234',
-      isVerified: true,
-      isPasswordCorrect: jest.fn(),
-      generateAccessToken: jest.fn(),
-      generateRefreshToken: jest.fn(),
-    };
+    const mockedUser = mockUsers.withAuth;
 
-    it('checks if a user is verified and password is correct, then sign in user', async () => {
+    const setupSignInMocks = () => {
       repo.findByIdentifier.mockResolvedValue(mockedUser as any);
       repo.findById.mockResolvedValue(mockedUser as any);
       repo.updateRefreshToken.mockResolvedValue({} as any);
-
       mockedUser.isPasswordCorrect.mockResolvedValue(true);
       mockedUser.generateAccessToken.mockReturnValue('access-token');
       mockedUser.generateRefreshToken.mockReturnValue('refresh-token');
+    };
 
-      const promise = await service.signInUser({
+    it('checks if a user is verified and password is correct, then sign in user', async () => {
+      setupSignInMocks();
+
+      const result = await service.signInUser({
         identifier: mockedUser.email,
         password: mockedUser.password,
       });
 
       expect(repo.findByIdentifier).toHaveBeenCalledWith(mockedUser.email);
       expect(mockedUser.isPasswordCorrect).toHaveBeenCalledWith(mockedUser.password);
-
       expect(repo.findById).toHaveBeenCalledWith('user-id');
       expect(mockedUser.generateAccessToken).toHaveBeenCalled();
       expect(mockedUser.generateRefreshToken).toHaveBeenCalled();
       expect(repo.updateRefreshToken).toHaveBeenCalledWith('user-id', 'refresh-token');
 
-      expect(promise).toEqual({
+      expect(result).toEqual({
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
       });
@@ -400,21 +370,16 @@ describe('UserService', () => {
     it('should throw NOT_FOUND if user does not exit', async () => {
       repo.findByIdentifier.mockResolvedValue(null);
 
-      await expect(
+      await expectApiError(
         service.signInUser({
           identifier: mockedUser.email,
           password: mockedUser.password,
         }),
-      ).rejects.toBeInstanceOf(ApiError);
-      await expect(
-        service.signInUser({
-          identifier: mockedUser.email,
-          password: mockedUser.password,
-        }),
-      ).rejects.toMatchObject({ statusCode: HttpStatus.NOT_FOUND });
+        HttpStatus.NOT_FOUND,
+      );
     });
 
-    it('should throw INTERNAL_SERVER_ERROR if user is not verified and unable to otp', async () => {
+    it('should throw INTERNAL_SERVER_ERROR if user is not verified and unable to send otp', async () => {
       const unverifiedUser = {
         _id: 'user-id',
         email: 'one@example.com',
@@ -424,20 +389,17 @@ describe('UserService', () => {
       };
 
       repo.findByIdentifier.mockResolvedValue(unverifiedUser as any);
-
       mockDeps.generateOTP.mockReturnValue('123456');
       mockDeps.generateExpiryTime.mockReturnValue(new Date());
       mockDeps.sendEmail.mockResolvedValue(false);
 
-      const promise = service.signInUser({
-        identifier: unverifiedUser.email,
-        password: unverifiedUser.password,
-      });
-
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+      await expectApiError(
+        service.signInUser({
+          identifier: unverifiedUser.email,
+          password: unverifiedUser.password,
+        }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
 
       expect(repo.findByIdentifier).toHaveBeenCalledWith(unverifiedUser.email);
       expect(mockDeps.sendEmail).toHaveBeenCalled();
@@ -447,15 +409,14 @@ describe('UserService', () => {
       repo.findByIdentifier.mockResolvedValue({ ...mockedUser, isVerified: false } as any);
       const resendSpy = jest.spyOn(service, 'resendOtp').mockResolvedValue(true);
 
-      const promise = service.signInUser({
-        identifier: mockedUser.email,
-        password: mockedUser.password,
-      });
+      await expectApiError(
+        service.signInUser({
+          identifier: mockedUser.email,
+          password: mockedUser.password,
+        }),
+        HttpStatus.FORBIDDEN,
+      );
 
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.FORBIDDEN,
-      });
       expect(repo.findByIdentifier).toHaveBeenCalledWith(mockedUser.email);
       expect(resendSpy).toHaveBeenCalledWith({ identifier: mockedUser.email });
     });
@@ -464,15 +425,14 @@ describe('UserService', () => {
       repo.findByIdentifier.mockResolvedValue(mockedUser as any);
       mockedUser.isPasswordCorrect.mockResolvedValue(false);
 
-      const promise = service.signInUser({
-        identifier: mockedUser.email,
-        password: mockedUser.password,
-      });
+      await expectApiError(
+        service.signInUser({
+          identifier: mockedUser.email,
+          password: mockedUser.password,
+        }),
+        HttpStatus.UNAUTHORIZED,
+      );
 
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
       expect(repo.findByIdentifier).toHaveBeenCalledWith(mockedUser.email);
       expect(mockedUser.isPasswordCorrect).toHaveBeenCalledWith(mockedUser.password);
     });
@@ -519,16 +479,15 @@ describe('UserService', () => {
       jest.spyOn(service, 'verifyOtp').mockResolvedValue(undefined as any);
       repo.findByIdentifier.mockResolvedValue(null);
 
-      const promise = service.forgetPassword({
-        otp: mockedUser.otp,
-        identifier: mockedUser.email,
-        password: mockedUser.password,
-      });
+      await expectApiError(
+        service.forgetPassword({
+          otp: mockedUser.otp,
+          identifier: mockedUser.email,
+          password: mockedUser.password,
+        }),
+        HttpStatus.NOT_FOUND,
+      );
 
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.NOT_FOUND,
-      });
       expect(service.verifyOtp).toHaveBeenCalledWith({
         otp: mockedUser.otp,
         identifier: mockedUser.email,
@@ -541,17 +500,18 @@ describe('UserService', () => {
     it('should return true if user does not exists', async () => {
       repo.findByIdentifier.mockResolvedValue(null);
 
-      const promise = await service.isIdentifierUnique({ identifier: 'username' });
+      const result = await service.isIdentifierUnique({ identifier: 'username' });
 
-      expect(promise).toBeTruthy();
+      expect(result).toBeTruthy();
       expect(repo.findByIdentifier).toHaveBeenCalledWith('username');
     });
+
     it('should return false if user exists', async () => {
       repo.findByIdentifier.mockResolvedValue({ _id: 'user-id', username: 'username' } as any);
 
-      const promise = await service.isIdentifierUnique({ identifier: 'username' });
+      const result = await service.isIdentifierUnique({ identifier: 'username' });
 
-      expect(promise).toBeFalsy();
+      expect(result).toBeFalsy();
       expect(repo.findByIdentifier).toHaveBeenCalledWith('username');
     });
   });
@@ -571,9 +531,9 @@ describe('UserService', () => {
         refreshToken: 'refresh-token',
       });
 
-      const promise = await service.generateRefreshAccessToken('refresh-token');
+      const result = await service.generateRefreshAccessToken('refresh-token');
 
-      expect(promise).toEqual({
+      expect(result).toEqual({
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
       });
@@ -585,25 +545,19 @@ describe('UserService', () => {
       expect(spy).toHaveBeenCalledWith(mockedDbUser._id);
     });
 
-    it('should should throw UNAUTHORIZED if token is not valid', async () => {
-      const promise = service.generateRefreshAccessToken(null);
-
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
+    it('should throw UNAUTHORIZED if token is not valid', async () => {
+      await expectApiError(service.generateRefreshAccessToken(null), HttpStatus.UNAUTHORIZED);
     });
 
     it('should throw UNAUTHORIZED if user does not exist', async () => {
       (mockDeps.jwt.verify as jest.Mock).mockReturnValue({ _id: mockedDbUser._id } as any);
       repo.findById.mockResolvedValue(null);
 
-      const promise = service.generateRefreshAccessToken('refresh-token');
+      await expectApiError(
+        service.generateRefreshAccessToken('refresh-token'),
+        HttpStatus.UNAUTHORIZED,
+      );
 
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
       expect(mockDeps.jwt.verify).toHaveBeenCalledWith(
         'refresh-token',
         process.env.REFRESH_TOKEN_SECRET!,
@@ -615,12 +569,11 @@ describe('UserService', () => {
       (mockDeps.jwt.verify as jest.Mock).mockReturnValue({ _id: mockedDbUser._id } as any);
       repo.findById.mockResolvedValue(mockedDbUser as any);
 
-      const promise = service.generateRefreshAccessToken('wrong-token');
+      await expectApiError(
+        service.generateRefreshAccessToken('wrong-token'),
+        HttpStatus.UNAUTHORIZED,
+      );
 
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.UNAUTHORIZED,
-      });
       expect(mockDeps.jwt.verify).toHaveBeenCalledWith(
         'wrong-token',
         process.env.REFRESH_TOKEN_SECRET!,
@@ -639,27 +592,19 @@ describe('UserService', () => {
       repo.findByIdentifier.mockResolvedValue(mockedUser as any);
       (mockDeps.userMapper.toPublicUser as jest.Mock).mockReturnValue(mockedUser as any);
 
-      await service.getUser(mockedUser.email);
+      const result = await service.getUser(mockedUser.email);
 
       expect(repo.findByIdentifier).toHaveBeenCalledWith(mockedUser.email);
       expect(mockDeps.userMapper.toPublicUser).toHaveBeenCalledWith(mockedUser);
-
-      const result = await service.getUser(mockedUser.email);
       expect(result).toEqual(mockedUser);
     });
 
     it('should throw NOT_FOUND if user does not exists', async () => {
       repo.findByIdentifier.mockResolvedValue(null);
 
-      const promise = service.getUser(mockedUser.email);
+      await expectApiError(service.getUser(mockedUser.email), HttpStatus.NOT_FOUND);
 
-      await expect(promise).rejects.toBeInstanceOf(ApiError);
-      await expect(promise).rejects.toMatchObject({
-        statusCode: HttpStatus.NOT_FOUND,
-      });
       expect(repo.findByIdentifier).toHaveBeenCalledWith(mockedUser.email);
     });
   });
-
-  
 });
