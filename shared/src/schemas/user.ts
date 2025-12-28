@@ -21,6 +21,7 @@ export const dbUserSchema = baseUserSchema.extend({
   github_login: z.string().optional(),
   github_access_token: z.string().optional(),
   github_access_token_type: z.string().optional(),
+  profileId: z.string().optional(),
 });
 
 // Public user schema (safe to expose to frontend)

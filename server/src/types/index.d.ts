@@ -1,7 +1,8 @@
-import { TBaseUser } from '@shared/src/index.js';
+import { TBaseUser } from 'shared';
 
 export interface IRequestUser extends TBaseUser {
   _id: string;
+  profileId: string;
 }
 declare global {
   namespace Express {

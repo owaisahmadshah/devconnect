@@ -185,7 +185,7 @@ describe('UserService', () => {
       expect(mockDeps.sendEmail).toHaveBeenCalledWith('one@example.com', '123456');
       expect(repo.save).toHaveBeenCalledWith(mockedUser);
     });
-
+ 
     it('should throw NOT_FOUND if user does not exist', async () => {
       repo.findByIdentifier.mockResolvedValue(null);
 

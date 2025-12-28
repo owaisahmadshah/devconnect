@@ -7,6 +7,7 @@ import type { IRequestUser } from '../types/index.js';
 
 interface JwtPayloadWithId extends jwt.JwtPayload {
   _id: string;
+  profileId: string;
 }
 
 const auth = async (req: Request, _: Response, next: NextFunction): Promise<void> => {
@@ -31,6 +32,7 @@ const auth = async (req: Request, _: Response, next: NextFunction): Promise<void
       username: user.username,
       email: user.email,
       role: user.role,
+      profileId: user.profileId as string,
     };
 
     req.user = reqUser;

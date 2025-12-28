@@ -175,7 +175,7 @@ export class UserService {
 
       while (!uniqueSlugFound) {
         try {
-          await profileModel.create(
+          const [profile] = await profileModel.create(
             [
               {
                 user: user._id,
@@ -186,6 +186,14 @@ export class UserService {
             ],
             { session },
           );
+
+          if (!profile) {
+            throw new ApiError(500, 'Internal server errror. Unable to create profile');
+          }
+
+          user.profileId = profile._id;
+
+          await repo.save(user);
 
           uniqueSlugFound = true; // success
         } catch (err: any) {

@@ -4,7 +4,6 @@ import { ProfileService } from '../services/profile.service.js';
 import {
   HttpStatus,
   type TDeleteProfileArrayItem,
-  type TAddProfileArrayField,
   type TSingleImageBackend,
   type TUpdateProfileField,
 } from 'shared';
