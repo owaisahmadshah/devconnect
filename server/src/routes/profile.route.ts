@@ -5,6 +5,7 @@ import { validateSchema } from '../middleware/validateRequest.middleware.js';
 
 import {
   fullNameSearchSchemas,
+  recommendConnectionsRouteSchema,
   userProfileDeleteArrayDataBodySchema,
   userProfileFieldUpdateSchema,
   userProfilePictureUpdateSchema,
@@ -58,6 +59,12 @@ router.patch(
   upload.single('profilePicture'),
   validateSchema(userProfilePictureUpdateSchema),
   profileController.updateProfilePicture,
+);
+router.get(
+  '/recommend-connections',
+  auth,
+  validateSchema(recommendConnectionsRouteSchema),
+  profileController.recommendPaginatedConnections,
 );
 
 export default router;

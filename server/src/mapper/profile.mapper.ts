@@ -19,6 +19,7 @@ export class ProfileMapper {
       bio: profileObj.bio,
       profileUrls: profileObj.profileUrls,
       isVerified: profileObj.isVerified,
+      connection: profileObj?.connection,
     };
   }
 
@@ -46,6 +47,7 @@ export class ProfileMapper {
       github_avatar_url: profileObj?.github_avatar_url ?? '',
       github_html_url: profileObj?.github_html_url ?? '',
       github_email: profileObj?.github_email ?? '',
+      connection: profileObj?.connection,
     };
   }
 

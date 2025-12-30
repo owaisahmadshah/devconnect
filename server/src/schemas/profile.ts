@@ -33,3 +33,7 @@ export const userProfileFieldUpdateSchema = z.object({
 export const fullNameSearchSchemas = z.object({
   query: fNSS.extend(paginationSchema.shape),
 });
+
+export const recommendConnectionsRouteSchema = z.object({
+  query: paginationSchema,
+});

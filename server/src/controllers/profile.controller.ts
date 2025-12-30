@@ -216,4 +216,39 @@ export class ProfileController {
       .status(HttpStatus.OK)
       .json(new ApiResponse(HttpStatus.OK, profiles, 'Got profiles successfully.'));
   });
+
+  /**
+   * Recommend connections with pagination.
+   *
+   * @route GET /api/v1/profile/recommend-connections
+   *
+   * @param {Request} req - Contains:
+   *   - req.user.profileId: string
+   *   - req.query.limit?: number
+   *   - req.query.cursor?: string (ISO timestamp)
+   *
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TUserProfileSummaryresponseWithPagination>>}
+   *
+   * @description
+   * Fetches all the users who has a pending connections with current user or have no conneciton.
+   */
+  recommendPaginatedConnections = asyncHandler(async (req: Request, res: Response) => {
+    if (!req?.user) {
+      throw new ApiError(HttpStatus.UNAUTHORIZED, 'UNAUTHORIZED');
+    }
+
+    const { limit, cursor } = req.query;
+
+    const profiles = await this.service.recommendProfiles({
+      profileId: req.user.profileId,
+      limit: Number(limit),
+      cursor: typeof cursor === 'string' ? cursor : null,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, profiles, 'Got recommend profiles successfully.'));
+  });
 }

@@ -209,4 +209,30 @@ export class ProfileService {
   ): Promise<TUserProfileSummaryresponseWithPagination> => {
     return this.searchProfiles(fullName, pagination);
   };
+
+  recommendProfiles = async ({
+    profileId,
+    limit,
+    cursor,
+  }: {
+    profileId: string;
+    limit: number;
+    cursor: string | null;
+  }): Promise<TUserProfileSummaryresponseWithPagination> => {
+    const { repo, profileMapper } = this.deps;
+
+    const profiles = await repo.recommendPaginatedProfiles({ profileId, limit, cursor });
+
+    const responseProfiles = profiles.map(profile => profileMapper.toUserProfileSummary(profile));
+
+    const hasMore = responseProfiles.length === limit;
+
+    const nextCursor = hasMore ? profiles.at(-1).createdAt.toISOString() : null;
+
+    return {
+      profiles,
+      hasMore,
+      nextCursor,
+    };
+  };
 }
