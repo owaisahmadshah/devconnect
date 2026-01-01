@@ -23,16 +23,17 @@ const auth = async (req: Request, _: Response, next: NextFunction): Promise<void
 
     const user = await User.findById(decodedToken._id).select('-password -refreshToken');
 
-    if (!user) {
+    if (!user || !user.profileId) {
       return next(new ApiError(404, 'User not found'));
     }
 
+    
     const reqUser: IRequestUser = {
       _id: user._id as string,
       username: user.username,
       email: user.email,
       role: user.role,
-      profileId: user.profileId as string,
+      profileId: user.profileId.toString(),
     };
 
     req.user = reqUser;

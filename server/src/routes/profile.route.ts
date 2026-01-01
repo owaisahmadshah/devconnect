@@ -20,19 +20,6 @@ import { profileController } from '../di/profile.container.js';
 
 const router = Router();
 
-// Public routes
-router.get(
-  '/fetch-profiles-by-names',
-  validateSchema(fullNameSearchSchemas),
-  profileController.fullNameSearch,
-);
-router.get(
-  '/:url',
-  validateSchema(userProfileParamsSchema),
-  attachUser, // User or null, authentication is'nt required.
-  profileController.getUserProfile,
-);
-
 // Protected routes
 router.get('/', auth, profileController.getSignedInUserProfileSummary);
 router.patch(
@@ -65,6 +52,19 @@ router.get(
   auth,
   validateSchema(recommendConnectionsRouteSchema),
   profileController.recommendPaginatedConnections,
+);
+
+// Public routes
+router.get(
+  '/fetch-profiles-by-names',
+  validateSchema(fullNameSearchSchemas),
+  profileController.fullNameSearch,
+);
+router.get(
+  '/:url',
+  validateSchema(userProfileParamsSchema),
+  attachUser, // User or null, authentication is'nt required.
+  profileController.getUserProfile,
 );
 
 export default router;

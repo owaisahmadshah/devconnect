@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as AppImport } from './routes/_app'
+import { Route as NetworkRouteImport } from './routes/network/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostNewImport } from './routes/post/new'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
@@ -25,6 +26,12 @@ import { Route as projectProjectNewImport } from './routes/(project)/project.new
 
 const AppRoute = AppImport.update({
   id: '/_app',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NetworkRouteRoute = NetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -85,6 +92,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/network': {
+      id: '/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof NetworkRouteImport
       parentRoute: typeof rootRoute
     }
     '/_app': {
@@ -150,6 +164,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/network': typeof NetworkRouteRoute
   '': typeof AppRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/signin': typeof authSigninRoute
@@ -162,6 +177,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/network': typeof NetworkRouteRoute
   '': typeof AppRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/signin': typeof authSigninRoute
@@ -175,6 +191,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/network': typeof NetworkRouteRoute
   '/_app': typeof AppRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/(auth)/signin': typeof authSigninRoute
@@ -189,6 +206,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/network'
     | ''
     | '/profile/$identifier'
     | '/signin'
@@ -200,6 +218,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/network'
     | ''
     | '/profile/$identifier'
     | '/signin'
@@ -211,6 +230,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/network'
     | '/_app'
     | '/profile/$identifier'
     | '/(auth)/signin'
@@ -224,6 +244,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  NetworkRouteRoute: typeof NetworkRouteRoute
   AppRoute: typeof AppRoute
   ProfileIdentifierRouteRoute: typeof ProfileIdentifierRouteRoute
   authSigninRoute: typeof authSigninRoute
@@ -236,6 +257,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  NetworkRouteRoute: NetworkRouteRoute,
   AppRoute: AppRoute,
   ProfileIdentifierRouteRoute: ProfileIdentifierRouteRoute,
   authSigninRoute: authSigninRoute,
@@ -257,6 +279,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/network",
         "/_app",
         "/profile/$identifier",
         "/(auth)/signin",
@@ -269,6 +292,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/network": {
+      "filePath": "network/route.tsx"
     },
     "/_app": {
       "filePath": "_app.tsx"

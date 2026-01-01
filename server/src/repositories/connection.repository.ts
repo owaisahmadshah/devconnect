@@ -1,6 +1,7 @@
+import mongoose from 'mongoose';
+
 import type { TCreateConnection, TDeleteConnection, TUpdateConnection } from 'shared';
 import { Connection } from '../models/connection.model.js';
-import { Schema } from 'mongoose';
 
 export class ConnectionRepository {
   createConnection(data: TCreateConnection) {
@@ -124,7 +125,7 @@ export class ConnectionRepository {
     cursor: string | null;
     limit: number;
   }) {
-    const profileObjectId = new Schema.Types.ObjectId(profileId);
+    const profileObjectId = new mongoose.Types.ObjectId(profileId);
 
     const filter: any = {
       receiver: profileObjectId,
@@ -143,7 +144,7 @@ export class ConnectionRepository {
     cursor: string | null;
     limit: number;
   }) {
-    const profileObjectId = new Schema.Types.ObjectId(profileId);
+    const profileObjectId = new mongoose.Types.ObjectId(profileId);
 
     const filter: any = {
       $or: [{ receiver: profileObjectId }, { sender: profileObjectId }],

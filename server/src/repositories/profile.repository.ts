@@ -136,7 +136,7 @@ export class ProfileRepository {
     limit: number;
     cursor: null | string;
   }) {
-    const profileObjectId = new mongoose.Schema.Types.ObjectId(profileId);
+    const profileObjectId = new mongoose.Types.ObjectId(profileId);
 
     const filter: any = {
       _id: {
@@ -145,7 +145,7 @@ export class ProfileRepository {
     };
 
     if (cursor) {
-      filter.createdAt = new Date(cursor);
+      filter.createdAt = { $lt: new Date(cursor) };
     }
 
     return Profile.aggregate([
@@ -159,6 +159,31 @@ export class ProfileRepository {
       },
       {
         $limit: limit,
+      },
+      {
+        $lookup: {
+          from: 'users',
+          let: {
+            userId: '$user',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$_id', '$$userId'],
+                },
+              },
+            },
+            {
+              $project: {
+                username: 1,
+                email: 1,
+                role: 1,
+              },
+            },
+          ],
+          as: 'user',
+        },
       },
       {
         $lookup: {
@@ -231,6 +256,9 @@ export class ProfileRepository {
           connection: {
             $ifNull: [{ $arrayElemAt: ['$connection', 0] }, {}],
           },
+          user: {
+            $arrayElemAt: ['$user', 0],
+          },
         },
       },
       {
@@ -247,6 +275,7 @@ export class ProfileRepository {
           email: 1,
           profileUrls: 1,
           connection: 1,
+          createdAt: 1,
         },
       },
     ]);
