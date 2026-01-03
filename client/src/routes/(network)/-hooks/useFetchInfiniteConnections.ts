@@ -1,8 +1,8 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { connections } from '../-services/networkService';
 
 export function useInfiniteConnections() {
-  return useInfiniteQuery({
+  return useSuspenseInfiniteQuery({
     queryKey: ['connections'],
     queryFn: ({ pageParam = null }: { pageParam: string | null }) => {
       return connections({ limit: 20, cursor: pageParam ?? '' });

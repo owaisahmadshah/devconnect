@@ -32,7 +32,7 @@ export type TUserProfileResponse = Omit<TBaseProfile, 'user'> & {
   username: string;
   email: string;
   role: string;
-  connection: {
+  connection?: {
     _id: string;
     sender: string;
     receiver: string;

@@ -2,10 +2,10 @@ import { ProfileWithUrl } from '@/components/organisms/ProfileWithUrl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, X, UserPlus } from 'lucide-react';
-import type { TUserProfileSummaryResponse } from 'shared';
+import type { TUserProfileSummaryResponse, TUserProfileWithConnection } from 'shared';
 
 interface IConnectionCardProps {
-  user: TUserProfileSummaryResponse;
+  user: TUserProfileSummaryResponse | TUserProfileWithConnection;
   addConnection?: () => void;
   removeConnection?: () => void;
   deleteConnection?: () => void;
@@ -50,8 +50,8 @@ export function ConnectionCard({
     if (user.connection?.state === 'accepted') {
       return (
         <Button onClick={deleteConnection} variant="outline" className="w-full" size="sm">
-          <Check className="mr-1 h-4 w-4" />
-          Connected
+          <X className="mr-1 h-4 w-4" />
+          Remove
         </Button>
       );
     }

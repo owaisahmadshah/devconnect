@@ -1,8 +1,8 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { pendingConnections } from '../-services/networkService';
 
 export function useFetchInfinitePendingConnections() {
-  return useInfiniteQuery({
+  return useSuspenseInfiniteQuery({
     queryKey: ['pending-connections'],
     queryFn: ({ pageParam = null }: { pageParam: string | null }) => {
       return pendingConnections({ limit: 20, cursor: pageParam ?? '' });

@@ -12,26 +12,22 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as AppImport } from './routes/_app'
-import { Route as NetworkRouteImport } from './routes/network/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostNewImport } from './routes/post/new'
+import { Route as networkNetworkImport } from './routes/(network)/network'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authSigninImport } from './routes/(auth)/signin'
 import { Route as ProfileIdentifierRouteImport } from './routes/profile/$identifier/route'
 import { Route as projectProjectsProfileUrlImport } from './routes/(project)/projects.$profileUrl'
 import { Route as projectProjectNewImport } from './routes/(project)/project.new'
+import { Route as networkNetworkPendingsImport } from './routes/(network)/network_.pendings'
+import { Route as networkNetworkConnectionsImport } from './routes/(network)/network_.connections'
 
 // Create/Update Routes
 
 const AppRoute = AppImport.update({
   id: '/_app',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const NetworkRouteRoute = NetworkRouteImport.update({
-  id: '/network',
-  path: '/network',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -44,6 +40,12 @@ const IndexRoute = IndexImport.update({
 const PostNewRoute = PostNewImport.update({
   id: '/post/new',
   path: '/post/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const networkNetworkRoute = networkNetworkImport.update({
+  id: '/(network)/network',
+  path: '/network',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -83,6 +85,18 @@ const projectProjectNewRoute = projectProjectNewImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const networkNetworkPendingsRoute = networkNetworkPendingsImport.update({
+  id: '/(network)/network_/pendings',
+  path: '/network/pendings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const networkNetworkConnectionsRoute = networkNetworkConnectionsImport.update({
+  id: '/(network)/network_/connections',
+  path: '/network/connections',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -92,13 +106,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/network': {
-      id: '/network'
-      path: '/network'
-      fullPath: '/network'
-      preLoaderRoute: typeof NetworkRouteImport
       parentRoute: typeof rootRoute
     }
     '/_app': {
@@ -136,11 +143,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authVerifyOtpImport
       parentRoute: typeof rootRoute
     }
+    '/(network)/network': {
+      id: '/(network)/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof networkNetworkImport
+      parentRoute: typeof rootRoute
+    }
     '/post/new': {
       id: '/post/new'
       path: '/post/new'
       fullPath: '/post/new'
       preLoaderRoute: typeof PostNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/(network)/network_/connections': {
+      id: '/(network)/network_/connections'
+      path: '/network/connections'
+      fullPath: '/network/connections'
+      preLoaderRoute: typeof networkNetworkConnectionsImport
+      parentRoute: typeof rootRoute
+    }
+    '/(network)/network_/pendings': {
+      id: '/(network)/network_/pendings'
+      path: '/network/pendings'
+      fullPath: '/network/pendings'
+      preLoaderRoute: typeof networkNetworkPendingsImport
       parentRoute: typeof rootRoute
     }
     '/(project)/project/new': {
@@ -164,26 +192,30 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/network': typeof NetworkRouteRoute
   '': typeof AppRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
+  '/network': typeof networkNetworkRoute
   '/post/new': typeof PostNewRoute
+  '/network/connections': typeof networkNetworkConnectionsRoute
+  '/network/pendings': typeof networkNetworkPendingsRoute
   '/project/new': typeof projectProjectNewRoute
   '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/network': typeof NetworkRouteRoute
   '': typeof AppRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/signin': typeof authSigninRoute
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
+  '/network': typeof networkNetworkRoute
   '/post/new': typeof PostNewRoute
+  '/network/connections': typeof networkNetworkConnectionsRoute
+  '/network/pendings': typeof networkNetworkPendingsRoute
   '/project/new': typeof projectProjectNewRoute
   '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
@@ -191,13 +223,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/network': typeof NetworkRouteRoute
   '/_app': typeof AppRoute
   '/profile/$identifier': typeof ProfileIdentifierRouteRoute
   '/(auth)/signin': typeof authSigninRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
+  '/(network)/network': typeof networkNetworkRoute
   '/post/new': typeof PostNewRoute
+  '/(network)/network_/connections': typeof networkNetworkConnectionsRoute
+  '/(network)/network_/pendings': typeof networkNetworkPendingsRoute
   '/(project)/project/new': typeof projectProjectNewRoute
   '/(project)/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
 }
@@ -206,37 +240,43 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/network'
     | ''
     | '/profile/$identifier'
     | '/signin'
     | '/signup'
     | '/verify-otp'
+    | '/network'
     | '/post/new'
+    | '/network/connections'
+    | '/network/pendings'
     | '/project/new'
     | '/projects/$profileUrl'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/network'
     | ''
     | '/profile/$identifier'
     | '/signin'
     | '/signup'
     | '/verify-otp'
+    | '/network'
     | '/post/new'
+    | '/network/connections'
+    | '/network/pendings'
     | '/project/new'
     | '/projects/$profileUrl'
   id:
     | '__root__'
     | '/'
-    | '/network'
     | '/_app'
     | '/profile/$identifier'
     | '/(auth)/signin'
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
+    | '/(network)/network'
     | '/post/new'
+    | '/(network)/network_/connections'
+    | '/(network)/network_/pendings'
     | '/(project)/project/new'
     | '/(project)/projects/$profileUrl'
   fileRoutesById: FileRoutesById
@@ -244,26 +284,30 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  NetworkRouteRoute: typeof NetworkRouteRoute
   AppRoute: typeof AppRoute
   ProfileIdentifierRouteRoute: typeof ProfileIdentifierRouteRoute
   authSigninRoute: typeof authSigninRoute
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
+  networkNetworkRoute: typeof networkNetworkRoute
   PostNewRoute: typeof PostNewRoute
+  networkNetworkConnectionsRoute: typeof networkNetworkConnectionsRoute
+  networkNetworkPendingsRoute: typeof networkNetworkPendingsRoute
   projectProjectNewRoute: typeof projectProjectNewRoute
   projectProjectsProfileUrlRoute: typeof projectProjectsProfileUrlRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  NetworkRouteRoute: NetworkRouteRoute,
   AppRoute: AppRoute,
   ProfileIdentifierRouteRoute: ProfileIdentifierRouteRoute,
   authSigninRoute: authSigninRoute,
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
+  networkNetworkRoute: networkNetworkRoute,
   PostNewRoute: PostNewRoute,
+  networkNetworkConnectionsRoute: networkNetworkConnectionsRoute,
+  networkNetworkPendingsRoute: networkNetworkPendingsRoute,
   projectProjectNewRoute: projectProjectNewRoute,
   projectProjectsProfileUrlRoute: projectProjectsProfileUrlRoute,
 }
@@ -279,22 +323,21 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/network",
         "/_app",
         "/profile/$identifier",
         "/(auth)/signin",
         "/(auth)/signup",
         "/(auth)/verify-otp",
+        "/(network)/network",
         "/post/new",
+        "/(network)/network_/connections",
+        "/(network)/network_/pendings",
         "/(project)/project/new",
         "/(project)/projects/$profileUrl"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/network": {
-      "filePath": "network/route.tsx"
     },
     "/_app": {
       "filePath": "_app.tsx"
@@ -311,8 +354,17 @@ export const routeTree = rootRoute
     "/(auth)/verify-otp": {
       "filePath": "(auth)/verify-otp.tsx"
     },
+    "/(network)/network": {
+      "filePath": "(network)/network.tsx"
+    },
     "/post/new": {
       "filePath": "post/new.tsx"
+    },
+    "/(network)/network_/connections": {
+      "filePath": "(network)/network_.connections.tsx"
+    },
+    "/(network)/network_/pendings": {
+      "filePath": "(network)/network_.pendings.tsx"
     },
     "/(project)/project/new": {
       "filePath": "(project)/project.new.tsx"

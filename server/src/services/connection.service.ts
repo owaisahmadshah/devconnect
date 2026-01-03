@@ -1,12 +1,11 @@
 import type { ConnectionRepository } from '../repositories/connection.repository.js';
 import {
   HttpStatus,
-  type TConnectionResponse,
   type TCreateConnection,
   type TDeleteConnection,
   type TUpdateConnection,
+  type TUserProfileWithConnection,
 } from 'shared';
-import type { ProfileService } from './profile.service.js';
 import type { ConnectionMapper } from '../mapper/connection.mapper.js';
 import { ApiError } from '../utils/ApiError.js';
 
@@ -60,11 +59,11 @@ export class ConnectionService {
     limit: number;
     cursor: string | null;
   }): Promise<{
-    connections: TConnectionResponse[];
+    connections: TUserProfileWithConnection[];
     hasMore: boolean;
     nextCursor: null | string;
   }> {
-    const { connectionRepository, connectionMapper } = this.deps;
+    const { connectionRepository } = this.deps;
 
     const pendingConnections = await connectionRepository.findPaginatedPendingConnections({
       profileId,
@@ -72,7 +71,11 @@ export class ConnectionService {
       cursor,
     });
 
-    return this.returnConnectionsWithPagination(pendingConnections, limit);
+    return this.returnUserProfileWithConnectionsWithPagination(
+      pendingConnections,
+      limit,
+      profileId,
+    );
   }
 
   async fetchAcceptedConnections({
@@ -84,11 +87,11 @@ export class ConnectionService {
     limit: number;
     cursor: string | null;
   }): Promise<{
-    connections: TConnectionResponse[];
+    connections: TUserProfileWithConnection[];
     hasMore: boolean;
     nextCursor: null | string;
   }> {
-    const { connectionRepository, connectionMapper } = this.deps;
+    const { connectionRepository } = this.deps;
 
     const acceptedConnections = await connectionRepository.findAcceptedConnections({
       profileId,
@@ -96,7 +99,11 @@ export class ConnectionService {
       cursor,
     });
 
-    return this.returnConnectionsWithPagination(acceptedConnections, limit);
+    return this.returnUserProfileWithConnectionsWithPagination(
+      acceptedConnections,
+      limit,
+      profileId,
+    );
   }
 
   returnConnectionsWithPagination(dbConnections: any[], limit: number) {
@@ -108,6 +115,30 @@ export class ConnectionService {
 
     const hasMore = connections.length === limit;
     const lastConnection = connections.at(-1);
+    const nextCursor: string | null = lastConnection?.createdAt
+      ? lastConnection.createdAt.toISOString()
+      : null;
+
+    return {
+      connections,
+      hasMore,
+      nextCursor,
+    };
+  }
+
+  returnUserProfileWithConnectionsWithPagination(
+    dbConnections: any[],
+    limit: number,
+    profileId: string,
+  ) {
+    const { connectionMapper } = this.deps;
+
+    const connections = dbConnections.map(connection =>
+      connectionMapper.toClientProfileConnection(connection, profileId),
+    );
+
+    const hasMore = connections.length === limit;
+    const lastConnection = dbConnections.at(-1);
     const nextCursor: string | null = lastConnection?.createdAt
       ? lastConnection.createdAt.toISOString()
       : null;

@@ -1,16 +1,18 @@
 import { TUserProfileSummaryResponse } from '../profile/profileResponse';
-import { TBaseConnection } from './connection';
+import { TBaseConnection, TConnectionPendingState } from './connection';
 
-export type TConnectionResponse = Omit<TBaseConnection, 'receiver'> & {
+export type TConnectionResponse = Omit<TBaseConnection, 'sender'> & {
   _id: string;
-  sender: TUserProfileSummaryResponse;
-  receiver: TUserProfileSummaryResponse;
+  sender: string;
+  state: TConnectionPendingState;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 };
 
+export type TUserProfileWithConnection = TUserProfileSummaryResponse;
+
 export type TConnectionResponseWithPagination = {
-  connections: TConnectionResponse[];
+  connections: TUserProfileWithConnection[];
   hasMore: boolean;
   nextCursor: string | null;
 };

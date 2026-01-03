@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { requireAuth } from '@/lib/requireAuth';
-import { Connections } from './-components/Connections';
+import { Network } from './-components/Network';
 
-export const Route = createFileRoute('/network')({
-  component: Connections,
+export const Route = createFileRoute('/(network)/network')({
+  component: Network,
   loader: requireAuth,
 });
