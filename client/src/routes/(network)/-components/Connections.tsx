@@ -4,14 +4,24 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useInfiniteConnections } from '../-hooks/useFetchInfiniteConnections';
 import { ConnectionsList } from './ConnectionList';
 import ErrorFallback from '@/components/ErrorFallback';
+import { NetworkNavbar } from './organisms/NetworkNavbar';
+import { NetworkSkeleton } from './organisms/NetworkSkeleton';
 
 export const Connections = () => (
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <Suspense fallback={<div>Loading Connections from Suspense...</div>}>
+    <Suspense fallback={<NetworkSkeleton />}>
       <ConnectionsList
         useInfiniteQuery={useInfiniteConnections}
-        title="Connections"
         dataKey="connections"
+        header={
+          <NetworkNavbar
+            title="Connections"
+            links={[
+              { text: 'Recommended Connections', url: '/network' },
+              { text: 'Pending Connections', url: '/network/pendings' },
+            ]}
+          />
+        }
       />
     </Suspense>
   </ErrorBoundary>

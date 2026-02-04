@@ -1,32 +1,26 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { Suspense } from 'react';
-import { Link } from '@tanstack/react-router';
 
 import { useInfiniteRecommendConnections } from '../-hooks/useRecommendConnections';
-import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { ConnectionsList } from './ConnectionList';
 import ErrorFallback from '@/components/ErrorFallback';
+import { NetworkNavbar } from './organisms/NetworkNavbar';
+import { NetworkSkeleton } from './organisms/NetworkSkeleton';
 
 export const Network = () => (
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <Suspense fallback={<div>Loading Network from Suspense...</div>}>
+    <Suspense fallback={<NetworkSkeleton />}>
       <ConnectionsList
         useInfiniteQuery={useInfiniteRecommendConnections}
-        title=""
         dataKey="profiles"
         header={
-          <div className="w-[80%] rounded-2xl border">
-            <Empty>
-              <EmptyHeader>
-                <EmptyTitle>Pending Connections</EmptyTitle>
-              </EmptyHeader>
-              <EmptyContent>
-                <Link to={'/network/pendings'} className="w-full text-center">
-                  You haven&apos;t have any pending connection right now!
-                </Link>
-              </EmptyContent>
-            </Empty>
-          </div>
+          <NetworkNavbar
+            title="Recommended Connections"
+            links={[
+              { text: 'Connections', url: '/network/connections' },
+              { text: 'Pending Connections', url: '/network/pendings' },
+            ]}
+          />
         }
       />
     </Suspense>
