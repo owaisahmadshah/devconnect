@@ -5,6 +5,7 @@ import { validateSchema } from '../middleware/validateRequest.middleware.js';
 
 import {
   fullNameSearchSchemas,
+  recommendConnectionsRouteSchema,
   userProfileDeleteArrayDataBodySchema,
   userProfileFieldUpdateSchema,
   userProfilePictureUpdateSchema,
@@ -18,19 +19,6 @@ import { upload } from '../middleware/multer.middleware.js';
 import { profileController } from '../di/profile.container.js';
 
 const router = Router();
-
-// Public routes
-router.get(
-  '/fetch-profiles-by-names',
-  validateSchema(fullNameSearchSchemas),
-  profileController.fullNameSearch,
-);
-router.get(
-  '/:url',
-  validateSchema(userProfileParamsSchema),
-  attachUser, // User or null, authentication is'nt required.
-  profileController.getUserProfile,
-);
 
 // Protected routes
 router.get('/', auth, profileController.getSignedInUserProfileSummary);
@@ -58,6 +46,25 @@ router.patch(
   upload.single('profilePicture'),
   validateSchema(userProfilePictureUpdateSchema),
   profileController.updateProfilePicture,
+);
+router.get(
+  '/recommend-connections',
+  auth,
+  validateSchema(recommendConnectionsRouteSchema),
+  profileController.recommendPaginatedConnections,
+);
+
+// Public routes
+router.get(
+  '/fetch-profiles-by-names',
+  validateSchema(fullNameSearchSchemas),
+  profileController.fullNameSearch,
+);
+router.get(
+  '/:url',
+  validateSchema(userProfileParamsSchema),
+  auth,
+  profileController.getUserProfile,
 );
 
 export default router;

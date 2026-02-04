@@ -6,7 +6,6 @@ import { ApiError } from '../utils/ApiError.js';
 import sendEmail from '../utils/emailSender.js';
 import { generateExpiryTime, generateOTP } from '../utils/generateOtpCodeAndExpiry.js';
 import { Profile } from '../models/profile.model.js';
-import logger from '../utils/logger.js';
 import {
   getDefaultMessageForStatus,
   HttpStatus,
@@ -176,7 +175,7 @@ export class UserService {
 
       while (!uniqueSlugFound) {
         try {
-          await profileModel.create(
+          const [profile] = await profileModel.create(
             [
               {
                 user: user._id,
@@ -187,6 +186,14 @@ export class UserService {
             ],
             { session },
           );
+
+          if (!profile) {
+            throw new ApiError(500, 'Internal server errror. Unable to create profile');
+          }
+
+          user.profileId = profile._id;
+
+          await repo.save(user);
 
           uniqueSlugFound = true; // success
         } catch (err: any) {
@@ -216,10 +223,8 @@ export class UserService {
       if (error instanceof ApiError) {
         throw error;
       } else if (error instanceof mongoose.MongooseError) {
-        logger.error('Invalid credentials for signup:', error.message);
         throw new ApiError(HttpStatus.UNPROCESSABLE_ENTITY, error.message);
       } else {
-        logger.error('Error in user creation transaction:', error);
         throw new ApiError(
           HttpStatus.INTERNAL_SERVER_ERROR,
           'Failed to create user. Please try again',
@@ -242,8 +247,14 @@ export class UserService {
     }
 
     if (!user.isVerified) {
-      // Resending otp
-      await this.resendOtp({ identifier: userData.identifier as string });
+      const isOtpSent = await this.resendOtp({ identifier: userData.identifier as string });
+
+      if (!isOtpSent) {
+        throw new ApiError(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          'Internal server error. Unable to send otp.',
+        );
+      }
 
       throw new ApiError(
         HttpStatus.FORBIDDEN,

@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/dateUtils';
 
 interface ProfileWithUrlProps {
   user: TUserProfileSummaryResponse;
-  profileSize?: 's' | 'm' | 'l';
+  profileSize?: 's' | 'm' | 'l' | 'connection';
   showName?: boolean;
   showImage?: boolean;
   reverse?: boolean;
@@ -25,7 +25,11 @@ export const ProfileWithUrl = ({
 }: ProfileWithUrlProps) => {
   return (
     <Link
-      className={cn('flex items-center gap-5', reverse && 'flex-row-reverse')}
+      className={cn(
+        'flex items-center gap-5',
+        reverse && 'flex-row-reverse',
+        profileSize === 'connection' && 'flex-col-reverse',
+      )}
       to={'/profile/$identifier'}
       params={{
         identifier: user.profileUrls[0].url,
@@ -53,12 +57,13 @@ export const ProfileWithUrl = ({
             profileSize === 's' && 'h-8 w-8 max-sm:h-6 max-sm:w-6',
             profileSize === 'm' && 'h-12 w-12 max-sm:h-8 max-sm:w-8',
             profileSize === 'l' && 'h-16 w-16 max-sm:h-10 max-sm:w-10',
+            profileSize === 'connection' && 'h-32 w-32 max-sm:h-24 max-sm:w-24',
           )}
         >
           <AvatarImage src={user.profilePictureUrl} />
           <AvatarFallback>
             {user.firstName[0]}
-            {user?.lastName[0]}Z
+            {user?.lastName[0]}
           </AvatarFallback>
         </Avatar>
       )}

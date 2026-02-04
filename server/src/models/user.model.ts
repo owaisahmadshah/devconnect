@@ -33,6 +33,11 @@ const userSchema = new Schema<IDbUser>(
       enum: ['recruiter', 'developer'],
       default: 'developer',
     },
+    profileId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Profile',
+      default: null,
+    },
     refreshToken: {
       type: String,
       default: null,
@@ -84,6 +89,7 @@ userSchema.methods.generateAccessToken = function () {
       _id: this._id,
       email: this.email,
       role: this.role,
+      profileId: this.profileId,
     },
     process.env.ACCESS_TOKEN_SECRET!,
     // { expiresIn: process.env.ACCESS_TOKEN_SECRET },

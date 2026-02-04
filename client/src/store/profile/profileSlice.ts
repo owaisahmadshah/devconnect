@@ -6,6 +6,7 @@ import {
   type TUpdateProfileField,
   type TUserProfileResponse,
   type TAddNewItemToProfileArrayFieldWithId,
+  type TConnectionPendingState,
 } from 'shared';
 
 export interface IProfileState {
@@ -47,11 +48,39 @@ const profileSlice = createSlice({
     },
     updateField: (state, action: PayloadAction<TUpdateProfileField>) => {
       const { fieldName, fieldData } = action.payload;
-      if (fieldName === 'isVerified') {
-        state.profile[fieldName] = fieldData;
-      } else {
-        state.profile[fieldName] = fieldData;
+      // TODO: Undo comments if isVerified is added
+      // if (fieldName === 'isVerified') {
+      //   state.profile[fieldName] = fieldData;
+      // } else {
+      state.profile[fieldName] = fieldData;
+      // }
+    },
+    updateConnection: (
+      state,
+      action: PayloadAction<{
+        _id: string;
+        sender: string;
+        receiver: string;
+        state: TConnectionPendingState;
+      }>,
+    ) => {
+      if (action.payload.state === 'accepted') {
+        state.profile['connection'] = action.payload;
+        state.profile['connections'] = state.profile['connections']
+          ? state.profile['connections'] + 1
+          : 1;
       }
+      if (action.payload.state === 'pending') {
+        state.profile['connection'] = action.payload;
+      }
+      if (action.payload.state === 'rejected') {
+        state.profile['connection'] = {};
+      }
+    },
+    deleteConnection: (state, _: PayloadAction<{ connectionId: string }>) => {
+      state.profile['connection'] = {};
+      state.profile['connections'] =
+        state.profile['connections'] && state.profile['connections'] - 1;
     },
     clearProfile: state => {
       state.profile = getProfileDefaultValues();
@@ -65,6 +94,8 @@ export const {
   addArrayItemToProfile,
   deleteArrayItemProfile,
   updateField,
+  updateConnection,
+  deleteConnection,
   clearProfile,
 } = profileSlice.actions;
 export default profileSlice.reducer;

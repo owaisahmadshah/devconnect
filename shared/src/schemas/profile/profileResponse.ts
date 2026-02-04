@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { TBaseProfile } from './profile';
 import { profileUrlsWithIdSchema } from './profileUrls';
+import { connectionPendingState } from '../connection/connection';
 
 // User profile summary light weight response
 export const userProfileSummarySchema = z.object({
@@ -15,6 +16,15 @@ export const userProfileSummarySchema = z.object({
   bio: z.string(),
   profileUrls: z.array(profileUrlsWithIdSchema),
   isVerified: z.boolean(),
+  connections: z.number().optional(),
+  connection: z
+    .object({
+      _id: z.string(),
+      sender: z.string(),
+      receiver: z.string(),
+      state: connectionPendingState,
+    })
+    .optional(),
 });
 
 // Export typescript types for responses
@@ -23,6 +33,13 @@ export type TUserProfileResponse = Omit<TBaseProfile, 'user'> & {
   username: string;
   email: string;
   role: string;
+  connection?: {
+    _id: string;
+    sender: string;
+    receiver: string;
+    state: z.infer<typeof connectionPendingState>;
+  };
+  connections?: number
 };
 export type TUserProfileSummaryResponse = z.infer<typeof userProfileSummarySchema>;
 export type TUserProfileSummary = TUserProfileSummaryResponse;

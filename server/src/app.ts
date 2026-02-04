@@ -49,6 +49,7 @@ import githubRouter from './routes/github.route.js';
 import postRouter from './routes/post.route.js';
 import reactionRouter from './routes/like.route.js';
 import commentRouter from './routes/comment.route.js';
+import connectionRouter from './routes/connection.route.js';
 
 // Register API routes
 app.use('/api/v1/health-check', healthCheckRouter);
@@ -59,6 +60,7 @@ app.use('/api/v1/github', githubRouter);
 app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/reaction', reactionRouter);
 app.use('/api/v1/comment', commentRouter);
+app.use('/api/v1/connection', connectionRouter);
 
 // Error middleware
 import { errorHandler } from './middleware/error.middleware.js';

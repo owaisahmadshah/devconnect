@@ -9,6 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { singleImageSchema } from 'shared';
 import { useProfilePictureUpdate } from '../../-hooks/useProfile';
 import { UpdateProfileHeaderForm } from './UpdateProfileHeaderForm';
+import { ConnectionActionButton } from '@/components/organisms/ConnectionActionButton';
+import type { IConnectionActionButtonProps } from '@/types/connectionActionButton-type';
 
 interface ProfileHeaderProps {
   firstName: string;
@@ -17,6 +19,8 @@ interface ProfileHeaderProps {
   bio: string;
   profilePictureUrl?: string;
   isEditable?: boolean;
+  connections: number;
+  connection: IConnectionActionButtonProps;
 }
 
 export const ProfileHeader = ({
@@ -26,6 +30,8 @@ export const ProfileHeader = ({
   bio,
   profilePictureUrl,
   isEditable = false,
+  connections,
+  connection,
 }: ProfileHeaderProps) => {
   const fullName = `${firstName} ${lastName}`.trim();
   const initials = `${firstName[0]} ${lastName[0]}`.toUpperCase();
@@ -126,14 +132,27 @@ export const ProfileHeader = ({
                 )}
               </div>
 
-              {/* Role Badge */}
-              {role && (
-                <div className="flex justify-center sm:justify-start">
-                  <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold">
-                    {role}
-                  </Badge>
-                </div>
-              )}
+              <div className="flex gap-3">
+                {/* Role Badge */}
+                {role && (
+                  <div className="flex justify-center sm:justify-start">
+                    <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold">
+                      {role}
+                    </Badge>
+                  </div>
+                )}
+                {!isEditable && (
+                  <ConnectionActionButton
+                    state={connection.state}
+                    senderId={connection.senderId}
+                    userId={connection.userId}
+                    acceptConnection={connection.acceptConnection}
+                    addConnection={connection.addConnection}
+                    removeConnection={connection.removeConnection}
+                    deleteConnection={connection.deleteConnection}
+                  />
+                )}
+              </div>
             </div>
 
             {/* Bio */}
@@ -148,7 +167,7 @@ export const ProfileHeader = ({
             {/* Optional: Stats or Additional Info */}
             <div className="flex items-center justify-center gap-6 pt-2 sm:justify-start">
               <div className="text-center sm:text-left">
-                <p className="text-foreground text-2xl font-bold">0</p>
+                <p className="text-foreground text-2xl font-bold">{connections}</p>
                 <p className="text-muted-foreground text-xs font-medium">Connections</p>
               </div>
               <div className="bg-border h-10 w-px" />
