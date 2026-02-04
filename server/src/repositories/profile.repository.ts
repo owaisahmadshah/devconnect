@@ -37,6 +37,144 @@ export class ProfileRepository {
     });
   }
 
+  /**
+   * viewerProfileId  - Profile ID of the user who is viewing/searching the profile
+   * subjectProfileId - Profile ID of the profile being viewed
+   */
+  findProfileByIdWithConnection({
+    viewerProfileId,
+    subjectProfileId,
+  }: {
+    viewerProfileId: string;
+    subjectProfileId: string;
+  }) {
+    const viewerProfileObjectId = new mongoose.Types.ObjectId(viewerProfileId);
+    const subjectProfileObjectId = new mongoose.Types.ObjectId(subjectProfileId);
+
+    return Profile.aggregate([
+      {
+        $match: {
+          _id: subjectProfileObjectId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          let: {
+            userId: '$user',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$_id', '$$userId'],
+                },
+              },
+            },
+            {
+              $project: {
+                username: 1,
+                email: 1,
+                role: 1,
+              },
+            },
+          ],
+          as: 'user',
+        },
+      },
+      {
+        $lookup: {
+          from: 'connections',
+          let: {
+            profileId: '$_id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $or: [
+                        {
+                          $eq: ['$sender', '$$profileId'],
+                        },
+                        {
+                          $eq: ['$receiver', '$$profileId'],
+                        },
+                      ],
+                    },
+                    {
+                      $eq: ['$state', 'accepted'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'connections',
+        },
+      },
+      {
+        $lookup: {
+          from: 'connections',
+          let: {
+            profileId: '$_id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    {
+                      $and: [
+                        {
+                          $eq: ['$sender', viewerProfileObjectId],
+                        },
+                        {
+                          $eq: ['$receiver', '$$profileId'],
+                        },
+                        {
+                          $ne: ['$state', 'rejected'],
+                        },
+                      ],
+                    },
+                    {
+                      $and: [
+                        {
+                          $eq: ['$sender', '$$profileId'],
+                        },
+                        {
+                          $eq: ['$receiver', viewerProfileObjectId],
+                        },
+                        {
+                          $ne: ['$state', 'rejected'],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'connection',
+        },
+      },
+      {
+        $addFields: {
+          connections: {
+            $size: '$connections',
+          },
+          connection: {
+            $ifNull: [{ $arrayElemAt: ['$connection', 0] }, {}],
+          },
+          user: {
+            $arrayElemAt: ['$user', 0],
+          },
+        },
+      },
+    ]);
+  }
+
   updateField(userId: string, fieldName: string, fieldData: any) {
     return Profile.findOneAndUpdate(
       { user: userId },

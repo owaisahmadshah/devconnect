@@ -63,7 +63,7 @@ export const ProfileWithUrl = ({
           <AvatarImage src={user.profilePictureUrl} />
           <AvatarFallback>
             {user.firstName[0]}
-            {user?.lastName[0]}Z
+            {user?.lastName[0]}
           </AvatarFallback>
         </Avatar>
       )}

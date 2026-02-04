@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { ConnectionCard } from './organisms/ConnectionCard';
-import { useCreateConnection } from '../-hooks/useCreateConnection';
-import { useDeleteConnection } from '../-hooks/useDeleteConnection';
-import { useUpdateConnection } from '../-hooks/useUpdateConnection';
+import { useCreateConnection } from '@/hooks/connection/useCreateConnection';
+import { useUpdateConnection } from '@/hooks/connection/useUpdateConnection';
+import { useDeleteConnection } from '@/hooks/connection/useDeleteConnection';
 import type { TUserProfileSummaryResponse, TUserProfileWithConnection } from 'shared';
 
 interface ConnectionsListProps {
@@ -27,7 +27,7 @@ export const ConnectionsList = ({
 }: ConnectionsListProps) => {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery();
 
-  const connections = data?.pages.flatMap(page => page[dataKey]) ?? [];
+  const connections = data?.pages.flatMap((page: any) => page[dataKey]) ?? [];
 
   const { mutateAsync: addConnection } = useCreateConnection();
   const { mutateAsync: deleteConnection } = useDeleteConnection();
@@ -62,7 +62,7 @@ export const ConnectionsList = ({
       {hasNextPage && (
         <div className="px-4 py-2">
           <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} variant="link">
-            {isFetchingNextPage ? 'Loading more posts...' : 'Load more connections'}
+            {isFetchingNextPage ? 'Loading more connections...' : 'Load more connections'}
           </Button>
         </div>
       )}

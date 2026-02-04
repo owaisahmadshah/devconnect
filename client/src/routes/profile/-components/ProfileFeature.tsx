@@ -10,10 +10,17 @@ import { EducationSection } from './organisms/EducationSection';
 import { SuggestionsSection } from './organisms/SuggestionsSection';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserPosts } from './UserPosts';
+import { useCreateConnection } from '@/hooks/connection/useCreateConnection';
+import { useDeleteConnection } from '@/hooks/connection/useDeleteConnection';
+import { useUpdateConnection } from '@/hooks/connection/useUpdateConnection';
 
 export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   // Fetching user profile
   useProfile(identifier);
+
+  const { mutate: addConnection } = useCreateConnection();
+  const { mutateAsync: deleteConnection } = useDeleteConnection();
+  const { mutateAsync: updateConnection } = useUpdateConnection();
 
   const { profile, isCurrentUser } = useSelector((state: RootState) => state.profile);
 
@@ -35,6 +42,24 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
           bio={profile.bio}
           profilePictureUrl={profile.profilePictureUrl}
           isEditable={isCurrentUser}
+          connections={profile?.connections ?? 0}
+          connection={{
+            ...profile?.connection,
+            userId: profile._id,
+            addConnection: () => addConnection({ receiver: profile._id, state: 'pending' }),
+            deleteConnection: () =>
+              deleteConnection({ connectionId: profile.connection?._id ?? '' }),
+            removeConnection: () =>
+              updateConnection({
+                connectionId: profile.connection?._id ?? '',
+                state: 'rejected',
+              }),
+            acceptConnection: () =>
+              updateConnection({
+                connectionId: profile.connection?._id ?? '',
+                state: 'accepted',
+              }),
+          }}
         />
       </div>
 

@@ -1,11 +1,11 @@
-export function updateConnectionInCache({
+export function addConnectionInCache({
   oldData,
-  connectionId,
+  receiverId,
   dataKey,
   updateData,
 }: {
   oldData: any;
-  connectionId: string;
+  receiverId: string;
   dataKey: 'profiles' | 'connections';
   updateData: any;
 }) {
@@ -13,10 +13,10 @@ export function updateConnectionInCache({
 
   return {
     ...oldData,
-    pages: oldData.pages.map(page => ({
+    pages: oldData.pages.map((page: any) => ({
       ...page,
-      [dataKey]: page[dataKey].map(item => {
-        if (item.connection?._id === connectionId) {
+      [dataKey]: page[dataKey].map((item: any) => {
+        if (item._id === receiverId) {
           return { ...item, connection: updateData };
         }
         return item;

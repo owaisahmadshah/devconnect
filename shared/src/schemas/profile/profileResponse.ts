@@ -16,6 +16,7 @@ export const userProfileSummarySchema = z.object({
   bio: z.string(),
   profileUrls: z.array(profileUrlsWithIdSchema),
   isVerified: z.boolean(),
+  connections: z.number().optional(),
   connection: z
     .object({
       _id: z.string(),
@@ -38,6 +39,7 @@ export type TUserProfileResponse = Omit<TBaseProfile, 'user'> & {
     receiver: string;
     state: z.infer<typeof connectionPendingState>;
   };
+  connections?: number
 };
 export type TUserProfileSummaryResponse = z.infer<typeof userProfileSummarySchema>;
 export type TUserProfileSummary = TUserProfileSummaryResponse;

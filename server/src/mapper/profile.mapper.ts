@@ -37,7 +37,7 @@ export class ProfileMapper {
       isVerified: profileObj.isVerified,
       achievements: profileObj.achievements,
       certifications: profileObj.certifications,
-      educations: profileObj.educations,
+      educations: profileObj?.educations,
       experiences: profileObj.experiences,
       phoneNumber: profileObj.phoneNumber,
       profileUrls: profileObj.profileUrls,
@@ -48,6 +48,7 @@ export class ProfileMapper {
       github_html_url: profileObj?.github_html_url ?? '',
       github_email: profileObj?.github_email ?? '',
       connection: profileObj?.connection,
+      connections: profileObj.connections,
     };
   }
 

@@ -17,7 +17,7 @@ export class ConnectionRepository {
   }
 
   deleteConnection(data: TDeleteConnection) {
-    return Connection.findByIdAndDelete(data.connectionId);
+    return Connection.findByIdAndDelete(data.connectionId, { new: true });
   }
 
   findPaginatedConnection({

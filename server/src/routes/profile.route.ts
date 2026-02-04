@@ -63,7 +63,7 @@ router.get(
 router.get(
   '/:url',
   validateSchema(userProfileParamsSchema),
-  attachUser, // User or null, authentication is'nt required.
+  auth,
   profileController.getUserProfile,
 );
 

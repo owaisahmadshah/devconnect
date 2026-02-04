@@ -49,11 +49,22 @@ export class ProfileService {
 
   getUsersProfile = async (
     profileUrl: string,
-    reqUser: IRequestUser | null,
+    reqUserProfileId: string,
   ): Promise<TUserProfileResponse> => {
-    const { repo, userService, profileMapper } = this.deps;
+    const { repo, profileMapper } = this.deps;
 
-    const profile = await repo.findByProfileUrl(profileUrl);
+    const userProfile = await repo.findByProfileUrl(profileUrl);
+
+    if (!userProfile) {
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
+    }
+
+    const subjectProfileId = userProfile._id as string;
+
+    const [profile] = await repo.findProfileByIdWithConnection({
+      viewerProfileId: reqUserProfileId,
+      subjectProfileId: subjectProfileId,
+    });
 
     if (!profile) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Profile not found.');
@@ -61,10 +72,8 @@ export class ProfileService {
 
     const responseProfile = profileMapper.toUserProfile(profile);
 
-    const user = await userService.getUser(reqUser?.email ?? '');
-
     // If user requesting his own profile
-    if (reqUser?._id === user?._id) {
+    if (responseProfile._id === reqUserProfileId) {
       return responseProfile;
     }
 

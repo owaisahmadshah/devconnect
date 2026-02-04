@@ -1,9 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { deleteConnection } from '../-services/networkService';
-import { updateConnectionInCache } from '../-utils/updateConnectionCache';
+import { updateConnectionInCache } from '@/lib/connection/updateConnectionCache';
+import { deleteConnection } from '@/services/networkService';
+import type { RootState } from '@/store/store';
+import {
+  deleteConnection as deleteConnectionInProfile,
+  updateConnection,
+} from '@/store/profile/profileSlice';
 
 export function useDeleteConnection() {
+  const dispatch = useDispatch();
+
+  const profile = useSelector((state: RootState) => state.profile.profile);
+
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -35,6 +45,14 @@ export function useDeleteConnection() {
           updateData: {},
         }),
       );
+
+      if (profile?._id === data.receiver && data.state === 'accepted') {
+        dispatch(deleteConnectionInProfile({ connectionId: data._id }));
+      }
+
+      if (profile?._id === data.receiver && data.state === 'pending') {
+        dispatch(updateConnection({ ...data, state: 'rejected' }));
+      }
 
       // TODO: Update in feed-posts and elsewhere necessary
     },
