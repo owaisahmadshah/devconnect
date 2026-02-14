@@ -7,6 +7,7 @@ export const baseOrganizationSchema = z.object({
   description: z.string(),
   websiteURL: z.string(),
   createdBy: z.string(),
+  organizationURL: z.string(),
 });
 
 export type TBaseOrganization = z.infer<typeof baseOrganizationSchema>;

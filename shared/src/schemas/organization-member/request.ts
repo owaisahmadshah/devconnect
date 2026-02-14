@@ -13,9 +13,17 @@ export const updateOrganizationMemberRoleSchema = z.object({
 
 // For api request (remove member) - _id required
 export const removeOrganizationMemberSchema = z.object({
-  _id: z.string(),
+  organizationId: z.string(),
+  userId: z.string(),
+});
+
+// For api request (change member role) - _id required
+export const changeOrganizationMemberRoleSchema = z.object({
+  organizationId: z.string(),
+  role: z.enum(['admin', 'member']),
 });
 
 export type TAddOrganizationMember = z.infer<typeof createOrganizationMemberSchema>;
 export type TUpdateOrganizationMemberRole = z.infer<typeof updateOrganizationMemberRoleSchema>;
 export type TRemoveOrganizationMember = z.infer<typeof removeOrganizationMemberSchema>;
+export type TChangeOrganizationMemberRole = z.infer<typeof changeOrganizationMemberRoleSchema>;

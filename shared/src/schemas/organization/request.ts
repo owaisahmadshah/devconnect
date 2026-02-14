@@ -1,9 +1,10 @@
-import * as z from 'zod'
-import { baseOrganizationSchema } from './organization'
+import * as z from 'zod';
+
+import { baseOrganizationSchema } from './organization';
 
 // For api request (create) - no _id required
 // We will attach createdBy directly in the backend
-export const createOrganizationSchema = baseOrganizationSchema;
+export const createOrganizationSchema = baseOrganizationSchema.omit({ organizationURL: true });
 
 // For api request (update) - _id required
 
