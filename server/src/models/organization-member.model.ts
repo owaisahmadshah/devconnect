@@ -1,9 +1,9 @@
 import { Document, model, Schema } from 'mongoose';
 
-import type { TAddOrganizationMember } from 'shared';
+import type { TCreateOrganizationMember } from 'shared';
 
 export interface IOrganizationMember
-  extends Document, Omit<TAddOrganizationMember, 'userId' | 'organizationId'> {
+  extends Document, Omit<TCreateOrganizationMember, 'userId' | 'organizationId'> {
   userId: Schema.Types.ObjectId;
   organizationId: Schema.Types.ObjectId;
 }

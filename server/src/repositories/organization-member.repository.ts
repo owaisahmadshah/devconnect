@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import { OrganizationMember } from '../models/organization-member.model.js';
-import type { TAddOrganizationMember, TChangeOrganizationMemberRole } from 'shared';
+import type { TCreateOrganizationMember, TChangeOrganizationMemberRole } from 'shared';
 import {
   lookupPipeline,
   profileSummaryLookupPipeline,
@@ -10,7 +10,7 @@ import {
 } from '../utils/aggregationHelpers.js';
 
 export class OrganizationMemberRepository {
-  createOrganizationMember(organizationMemberData: TAddOrganizationMember) {
+  createOrganizationMember(organizationMemberData: TCreateOrganizationMember) {
     return OrganizationMember.create(organizationMemberData);
   }
 
@@ -60,11 +60,11 @@ export class OrganizationMemberRepository {
     ]);
   }
 
-  findAllMembersOfOrganizationByName({ name }: { name: string }) {
+  findAllMembersOfOrganizationByURL({ url }: { url: string }) {
     return OrganizationMember.aggregate([
       {
         $match: {
-          name,
+          url: url,
         },
       },
       profileSummaryLookupPipeline({
@@ -92,7 +92,7 @@ export class OrganizationMemberRepository {
     ]);
   }
 
-  createManyOrganizationMembers(organizationMembersData: TAddOrganizationMember[]) {
+  createManyOrganizationMembers(organizationMembersData: TCreateOrganizationMember[]) {
     return OrganizationMember.insertMany(organizationMembersData);
   }
 

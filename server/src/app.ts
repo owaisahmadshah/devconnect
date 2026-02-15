@@ -50,6 +50,9 @@ import postRouter from './routes/post.route.js';
 import reactionRouter from './routes/like.route.js';
 import commentRouter from './routes/comment.route.js';
 import connectionRouter from './routes/connection.route.js';
+import organizationRouter from './routes/organization.route.js';
+import organizationMemberRouter from './routes/organizationMember.route.js';
+import jobRouter from './routes/job.route.js';
 
 // Register API routes
 app.use('/api/v1/health-check', healthCheckRouter);
@@ -61,6 +64,9 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/reaction', reactionRouter);
 app.use('/api/v1/comment', commentRouter);
 app.use('/api/v1/connection', connectionRouter);
+app.use('api/v1/organizations', organizationRouter);
+app.use('api/v1/organization-members', organizationMemberRouter);
+app.use('api/v1/jobs', jobRouter);
 
 // Error middleware
 import { errorHandler } from './middleware/error.middleware.js';

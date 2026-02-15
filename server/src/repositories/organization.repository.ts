@@ -19,13 +19,19 @@ export class OrganizationRepository {
     return Organization.findByIdAndDelete(organizationId);
   }
 
-  findOrganizationById({ organizationId }: { organizationId: string }) {
-    const organizationObjectId = new mongoose.Types.ObjectId(organizationId);
+  findOrganization({ query }: { query: string }) {
+    let matchState: any = {};
+
+    if (mongoose.Types.ObjectId.isValid(query)) {
+      matchState._id = new mongoose.Types.ObjectId(query);
+    } else {
+      matchState.organizationURL = query;
+    }
 
     return Organization.aggregate([
       {
         $match: {
-          _id: organizationObjectId,
+          ...matchState,
         },
       },
       profileSummaryLookupPipeline({
@@ -77,24 +83,5 @@ export class OrganizationRepository {
       projectStage(ORGANIZATION_FIELDS_PROJECTION.SUMMARY),
     ]);
   }
-
-  findByOrganizationURL({ url }: { url: string }) {
-    return Organization.aggregate([
-      {
-        $match: {
-          organizationURL: url,
-        },
-      },
-      profileSummaryLookupPipeline({
-        localField: 'createdBy',
-        asField: 'createdBy',
-      }),
-      unwindField({
-        asField: 'createdBy',
-      }),
-      projectStage(ORGANIZATION_FIELDS_PROJECTION.DETAIL),
-    ]);
-  }
-
   // TODO: Add recommend organizations based on user's interests and connections
 }
