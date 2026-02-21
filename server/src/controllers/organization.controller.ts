@@ -71,7 +71,7 @@ export class OrganizationController {
    * @param {Request} req - Contains `req.user` (authenticated user) and optional query parameters `limit` and `cursor` for pagination
    * @param {Response} res - Express response object
    *
-   * @returns {Promise<ApiResponse<TOrganizationResponse[]>>}
+   * @returns {Promise<ApiResponse<TOrganizationListResponseWithCursorPagination[]>>}
    *
    * @description
    * Fetches all organizations that the authenticated user is a member of.

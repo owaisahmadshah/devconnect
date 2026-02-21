@@ -110,7 +110,7 @@ export class JobController {
    * @param {Request} req - Contains `req.user` (authenticated user), `req.params.organizationId`, and query parameters `limit` and `cursor`
    * @param {Response} res - Express response object
    *
-   * @returns {Promise<ApiResponse<TJobResponse[]>>}
+   * @returns {Promise<ApiResponse<TJobListResponseWithCursorPagination[]>>}
    *
    * @description
    * Retrieves all jobs of an organization for the authenticated user, with pagination support.

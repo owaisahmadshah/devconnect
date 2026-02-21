@@ -1,4 +1,10 @@
-import { HttpStatus, type TCreateJob, type TDeleteJob, type TUpdateJob } from 'shared';
+import {
+  HttpStatus,
+  type TCreateJob,
+  type TDeleteJob,
+  type TJobListResponseWithCursorPagination,
+  type TUpdateJob,
+} from 'shared';
 import type { JobMapper } from '../mapper/job.mapper.js';
 import type { JobRepository } from '../repositories/job.repository.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -67,7 +73,7 @@ export class JobService {
     organizationId: string;
     limit: number;
     cursor: string | null;
-  }) {
+  }): Promise<TJobListResponseWithCursorPagination> {
     const { repo, mapper } = this.deps;
 
     const jobs = await repo.findAllJobsOfOrganization({
@@ -76,6 +82,13 @@ export class JobService {
       cursor,
     });
 
-    return jobs.map(job => mapper.toJobSummaryResponse(job));
+    const hasMore = jobs.length === limit;
+    const nextCursor = hasMore ? (jobs[jobs.length - 1]._id as string) : null;
+
+    return {
+      jobs: jobs.map(job => mapper.toJobSummaryResponse(job)),
+      hasMore,
+      nextCursor,
+    };
   }
 }

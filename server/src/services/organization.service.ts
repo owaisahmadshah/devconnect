@@ -1,6 +1,11 @@
 import type slugify from 'slugify';
 
-import { HttpStatus, type TCreateOrganization, type TDeleteOrganization } from 'shared';
+import {
+  HttpStatus,
+  type TCreateOrganization,
+  type TDeleteOrganization,
+  type TOrganizationListResponseWithCursorPagination,
+} from 'shared';
 import type { OrganizationRepository } from '../repositories/organization.repository.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { OrganizationMapper } from '../mapper/organization.mapper.js';
@@ -86,7 +91,7 @@ export class OrganizationService {
     profileId: string;
     limit: number;
     cursor: string | null;
-  }) => {
+  }): Promise<TOrganizationListResponseWithCursorPagination> => {
     const { repo, mapper } = this.deps;
 
     const organizations = await repo.findAllOrganizationsOfUser({
@@ -99,7 +104,14 @@ export class OrganizationService {
       mapper.toOrganizationSummaryResponse(org),
     );
 
-    return responseOrganization;
+    const hasMore = organizations.length === limit;
+    const nextCursor = hasMore ? (organizations[organizations.length - 1]._id as string) : null;
+
+    return {
+      organizations: responseOrganization,
+      hasMore,
+      nextCursor,
+    };
   };
 
   findOrganizationByIdOrURL = async ({ query }: { query: string }) => {
