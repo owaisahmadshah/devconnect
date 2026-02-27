@@ -15,6 +15,7 @@ import { Route as AppImport } from './routes/_app'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostNewImport } from './routes/post/new'
 import { Route as JobNewImport } from './routes/job/new'
+import { Route as settingsOrganizationsListImport } from './routes/(settings)/organizations-list'
 import { Route as networkNetworkImport } from './routes/(network)/network'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
@@ -49,6 +50,12 @@ const PostNewRoute = PostNewImport.update({
 const JobNewRoute = JobNewImport.update({
   id: '/job/new',
   path: '/job/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const settingsOrganizationsListRoute = settingsOrganizationsListImport.update({
+  id: '/(settings)/organizations-list',
+  path: '/organizations-list',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -173,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof networkNetworkImport
       parentRoute: typeof rootRoute
     }
+    '/(settings)/organizations-list': {
+      id: '/(settings)/organizations-list'
+      path: '/organizations-list'
+      fullPath: '/organizations-list'
+      preLoaderRoute: typeof settingsOrganizationsListImport
+      parentRoute: typeof rootRoute
+    }
     '/job/new': {
       id: '/job/new'
       path: '/job/new'
@@ -242,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
   '/network': typeof networkNetworkRoute
+  '/organizations-list': typeof settingsOrganizationsListRoute
   '/job/new': typeof JobNewRoute
   '/post/new': typeof PostNewRoute
   '/network/connections': typeof networkNetworkConnectionsRoute
@@ -260,6 +275,7 @@ export interface FileRoutesByTo {
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
   '/network': typeof networkNetworkRoute
+  '/organizations-list': typeof settingsOrganizationsListRoute
   '/job/new': typeof JobNewRoute
   '/post/new': typeof PostNewRoute
   '/network/connections': typeof networkNetworkConnectionsRoute
@@ -279,6 +295,7 @@ export interface FileRoutesById {
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
   '/(network)/network': typeof networkNetworkRoute
+  '/(settings)/organizations-list': typeof settingsOrganizationsListRoute
   '/job/new': typeof JobNewRoute
   '/post/new': typeof PostNewRoute
   '/(network)/network_/connections': typeof networkNetworkConnectionsRoute
@@ -299,6 +316,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-otp'
     | '/network'
+    | '/organizations-list'
     | '/job/new'
     | '/post/new'
     | '/network/connections'
@@ -316,6 +334,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-otp'
     | '/network'
+    | '/organizations-list'
     | '/job/new'
     | '/post/new'
     | '/network/connections'
@@ -333,6 +352,7 @@ export interface FileRouteTypes {
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
     | '/(network)/network'
+    | '/(settings)/organizations-list'
     | '/job/new'
     | '/post/new'
     | '/(network)/network_/connections'
@@ -352,6 +372,7 @@ export interface RootRouteChildren {
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
   networkNetworkRoute: typeof networkNetworkRoute
+  settingsOrganizationsListRoute: typeof settingsOrganizationsListRoute
   JobNewRoute: typeof JobNewRoute
   PostNewRoute: typeof PostNewRoute
   networkNetworkConnectionsRoute: typeof networkNetworkConnectionsRoute
@@ -370,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
   networkNetworkRoute: networkNetworkRoute,
+  settingsOrganizationsListRoute: settingsOrganizationsListRoute,
   JobNewRoute: JobNewRoute,
   PostNewRoute: PostNewRoute,
   networkNetworkConnectionsRoute: networkNetworkConnectionsRoute,
@@ -397,6 +419,7 @@ export const routeTree = rootRoute
         "/(auth)/signup",
         "/(auth)/verify-otp",
         "/(network)/network",
+        "/(settings)/organizations-list",
         "/job/new",
         "/post/new",
         "/(network)/network_/connections",
@@ -427,6 +450,9 @@ export const routeTree = rootRoute
     },
     "/(network)/network": {
       "filePath": "(network)/network.tsx"
+    },
+    "/(settings)/organizations-list": {
+      "filePath": "(settings)/organizations-list.tsx"
     },
     "/job/new": {
       "filePath": "job/new.tsx"

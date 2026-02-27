@@ -51,7 +51,7 @@ export const CreateJobForm = () => {
   };
 
   if (!organizationId) {
-    navigate({ to: '/organization/select' });
+    navigate({ to: '/organization/select?from=create-job' });
   }
 
   return (

@@ -13,7 +13,7 @@ import { getErrorDetails } from '@/lib/errorHanldling';
 import { Form } from '@/components/ui/form';
 
 export const CreateOrganizationForm = () => {
-  const { from } = useSearch({ from: '/organization/new' });
+  const { from } = useSearch({ from: '/(settings)/organization/new' });
 
   const form = useForm<TCreateOrganization>({
     resolver: zodResolver(createOrganizationSchema),
@@ -26,7 +26,7 @@ export const CreateOrganizationForm = () => {
     },
   });
 
-  const { mutateAsync, isPending, isError, error, isSuccess } = useCreateOrganization();
+  const { mutateAsync, data, isPending, isError, error, isSuccess } = useCreateOrganization();
 
   const navigate = useNavigate();
 
@@ -41,9 +41,9 @@ export const CreateOrganizationForm = () => {
 
   if (isSuccess) {
     if (from && from === 'create-job') {
-      navigate({ to: '/organization/select' });
+      navigate({ to: '/job/new', search: { organizationId: data._id } });
     } else {
-      navigate({ to: '/organizations' });
+      navigate({ to: '/organizations-list' });
     }
   }
 

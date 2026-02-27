@@ -4,12 +4,14 @@ import type { TCreateOrganization } from 'shared';
 
 export interface IOrganization extends Document, Omit<TCreateOrganization, 'createdBy'> {
   createdBy: Schema.Types.ObjectId;
+  organizationURL: string;
 }
 
 const organizationSchema = new Schema<IOrganization>(
   {
     name: {
       type: String,
+      unique: true,
       required: true,
     },
     description: {
@@ -23,6 +25,11 @@ const organizationSchema = new Schema<IOrganization>(
     logo: {
       type: String,
       default: '',
+    },
+    organizationURL: {
+      type: String,
+      unique: true,
+      required: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
