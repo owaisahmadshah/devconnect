@@ -9,9 +9,11 @@ import {
 import type { OrganizationRepository } from '../repositories/organization.repository.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { OrganizationMapper } from '../mapper/organization.mapper.js';
+import type { OrganizationMemberRepository } from '../repositories/organization-member.repository.js';
 
 interface IOrganizationServiceDeps {
   repo: OrganizationRepository;
+  organizationMemberRepo: OrganizationMemberRepository;
   mapper: OrganizationMapper;
   slugifyFn: typeof slugify;
 }
@@ -20,7 +22,7 @@ export class OrganizationService {
   constructor(private deps: IOrganizationServiceDeps) {}
 
   createOrganization = async (organizationData: TCreateOrganization) => {
-    const { repo, slugifyFn, mapper } = this.deps;
+    const { repo, slugifyFn, mapper, organizationMemberRepo } = this.deps;
 
     const baseSlug = (slugifyFn as any)(`${organizationData.name || ''}`, {
       lower: true,
@@ -61,6 +63,12 @@ export class OrganizationService {
     if (!organization) {
       throw new ApiError(500, 'Internal server error. Unable to create organization.');
     }
+
+    await organizationMemberRepo.createOrganizationMember({
+      organizationId: organization._id as string,
+      userId: organizationData.createdBy,
+      role: 'admin',
+    });
 
     const createdOrg = await repo.findOrganization({
       query: (organization._id as any).toString(),

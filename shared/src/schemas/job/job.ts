@@ -8,7 +8,7 @@ export const baseJobSchema = z.object({
   type: z.enum(['full-time', 'part-time', 'contract', 'internship']),
   organizationId: z.string(),
   postedBy: z.string(),
-  status: z.enum(['open', 'closed']).default('open'),
+  status: z.enum(['open', 'closed']),
 });
 
 export type TBaseJob = z.infer<typeof baseJobSchema>;

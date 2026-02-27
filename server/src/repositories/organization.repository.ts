@@ -54,7 +54,6 @@ export class OrganizationRepository {
     limit: number;
     cursor: string | null;
   }) {
-    // const profileObjectId = new mongoose.Types.ObjectId(profileId);
     let matchStage: any = { createdBy: new mongoose.Types.ObjectId(profileId) };
 
     if (cursor) {
@@ -66,9 +65,7 @@ export class OrganizationRepository {
 
     return Organization.aggregate([
       {
-        $match: {
-          createdBy: matchStage,
-        },
+        $match: matchStage,
       },
       ...paginateCursorPipeline({
         limit,

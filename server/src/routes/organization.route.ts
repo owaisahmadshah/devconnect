@@ -23,7 +23,23 @@ router.delete(
   validateSchema(deleteOrganizationQuerySchema),
   organizationController.deleteOrganization,
 );
-router.get('/:query', auth, organizationController.getOrganizationByIdOrURL);
-router.get('/', auth, organizationController.getUserOrganizations);
+router.get(
+  '/:query',
+  (req, res, next) => {
+    console.log('---------Query /:query-------');
+    next();
+  },
+  auth,
+  organizationController.getOrganizationByIdOrURL,
+);
+router.get(
+  '/',
+  (req, res, next) => {
+    console.log('---------Query /-------');
+    next();
+  },
+  auth,
+  organizationController.getUserOrganizations,
+);
 
 export default router;

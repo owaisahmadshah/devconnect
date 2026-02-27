@@ -3,7 +3,7 @@ import type { Document } from 'mongoose';
 
 export class OrganizationMapper {
   toOrganizationSummaryResponse(organization: Document): TOrganizationSummaryResponse {
-    const orgObj = organization.toObject();
+    const orgObj = organization;
 
     return {
       _id: orgObj._id,
@@ -14,7 +14,7 @@ export class OrganizationMapper {
   }
 
   toOrganizationResponse(organization: Document): TOrganizationResponse {
-    const orgObj = organization.toObject();
+    const orgObj = organization;
 
     return {
       _id: orgObj._id,

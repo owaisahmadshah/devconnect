@@ -64,9 +64,9 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/reaction', reactionRouter);
 app.use('/api/v1/comment', commentRouter);
 app.use('/api/v1/connection', connectionRouter);
-app.use('api/v1/organizations', organizationRouter);
-app.use('api/v1/organization-members', organizationMemberRouter);
-app.use('api/v1/jobs', jobRouter);
+app.use('/api/v1/organizations', organizationRouter);
+app.use('/api/v1/organization-members', organizationMemberRouter);
+app.use('/api/v1/jobs', jobRouter);
 
 // Error middleware
 import { errorHandler } from './middleware/error.middleware.js';
