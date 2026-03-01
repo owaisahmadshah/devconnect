@@ -106,6 +106,7 @@ export class OrganizationController {
   getOrganizationByIdOrURL = asyncHandler(async (req: Request, res: Response) => {
     const organization = await this.service.findOrganizationByIdOrURL({
       query: String(req.params.query),
+      profileId: req.user?.profileId as string,
     });
 
     return res

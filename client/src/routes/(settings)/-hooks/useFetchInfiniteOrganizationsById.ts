@@ -1,9 +1,9 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 
 import { fetchOrganizationByIdService } from '../-services/organizationService';
 
 export const useFetchInfiniteOrganizationsById = () => {
-  return useInfiniteQuery({
+  return useSuspenseInfiniteQuery({
     queryKey: ['organizations-by-id'],
     queryFn: ({ pageParam = null }: { pageParam: string | null }) =>
       fetchOrganizationByIdService({ cursor: pageParam ?? '', limit: 10 }),

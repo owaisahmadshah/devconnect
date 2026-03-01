@@ -9,8 +9,6 @@ import type {
 } from 'shared';
 
 export const createOrganizationService = async (data: TCreateOrganization) => {
-  console.log('---------Data-------');
-  console.log(data);
   return apiPost<TOrganizationResponse>('/api/v1/organizations/create', data);
 };
 
@@ -24,4 +22,8 @@ export const fetchUserOrganizationsService = async (query: TPagination) => {
 
 export const fetchOrganizationByIdService = async (pag_query: TPagination) => {
   return apiGet<TOrganizationListResponseWithCursorPagination>(`/api/v1/organizations/`, pag_query);
+};
+
+export const fetchOrganizationByURLService = async ({ query }: { query: string }) => {
+  return apiGet<TOrganizationResponse>(`/api/v1/organizations/${query}`);
 };

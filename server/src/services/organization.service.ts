@@ -122,7 +122,13 @@ export class OrganizationService {
     };
   };
 
-  findOrganizationByIdOrURL = async ({ query }: { query: string }) => {
+  findOrganizationByIdOrURL = async ({
+    query,
+    profileId,
+  }: {
+    query: string;
+    profileId: string;
+  }) => {
     const { repo, mapper } = this.deps;
 
     const organization = await repo.findOrganization({ query });
@@ -131,6 +137,10 @@ export class OrganizationService {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Organization not found.');
     }
 
-    return mapper.toOrganizationResponse(organization[0]);
+    // TODO: Optimize this by doing a single query that checks if the user is a member and their role, instead of fetching organization and then checking if the user is admin OR Just check it findOrganization pipeline itself and add isAdmin field there instead of doing it here in service layer, because there could be multiple admins within one organization
+    return mapper.toOrganizationResponse({
+      ...organization[0],
+      isAdmin: organization[0].createdBy._id.toString() === profileId,
+    });
   };
 }

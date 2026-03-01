@@ -4,7 +4,7 @@ import type { TJobSummaryResponse } from 'shared';
 
 export class JobMapper {
   toJobSummaryResponse(jobDoc: Document): TJobSummaryResponse {
-    const job = jobDoc.toObject();
+    const job = jobDoc;
 
     return {
       _id: job._id.toString(),
@@ -17,7 +17,7 @@ export class JobMapper {
   }
 
   toJobResponse(jobDoc: Document) {
-    const job = jobDoc.toObject();
+    const job = jobDoc;
 
     return {
       _id: job._id.toString(),

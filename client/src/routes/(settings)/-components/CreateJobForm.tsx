@@ -18,7 +18,7 @@ import { useState } from 'react';
 export const CreateJobForm = () => {
   const [orgError, setOrgError] = useState<string | null>(null);
 
-  const { organizationId } = useSearch({ from: '/job/new' });
+  const { organizationId } = useSearch({ from: '/(settings)/job/new' });
 
   const { mutateAsync, isPending, isError, error } = useCreateJob();
 

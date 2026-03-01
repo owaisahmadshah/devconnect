@@ -5,11 +5,12 @@ export type TOrganizationResponse = Omit<TBaseOrganization, 'createdBy'> & {
   _id: string;
   createdBy: TUserProfileSummary;
   createdAt: Date;
+  isAdmin: boolean;
 };
 
 export type TOrganizationSummaryResponse = Omit<
   TOrganizationResponse,
-  'description' | 'websiteURL' | 'createdBy' | 'createdAt'
+  'description' | 'websiteURL' | 'createdBy' | 'createdAt' | 'isAdmin'
 >;
 
 export type TOrganizationListResponseWithCursorPagination = {

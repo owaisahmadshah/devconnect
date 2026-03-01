@@ -1,12 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { fetchJobByIdService } from '../-services/jobService';
+import { useParams } from '@tanstack/react-router';
 
 export const useFetchJobById = () => {
-  const jobId = '';
+  const { jobId } = useParams({
+    from: '/(settings)/organization/$organizationURL/job/$jobId',
+  });
 
-  // TODO: Get from params or accept in hook parameter
-
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: ['fetchJobById', jobId],
     queryFn: () => fetchJobByIdService(jobId),
   });

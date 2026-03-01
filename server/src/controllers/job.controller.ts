@@ -24,7 +24,7 @@ export class JobController {
   createJob = asyncHandler(async (req: Request, res: Response) => {
     const jobResponse = await this.service.createJob({
       ...req.body,
-      createdBy: req.user?.profileId as string,
+      postedBy: req.user?.profileId as string,
     });
 
     return res

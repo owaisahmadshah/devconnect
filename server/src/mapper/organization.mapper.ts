@@ -25,6 +25,7 @@ export class OrganizationMapper {
       logo: orgObj.logo,
       createdBy: orgObj.createdBy,
       createdAt: orgObj.createdAt,
+      isAdmin: orgObj.isAdmin,
     };
   }
 }
