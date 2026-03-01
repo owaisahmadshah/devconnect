@@ -14,15 +14,21 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AppImport } from './routes/_app'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostNewImport } from './routes/post/new'
+import { Route as settingsOrganizationsListImport } from './routes/(settings)/organizations-list'
 import { Route as networkNetworkImport } from './routes/(network)/network'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authSigninImport } from './routes/(auth)/signin'
 import { Route as ProfileIdentifierRouteImport } from './routes/profile/$identifier/route'
+import { Route as settingsOrganizationSelectImport } from './routes/(settings)/organization.select'
+import { Route as settingsOrganizationNewImport } from './routes/(settings)/organization.new'
+import { Route as settingsJobNewImport } from './routes/(settings)/job.new'
 import { Route as projectProjectsProfileUrlImport } from './routes/(project)/projects.$profileUrl'
 import { Route as projectProjectNewImport } from './routes/(project)/project.new'
 import { Route as networkNetworkPendingsImport } from './routes/(network)/network_.pendings'
 import { Route as networkNetworkConnectionsImport } from './routes/(network)/network_.connections'
+import { Route as settingsOOrganizationOrganizationURLImport } from './routes/(settings)/o.organization.$organizationURL'
+import { Route as settingsOrganizationOrganizationURLJobJobIdImport } from './routes/(settings)/organization.$organizationURL.job.$jobId'
 
 // Create/Update Routes
 
@@ -40,6 +46,12 @@ const IndexRoute = IndexImport.update({
 const PostNewRoute = PostNewImport.update({
   id: '/post/new',
   path: '/post/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const settingsOrganizationsListRoute = settingsOrganizationsListImport.update({
+  id: '/(settings)/organizations-list',
+  path: '/organizations-list',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -73,6 +85,26 @@ const ProfileIdentifierRouteRoute = ProfileIdentifierRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const settingsOrganizationSelectRoute = settingsOrganizationSelectImport.update(
+  {
+    id: '/(settings)/organization/select',
+    path: '/organization/select',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
+
+const settingsOrganizationNewRoute = settingsOrganizationNewImport.update({
+  id: '/(settings)/organization/new',
+  path: '/organization/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const settingsJobNewRoute = settingsJobNewImport.update({
+  id: '/(settings)/job/new',
+  path: '/job/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const projectProjectsProfileUrlRoute = projectProjectsProfileUrlImport.update({
   id: '/(project)/projects/$profileUrl',
   path: '/projects/$profileUrl',
@@ -96,6 +128,20 @@ const networkNetworkConnectionsRoute = networkNetworkConnectionsImport.update({
   path: '/network/connections',
   getParentRoute: () => rootRoute,
 } as any)
+
+const settingsOOrganizationOrganizationURLRoute =
+  settingsOOrganizationOrganizationURLImport.update({
+    id: '/(settings)/o/organization/$organizationURL',
+    path: '/o/organization/$organizationURL',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const settingsOrganizationOrganizationURLJobJobIdRoute =
+  settingsOrganizationOrganizationURLJobJobIdImport.update({
+    id: '/(settings)/organization/$organizationURL/job/$jobId',
+    path: '/organization/$organizationURL/job/$jobId',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -150,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof networkNetworkImport
       parentRoute: typeof rootRoute
     }
+    '/(settings)/organizations-list': {
+      id: '/(settings)/organizations-list'
+      path: '/organizations-list'
+      fullPath: '/organizations-list'
+      preLoaderRoute: typeof settingsOrganizationsListImport
+      parentRoute: typeof rootRoute
+    }
     '/post/new': {
       id: '/post/new'
       path: '/post/new'
@@ -185,6 +238,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof projectProjectsProfileUrlImport
       parentRoute: typeof rootRoute
     }
+    '/(settings)/job/new': {
+      id: '/(settings)/job/new'
+      path: '/job/new'
+      fullPath: '/job/new'
+      preLoaderRoute: typeof settingsJobNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/(settings)/organization/new': {
+      id: '/(settings)/organization/new'
+      path: '/organization/new'
+      fullPath: '/organization/new'
+      preLoaderRoute: typeof settingsOrganizationNewImport
+      parentRoute: typeof rootRoute
+    }
+    '/(settings)/organization/select': {
+      id: '/(settings)/organization/select'
+      path: '/organization/select'
+      fullPath: '/organization/select'
+      preLoaderRoute: typeof settingsOrganizationSelectImport
+      parentRoute: typeof rootRoute
+    }
+    '/(settings)/o/organization/$organizationURL': {
+      id: '/(settings)/o/organization/$organizationURL'
+      path: '/o/organization/$organizationURL'
+      fullPath: '/o/organization/$organizationURL'
+      preLoaderRoute: typeof settingsOOrganizationOrganizationURLImport
+      parentRoute: typeof rootRoute
+    }
+    '/(settings)/organization/$organizationURL/job/$jobId': {
+      id: '/(settings)/organization/$organizationURL/job/$jobId'
+      path: '/organization/$organizationURL/job/$jobId'
+      fullPath: '/organization/$organizationURL/job/$jobId'
+      preLoaderRoute: typeof settingsOrganizationOrganizationURLJobJobIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -198,11 +286,17 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
   '/network': typeof networkNetworkRoute
+  '/organizations-list': typeof settingsOrganizationsListRoute
   '/post/new': typeof PostNewRoute
   '/network/connections': typeof networkNetworkConnectionsRoute
   '/network/pendings': typeof networkNetworkPendingsRoute
   '/project/new': typeof projectProjectNewRoute
   '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
+  '/job/new': typeof settingsJobNewRoute
+  '/organization/new': typeof settingsOrganizationNewRoute
+  '/organization/select': typeof settingsOrganizationSelectRoute
+  '/o/organization/$organizationURL': typeof settingsOOrganizationOrganizationURLRoute
+  '/organization/$organizationURL/job/$jobId': typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -213,11 +307,17 @@ export interface FileRoutesByTo {
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
   '/network': typeof networkNetworkRoute
+  '/organizations-list': typeof settingsOrganizationsListRoute
   '/post/new': typeof PostNewRoute
   '/network/connections': typeof networkNetworkConnectionsRoute
   '/network/pendings': typeof networkNetworkPendingsRoute
   '/project/new': typeof projectProjectNewRoute
   '/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
+  '/job/new': typeof settingsJobNewRoute
+  '/organization/new': typeof settingsOrganizationNewRoute
+  '/organization/select': typeof settingsOrganizationSelectRoute
+  '/o/organization/$organizationURL': typeof settingsOOrganizationOrganizationURLRoute
+  '/organization/$organizationURL/job/$jobId': typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
 
 export interface FileRoutesById {
@@ -229,11 +329,17 @@ export interface FileRoutesById {
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
   '/(network)/network': typeof networkNetworkRoute
+  '/(settings)/organizations-list': typeof settingsOrganizationsListRoute
   '/post/new': typeof PostNewRoute
   '/(network)/network_/connections': typeof networkNetworkConnectionsRoute
   '/(network)/network_/pendings': typeof networkNetworkPendingsRoute
   '/(project)/project/new': typeof projectProjectNewRoute
   '/(project)/projects/$profileUrl': typeof projectProjectsProfileUrlRoute
+  '/(settings)/job/new': typeof settingsJobNewRoute
+  '/(settings)/organization/new': typeof settingsOrganizationNewRoute
+  '/(settings)/organization/select': typeof settingsOrganizationSelectRoute
+  '/(settings)/o/organization/$organizationURL': typeof settingsOOrganizationOrganizationURLRoute
+  '/(settings)/organization/$organizationURL/job/$jobId': typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
 
 export interface FileRouteTypes {
@@ -246,11 +352,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-otp'
     | '/network'
+    | '/organizations-list'
     | '/post/new'
     | '/network/connections'
     | '/network/pendings'
     | '/project/new'
     | '/projects/$profileUrl'
+    | '/job/new'
+    | '/organization/new'
+    | '/organization/select'
+    | '/o/organization/$organizationURL'
+    | '/organization/$organizationURL/job/$jobId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -260,11 +372,17 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-otp'
     | '/network'
+    | '/organizations-list'
     | '/post/new'
     | '/network/connections'
     | '/network/pendings'
     | '/project/new'
     | '/projects/$profileUrl'
+    | '/job/new'
+    | '/organization/new'
+    | '/organization/select'
+    | '/o/organization/$organizationURL'
+    | '/organization/$organizationURL/job/$jobId'
   id:
     | '__root__'
     | '/'
@@ -274,11 +392,17 @@ export interface FileRouteTypes {
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
     | '/(network)/network'
+    | '/(settings)/organizations-list'
     | '/post/new'
     | '/(network)/network_/connections'
     | '/(network)/network_/pendings'
     | '/(project)/project/new'
     | '/(project)/projects/$profileUrl'
+    | '/(settings)/job/new'
+    | '/(settings)/organization/new'
+    | '/(settings)/organization/select'
+    | '/(settings)/o/organization/$organizationURL'
+    | '/(settings)/organization/$organizationURL/job/$jobId'
   fileRoutesById: FileRoutesById
 }
 
@@ -290,11 +414,17 @@ export interface RootRouteChildren {
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
   networkNetworkRoute: typeof networkNetworkRoute
+  settingsOrganizationsListRoute: typeof settingsOrganizationsListRoute
   PostNewRoute: typeof PostNewRoute
   networkNetworkConnectionsRoute: typeof networkNetworkConnectionsRoute
   networkNetworkPendingsRoute: typeof networkNetworkPendingsRoute
   projectProjectNewRoute: typeof projectProjectNewRoute
   projectProjectsProfileUrlRoute: typeof projectProjectsProfileUrlRoute
+  settingsJobNewRoute: typeof settingsJobNewRoute
+  settingsOrganizationNewRoute: typeof settingsOrganizationNewRoute
+  settingsOrganizationSelectRoute: typeof settingsOrganizationSelectRoute
+  settingsOOrganizationOrganizationURLRoute: typeof settingsOOrganizationOrganizationURLRoute
+  settingsOrganizationOrganizationURLJobJobIdRoute: typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -305,11 +435,19 @@ const rootRouteChildren: RootRouteChildren = {
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
   networkNetworkRoute: networkNetworkRoute,
+  settingsOrganizationsListRoute: settingsOrganizationsListRoute,
   PostNewRoute: PostNewRoute,
   networkNetworkConnectionsRoute: networkNetworkConnectionsRoute,
   networkNetworkPendingsRoute: networkNetworkPendingsRoute,
   projectProjectNewRoute: projectProjectNewRoute,
   projectProjectsProfileUrlRoute: projectProjectsProfileUrlRoute,
+  settingsJobNewRoute: settingsJobNewRoute,
+  settingsOrganizationNewRoute: settingsOrganizationNewRoute,
+  settingsOrganizationSelectRoute: settingsOrganizationSelectRoute,
+  settingsOOrganizationOrganizationURLRoute:
+    settingsOOrganizationOrganizationURLRoute,
+  settingsOrganizationOrganizationURLJobJobIdRoute:
+    settingsOrganizationOrganizationURLJobJobIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -329,11 +467,17 @@ export const routeTree = rootRoute
         "/(auth)/signup",
         "/(auth)/verify-otp",
         "/(network)/network",
+        "/(settings)/organizations-list",
         "/post/new",
         "/(network)/network_/connections",
         "/(network)/network_/pendings",
         "/(project)/project/new",
-        "/(project)/projects/$profileUrl"
+        "/(project)/projects/$profileUrl",
+        "/(settings)/job/new",
+        "/(settings)/organization/new",
+        "/(settings)/organization/select",
+        "/(settings)/o/organization/$organizationURL",
+        "/(settings)/organization/$organizationURL/job/$jobId"
       ]
     },
     "/": {
@@ -357,6 +501,9 @@ export const routeTree = rootRoute
     "/(network)/network": {
       "filePath": "(network)/network.tsx"
     },
+    "/(settings)/organizations-list": {
+      "filePath": "(settings)/organizations-list.tsx"
+    },
     "/post/new": {
       "filePath": "post/new.tsx"
     },
@@ -371,6 +518,21 @@ export const routeTree = rootRoute
     },
     "/(project)/projects/$profileUrl": {
       "filePath": "(project)/projects.$profileUrl.tsx"
+    },
+    "/(settings)/job/new": {
+      "filePath": "(settings)/job.new.tsx"
+    },
+    "/(settings)/organization/new": {
+      "filePath": "(settings)/organization.new.tsx"
+    },
+    "/(settings)/organization/select": {
+      "filePath": "(settings)/organization.select.tsx"
+    },
+    "/(settings)/o/organization/$organizationURL": {
+      "filePath": "(settings)/o.organization.$organizationURL.tsx"
+    },
+    "/(settings)/organization/$organizationURL/job/$jobId": {
+      "filePath": "(settings)/organization.$organizationURL.job.$jobId.tsx"
     }
   }
 }
