@@ -47,4 +47,6 @@ const jobSchema = new Schema<IJob>(
   },
 );
 
+jobSchema.index({ title: 'text', description: 'text' });
+
 export const Job = model<IJob>('Job', jobSchema);

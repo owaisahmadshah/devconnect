@@ -80,5 +80,97 @@ export class OrganizationRepository {
       projectStage(ORGANIZATION_FIELDS_PROJECTION.SUMMARY),
     ]);
   }
-  // TODO: Add recommend organizations based on user's interests and connections
+
+  findRecommendedOrganizationsForUser({
+    profileId,
+    limit,
+    cursor,
+  }: {
+    profileId: string;
+    limit: number;
+    cursor: string | null;
+  }) {
+    let matchStage: any = {};
+
+    if (cursor) {
+      matchStage.createdAt = { $lt: new Date(cursor) };
+    }
+
+    return Organization.aggregate([
+      {
+        $match: matchStage,
+      },
+      ...paginateCursorPipeline({
+        limit,
+      }),
+      profileSummaryLookupPipeline({
+        localField: 'createdBy',
+        asField: 'createdBy',
+      }),
+      unwindField({
+        asField: 'createdBy',
+      }),
+      projectStage(ORGANIZATION_FIELDS_PROJECTION.SUMMARY),
+    ]);
+  }
+
+  searchOrganizations({
+    query,
+    limit,
+    cursor,
+  }: {
+    query: string;
+    profileId: string;
+    limit: number;
+    cursor: string | null;
+  }) {
+    let matchStage: any = {
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+      ],
+    };
+
+    if (cursor) {
+      matchStage.createdAt = { $lt: new Date(cursor) };
+    }
+
+    return Organization.aggregate([
+      {
+        $match: matchStage,
+      },
+      ...paginateCursorPipeline({
+        limit,
+      }),
+      profileSummaryLookupPipeline({
+        localField: 'createdBy',
+        asField: 'createdBy',
+      }),
+      unwindField({
+        asField: 'createdBy',
+      }),
+      projectStage(ORGANIZATION_FIELDS_PROJECTION.SUMMARY),
+    ]);
+  }
+
+  updateOrganizationField({
+    organizationId,
+    field,
+    value,
+  }: {
+    organizationId: string;
+    field: string;
+    value: any;
+  }) {
+    const updateData: any = {};
+    updateData[field] = value;
+
+    return Organization.findByIdAndUpdate(
+      organizationId,
+      {
+        $set: updateData,
+      },
+      { new: true },
+    );
+  }
 }

@@ -5,6 +5,7 @@ import { OrganizationRepository } from '../repositories/organization.repository.
 import { OrganizationService } from '../services/organization.service.js';
 import { OrganizationController } from '../controllers/organization.controller.js';
 import { OrganizationMemberRepository } from '../repositories/organization-member.repository.js';
+import { uploadSingleImage } from '../utils/uploadImages.js';
 
 const organizationMapper = new OrganizationMapper();
 const organizationRepository = new OrganizationRepository();
@@ -14,6 +15,7 @@ const organizationService = new OrganizationService({
   mapper: organizationMapper,
   slugifyFn: slugify,
   organizationMemberRepo: organizationMemberRepository,
+  uploadSingleImage,
 });
 const organizationController = new OrganizationController(organizationService);
 

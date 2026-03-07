@@ -113,4 +113,123 @@ export class OrganizationController {
       .status(HttpStatus.OK)
       .json(new ApiResponse(HttpStatus.OK, organization, 'Fetched organization successfully'));
   });
+
+  /**
+   * Retrieves a list of recommended organizations for the authenticated user.
+   *
+   * @route GET /api/v1/organizations/recommendations
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user) and optional query parameters `limit` and `cursor` for pagination
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationListResponseWithCursorPagination[]>>}
+   *
+   * @description
+   * Fetches a list of recommended organizations that the authenticated user may be interested in joining.
+   */
+  findRecommendedOrganizationsForUser = asyncHandler(async (req: Request, res: Response) => {
+    const organizations = await this.service.findRecommendedOrganizationsForUser({
+      profileId: req.user?.profileId as string,
+      limit: Number(req.query.limit) || 10,
+      cursor: (req.query.cursor as string) || null,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          organizations,
+          'Fetched recommended organizations for user successfully',
+        ),
+      );
+  });
+
+  /**
+   * Searches for organizations based on a query string.
+   *
+   * @route GET /api/v1/organizations/search
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user) and query parameters `query`, `limit`, and `cursor` for pagination
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationListResponseWithCursorPagination[]>>}
+   *
+   * @description
+   * Searches for organizations that match the provided query string, allowing users to discover new organizations to join.
+   */
+  searchOrganizations = asyncHandler(async (req: Request, res: Response) => {
+    const organizations = await this.service.searchOrganizations({
+      query: String(req.query.query),
+      profileId: req.user?.profileId as string,
+      limit: Number(req.query.limit) || 10,
+      cursor: (req.query.cursor as string) || null,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          organizations,
+          'Fetched searched organizations successfully',
+        ),
+      );
+  });
+
+  /**
+   * Updates a specific field of an organization.
+   *
+   * @route PATCH /api/v1/organizations/field/:organizationId
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user), `req.params.organizationId`, and request body with `field` and `value`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationResponse>>}
+   *
+   * @description
+   * Updates a specific field (e.g., description, websiteURL) of an organization. Only organization admins should be allowed to perform this action.
+   */
+  updateOrganizationField = asyncHandler(async (req: Request, res: Response) => {
+    const { organizationId } = req.params;
+    const { field, value } = req.body;
+
+    const updatedOrganization = await this.service.updateOrganizationField({
+      organizationId: organizationId as string,
+      field,
+      value,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(HttpStatus.OK, updatedOrganization, 'Organization updated successfully'),
+      );
+  });
+
+  updateOrganizationLogo = asyncHandler(async (req: Request, res: Response) => {
+    const { organizationId } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(new ApiResponse(HttpStatus.BAD_REQUEST, null, 'Logo file is required'));
+    }
+
+    const updatedOrganization = await this.service.updateOrganizationLogo({
+      organizationId: organizationId as string,
+      file,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          updatedOrganization,
+          'Organization logo updated successfully',
+        ),
+      );
+  });
 }
