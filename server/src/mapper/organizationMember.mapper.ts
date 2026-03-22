@@ -4,7 +4,8 @@ import type { TOrganizationMemberResponse } from 'shared';
 
 export class OrganizationMemberMapper {
   toOrganizationMemberResponse(organizationMemberData: Document): TOrganizationMemberResponse {
-    const orgMemData = organizationMemberData.toObject();
+    // const orgMemData = organizationMemberData.toObject();
+    const orgMemData = organizationMemberData;
 
     return {
       _id: orgMemData._id,

@@ -126,6 +126,7 @@ export class JobRepository {
       {
         $match: matchStage,
       },
+      ...paginateCursorPipeline({ limit }),
       profileSummaryLookupPipeline({
         localField: 'postedBy',
         asField: 'postedBy',

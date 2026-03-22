@@ -144,7 +144,7 @@ export class JobController {
     const jobs = await this.service.getJobFeed({
       profileId: req.user?.profileId as string,
       limit: Number(req.query.limit),
-      cursor: String(req.query.cursor),
+      cursor: req.query?.cursor ? String(req.query.cursor) : null,
     });
 
     return res
@@ -166,7 +166,11 @@ export class JobController {
    * Retrieves feed jobs for an authenticated user, with pagination support.
    */
   searchJobs = asyncHandler(async (req: Request, res: Response) => {
-    const jobs = await this.service.searchJobs(req.query);
+    const jobs = await this.service.searchJobs({
+      ...req.query,
+      limit: Number(req.query.limit),
+      cursor: req.query?.cursor ? String(req.query.cursor) : null,
+    });
 
     return res
       .status(HttpStatus.OK)

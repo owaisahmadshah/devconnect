@@ -96,6 +96,7 @@ export class JobService {
 
   searchJobs = async (query: TGetSearchJob & TPagination) => {
     const { repo, mapper } = this.deps;
+
     const jobs = await repo.searchJobs(query);
 
     const hasMore = jobs.length === query.limit;

@@ -25,7 +25,7 @@ export const OrganizationSummaryCard = ({
   return (
     <Link
       className={cn('flex w-full items-center gap-5', customClassName)}
-      to={redirectURL ?? '/organization/$organizationURL'}
+      to={redirectURL ?? '/o/organization/$organizationURL'}
       search={{
         ...Object.fromEntries(params.map(p => [p.name, p.value])),
       }}

@@ -7,14 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 
 export const OrganizationsList = () => {
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useFetchInfiniteOrganizations();
+  const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = useFetchInfiniteOrganizations();
 
   const organizations = data?.pages.flatMap(page => page.organizations) || [];
-
-  if (isLoading) {
-    return <div>Loading organizations...</div>;
-  }
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center space-y-2 py-4">

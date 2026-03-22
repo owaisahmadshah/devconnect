@@ -35,7 +35,7 @@ router.post(
   validateSchema(createManyOrganizationMembersBodySchema),
   organizationMemberController.createManyOrganizationMembers,
 );
-router.put(
+router.patch(
   '/update-role',
   auth,
   validateSchema(updateOrganizationMemberRoleBodySchema),

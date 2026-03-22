@@ -1,12 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { fetchAllMembersOfOrganizationService } from '../-services/organizationMemberService';
 
-export const useFetchAllMembersOfOrganization = () => {
-  const organizationId = '';
-
-  return useQuery({
-    queryKey: ['fetchAllMembersOfOrganization'],
+export const useFetchAllMembersOfOrganization = (organizationId: string) => {
+  return useSuspenseQuery({
+    queryKey: ['fetch-org-members', organizationId],
     queryFn: () => fetchAllMembersOfOrganizationService({ organizationId }),
   });
 };

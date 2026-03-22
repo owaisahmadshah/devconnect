@@ -1,8 +1,9 @@
-import { apiPost, apiGet, apiDelete } from '@/lib/api-client';
+import { apiPost, apiGet, apiDelete, apiPatch } from '@/lib/api-client';
 
 import type {
   TCreateJob,
   TDeleteJob,
+  TGetSearchJob,
   TJobListResponseWithCursorPagination,
   TJobResponse,
   TPagination,
@@ -18,7 +19,7 @@ export const deleteJobService = async (data: TDeleteJob) => {
 };
 
 export const updateJobStatusService = async (data: TUpdateJob) => {
-  return apiPost<TJobResponse>('/api/v1/jobs/update-status', data);
+  return apiPatch<TJobResponse>('/api/v1/jobs/update-status', data);
 };
 
 export const fetchJobByIdService = async (jobId: string) => {
@@ -34,4 +35,20 @@ export const fetchAllJobsOfOrganizationService = async (
   query: TPagination,
 ) => {
   return apiGet<TJobListResponseWithCursorPagination>(`/api/v1/jobs/${organizationId}/jobs`, query);
+};
+
+export const fetchJobsFeedService = (data: TPagination) => {
+  return apiGet<TJobListResponseWithCursorPagination>('/api/v1/jobs/feed', data);
+};
+
+export const fetchJobsSearchService = (
+  data: TPagination & {
+    query: TGetSearchJob;
+  },
+) => {
+  const { query, ...pagination } = data;
+  return apiGet<TJobListResponseWithCursorPagination>('/api/v1/jobs/search', {
+    ...query,
+    ...pagination,
+  });
 };
