@@ -1,6 +1,7 @@
 import {
   HttpStatus,
   type TCreateOrganizationMember,
+  type TCreateOrganizationMemberInvite,
   type TDeleteOrganizationMember,
   type TUpdateOrganizationMemberRole,
 } from 'shared';
@@ -19,7 +20,10 @@ export class OrganizationMemberService {
   createOrgMember = async (organizationMemberData: TCreateOrganizationMember) => {
     const { repo } = this.deps;
 
-    const organizationMember = await repo.createOrganizationMember(organizationMemberData);
+    const organizationMember = await repo.createOrganizationMember({
+      ...organizationMemberData,
+      status: organizationMemberData?.status ?? 'pending',
+    });
 
     if (!organizationMember) {
       throw new ApiError(500, 'Internal server error. Unable to create organization member.');
@@ -53,15 +57,6 @@ export class OrganizationMemberService {
     return response;
   };
 
-  createManyOrganizationMembers = async (organizationMembersData: TCreateOrganizationMember[]) => {
-    const { repo } = this.deps;
-
-    const createdOrganizationMembers =
-      await repo.createManyOrganizationMembers(organizationMembersData);
-
-    return createdOrganizationMembers;
-  };
-
   updateOrganizationMemberRole = async ({ _id, role }: TUpdateOrganizationMemberRole) => {
     const { repo, mapper } = this.deps;
 
@@ -75,5 +70,25 @@ export class OrganizationMemberService {
     }
 
     return mapper.toOrganizationMemberResponse(updatedOrganizationMember);
+  };
+
+  organizationMemberInvitations = async ({ profileId }: { profileId: string }) => {
+    const { repo, mapper } = this.deps;
+
+    const invitations = await repo.getOrganizationMemberInvitations({ profileId });
+
+    const response = invitations.map(invite =>
+      mapper.toOrganizationMemberWithStatusResponse(invite),
+    );
+
+    return response;
+  };
+
+  createOrganizationMemberInvite = async (data: TCreateOrganizationMemberInvite) => {
+    const { repo } = this.deps;
+
+    const invitation = await repo.createOrganizationMember({ ...data, status: 'pending' });
+
+    return invitation;
   };
 }

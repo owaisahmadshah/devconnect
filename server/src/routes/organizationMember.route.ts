@@ -6,6 +6,7 @@ import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
   createManyOrganizationMembersBodySchema,
   createOrganizationMemberBodySchema,
+  createOrganizationMemberInviteSchema,
   deleteOrganizationMemberQuerySchema,
   updateOrganizationMemberRoleBodySchema,
 } from '../schemas/organizationMember.js';
@@ -29,17 +30,18 @@ router.get(
   auth,
   organizationMemberController.findOrganizationAllMembers,
 );
-router.post(
-  '/add-many',
-  auth,
-  validateSchema(createManyOrganizationMembersBodySchema),
-  organizationMemberController.createManyOrganizationMembers,
-);
 router.patch(
   '/update-role',
   auth,
   validateSchema(updateOrganizationMemberRoleBodySchema),
   organizationMemberController.updateOrganizationMemberRole,
+);
+router.get('/invitations', auth, organizationMemberController.organizationMemberInvitations);
+router.post(
+  '/invite',
+  auth,
+  validateSchema(createOrganizationMemberInviteSchema),
+  organizationMemberController.createOrganizationMemberInvite,
 );
 
 export default router;

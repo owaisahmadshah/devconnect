@@ -11,6 +11,7 @@ import { useFetchAllMembersOfOrganization } from '../-hooks/useFetchAllMembersOf
 import { useUpdateMemberRole } from '../-hooks/useUpdateMemberRole';
 import { useDeleteOrganizationMember } from '../-hooks/useDeleteOrganizationMember';
 import type { TOrganizationMemberRole } from 'shared';
+import { useCreateOrganizationMemberInvite } from '../-hooks/useCreateOrganizationMemberInvite';
 
 interface ManageMembersProps {
   organizationId: string;
@@ -21,17 +22,15 @@ export const ManageOrganizationMembers = ({ organizationId }: ManageMembersProps
   const [isInviting, setIsInviting] = useState(false);
   const [search, setSearch] = useState('');
 
-  // TODO: replace with real hooks
   const { data: members } = useFetchAllMembersOfOrganization(organizationId);
-  // const { mutate: inviteMember } = useInviteMember();
+  const { mutateAsync: inviteMember } = useCreateOrganizationMemberInvite();
   const { mutate: updateRole } = useUpdateMemberRole();
   const { mutate: removeMember } = useDeleteOrganizationMember();
 
-  const handleInvite = async (email: string, role: TOrganizationMemberRole) => {
+  const handleInvite = async (data: { role: TOrganizationMemberRole; userId: string }) => {
     setIsInviting(true);
-    console.log(email, role);
     try {
-      // await inviteMember({ organizationId, email, role });
+      await inviteMember({ ...data, status: 'pending', organizationId: organizationId });
       setInviteOpen(false);
     } finally {
       setIsInviting(false);
@@ -46,8 +45,6 @@ export const ManageOrganizationMembers = ({ organizationId }: ManageMembersProps
     removeMember({ organizationId, userId: memberId });
   };
 
-  // placeholder until you wire up real data
-  // const members: TOrganizationMemberResponse[] = [];
   const filtered = members.filter(m =>
     (m.user.firstName + ' ' + m.user.lastName).trim().toLowerCase().includes(search.toLowerCase()),
   );

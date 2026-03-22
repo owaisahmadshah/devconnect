@@ -91,27 +91,6 @@ export class OrganizationMemberController {
   });
 
   /**
-   * @route POST /api/v1/organization-members/add-many
-   *
-   * @param {Request} req - Contains `req.user` (authenticated user) and `req.body` (array of organization member data)
-   * @param {Response} res - Express response object
-   *
-   * @returns {Promise<ApiResponse<TOrganizationMemberResponse[]>>}
-   *
-   * @description
-   * Creates multiple organization members in a single request for the authenticated user.
-   */
-  createManyOrganizationMembers = asyncHandler(async (req: Request, res: Response) => {
-    const response = await this.service.createManyOrganizationMembers(req.body);
-
-    return res
-      .status(HttpStatus.CREATED)
-      .json(
-        new ApiResponse(HttpStatus.CREATED, response, 'Organization members created successfully'),
-      );
-  });
-
-  /**
    * Updates an organization member's role.
    *
    * @route PUT /api/v1/organization-members/update-role
@@ -128,6 +107,64 @@ export class OrganizationMemberController {
     const updatedOrganizationMember = await this.service.updateOrganizationMemberRole({
       _id: req.body._id,
       role: req.body.role,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          updatedOrganizationMember,
+          'Organization member role updated successfully',
+        ),
+      );
+  });
+
+  /**
+   * Fetches organization member invitations.
+   *
+   * @route GET /api/v1/organization-members/invitations
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user)`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationMemberResponse[]>>}
+   *
+   * @description
+   * Fetches organization member invites of a user.
+   */
+  organizationMemberInvitations = asyncHandler(async (req: Request, res: Response) => {
+    const updatedOrganizationMember = await this.service.organizationMemberInvitations({
+      profileId: String(req.user?.profileId ?? ''),
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          updatedOrganizationMember,
+          'Organization member role updated successfully',
+        ),
+      );
+  });
+
+  /**
+   * Updates an organization member's role.
+   *
+   * @route POST /api/v1/organization-members/invite
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user), req.body.userId (organization member ID), req.body.status (optional flag, pending or accepted), req.body.role (admin or member), and req.body.role (new role)`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationMemberResponse>>}
+   *
+   * @description
+   * Creates a new invite for an organization.
+   */
+  createOrganizationMemberInvite = asyncHandler(async (req: Request, res: Response) => {
+    const updatedOrganizationMember = await this.service.createOrganizationMemberInvite({
+      ...req.body,
     });
 
     return res

@@ -1,4 +1,5 @@
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+
 import {
   Dialog,
   DialogContent,
@@ -6,15 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+
+import type { TOrganizationMemberRole, TUserProfileSummary } from 'shared';
+import { UserPicker } from '@/components/organisms/UserPicker';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
-import type { TOrganizationMemberRole } from 'shared';
 
 interface TOrganizationMemberInviteDialogProps {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onInvite: (email: string, role: TOrganizationMemberRole) => Promise<void>;
+  onInvite: (data: { role: TOrganizationMemberRole; userId: string }) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -24,14 +26,21 @@ export const OrganizationMemberInviteDialog = ({
   onInvite,
   isLoading,
 }: TOrganizationMemberInviteDialogProps) => {
-  const [email, setEmail] = useState('');
   const [role, setRole] = useState<TOrganizationMemberRole>('member');
+  const [selectedUsers, setSelectedUsers] = useState<TUserProfileSummary[]>([]);
 
   const handleSubmit = async () => {
-    if (!email.trim()) return;
-    await onInvite(email.trim(), role);
-    setEmail('');
+    if (selectedUsers.length === 0) return;
+    await onInvite({ role, userId: selectedUsers[0]._id });
     setRole('member');
+  };
+
+  const handleUserSelect = (user: TUserProfileSummary) => {
+    setSelectedUsers([user]);
+  };
+
+  const handleRemoveSelectedUser = () => {
+    setSelectedUsers([]);
   };
 
   return (
@@ -42,16 +51,11 @@ export const OrganizationMemberInviteDialog = ({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Email address</label>
-            <Input
-              placeholder="name@example.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-              type="email"
-            />
-          </div>
+          <UserPicker
+            onSelect={handleUserSelect}
+            onDelete={handleRemoveSelectedUser}
+            selectedUsers={selectedUsers}
+          />
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Role</label>
@@ -78,7 +82,7 @@ export const OrganizationMemberInviteDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={!email.trim() || isLoading}>
+          <Button onClick={handleSubmit} disabled={selectedUsers.length == 0 || isLoading}>
             {isLoading ? 'Sending...' : 'Send invite'}
           </Button>
         </DialogFooter>

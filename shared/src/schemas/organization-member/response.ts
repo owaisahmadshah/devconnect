@@ -11,3 +11,7 @@ export type TOrganizationMemberResponse = Omit<
   user: TUserProfileSummary;
   createdAt: Date;
 };
+
+export type TOrganizationMemberWithStatusResponse = TOrganizationMemberResponse & {
+  status: 'pending' | 'accepted';
+};

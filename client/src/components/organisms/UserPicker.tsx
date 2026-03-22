@@ -11,18 +11,22 @@ import { cn } from '@/lib/utils';
 import { useInfiniteUserSearchByFullName } from '@/hooks/useInfiniteUserSearchByFullName';
 import type { TUserProfileSummary } from 'shared';
 
-interface CollaboratorSearchProps {
-  form: UseFormReturn<any>;
-  collaborators: TUserProfileSummary[];
+interface UserPickerProps {
+  form?: UseFormReturn<any>;
+  selectedUsers: TUserProfileSummary[];
   onSelect: (user: TUserProfileSummary) => void;
   onDelete: (user: TUserProfileSummary) => void;
+  searchPlaceholder?: string;
+  selectedLabel?: string;
 }
 
-export const CollaboratorSearch: React.FC<CollaboratorSearchProps> = ({
+export const UserPicker: React.FC<UserPickerProps> = ({
   form,
-  collaborators,
+  selectedUsers,
   onSelect,
   onDelete,
+  searchPlaceholder = 'Search users...',
+  selectedLabel = 'Selected Users:',
 }) => {
   const [fullName, setFullName] = useState('');
   const [isPopOverOpen, setIsPopOverOpen] = useState(false);
@@ -30,15 +34,15 @@ export const CollaboratorSearch: React.FC<CollaboratorSearchProps> = ({
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteUserSearchByFullName(fullName);
 
-  const currentLoggedInUser = form.watch('createdBy');
+  const currentLoggedInUser = form?.watch('createdBy');
 
   const allProfiles =
     data?.pages
       ?.flatMap(page => page.profiles)
       ?.filter(
         profile =>
-          !collaborators.some(
-            colUser => colUser._id === profile._id || profile._id === currentLoggedInUser,
+          !selectedUsers.some(
+            user => user._id === profile._id || profile._id === currentLoggedInUser,
           ),
       ) || [];
 
@@ -53,12 +57,12 @@ export const CollaboratorSearch: React.FC<CollaboratorSearchProps> = ({
         <PopoverTrigger asChild>
           <div className="relative flex gap-2">
             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-            <Input placeholder="Search collaborators..." className="pl-10" disabled={isPopOverOpen} />
+            <Input placeholder={searchPlaceholder} className="pl-10" disabled={isPopOverOpen} />
           </div>
         </PopoverTrigger>
         <PopoverContent className="w-80 overflow-y-auto p-0" align="start" side="bottom">
           <Input
-            placeholder="Search collaborators..."
+            placeholder={searchPlaceholder}
             onChange={e => setFullName(e.target.value)}
             value={fullName}
             className="pl-10"
@@ -109,11 +113,11 @@ export const CollaboratorSearch: React.FC<CollaboratorSearchProps> = ({
         </PopoverContent>
       </Popover>
 
-      {collaborators.length > 0 && (
+      {selectedUsers.length > 0 && (
         <div className="mt-2 space-y-2">
-          <p className="text-sm font-medium">Selected Collaborators:</p>
+          <p className="text-sm font-medium">{selectedLabel}</p>
           <div className="flex flex-wrap gap-2">
-            {collaborators.map(user => (
+            {selectedUsers.map(user => (
               <DismissibleBadge
                 key={user._id}
                 avatar={user.profilePictureUrl}

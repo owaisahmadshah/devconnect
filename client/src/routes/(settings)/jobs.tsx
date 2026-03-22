@@ -4,13 +4,5 @@ import { getSearchJobBaseSchema } from 'shared';
 
 export const Route = createFileRoute('/(settings)/jobs')({
   validateSearch: getSearchJobBaseSchema,
-  component: RouteComponent,
+  component: JobsFeedList,
 });
-
-function RouteComponent() {
-  return (
-    <div>
-      <JobsFeedList />
-    </div>
-  );
-}

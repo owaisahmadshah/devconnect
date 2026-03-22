@@ -71,6 +71,7 @@ export class OrganizationService {
       organizationId: organization._id as string,
       userId: organizationData.createdBy,
       role: 'admin',
+      status: 'accepted',
     });
 
     const createdOrg = await repo.findOrganization({

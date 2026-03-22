@@ -33,6 +33,7 @@ export class OrganizationMemberRepository {
       {
         $match: {
           organizationId: organizationObjectId,
+          status: 'accepted',
         },
       },
       profileSummaryLookupPipeline({
@@ -56,6 +57,7 @@ export class OrganizationMemberRepository {
         role: 1,
         user: 1,
         organization: 1,
+        createdAt: 1,
       }),
     ]);
   }
@@ -65,6 +67,7 @@ export class OrganizationMemberRepository {
       {
         $match: {
           url: url,
+          status: 'accepted',
         },
       },
       profileSummaryLookupPipeline({
@@ -90,10 +93,6 @@ export class OrganizationMemberRepository {
         organization: 1,
       }),
     ]);
-  }
-
-  createManyOrganizationMembers(organizationMembersData: TCreateOrganizationMember[]) {
-    return OrganizationMember.insertMany(organizationMembersData);
   }
 
   updateOrganizationMemberRole({ organizationId, role }: TChangeOrganizationMemberRole) {
@@ -108,5 +107,39 @@ export class OrganizationMemberRepository {
       { role },
       { new: true },
     );
+  }
+
+  getOrganizationMemberInvitations({ profileId }: { profileId: string }) {
+    return OrganizationMember.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(profileId),
+          status: 'pending',
+        },
+      },
+      profileSummaryLookupPipeline({
+        localField: 'userId',
+        asField: 'user',
+      }),
+      unwindField({
+        asField: 'user',
+      }),
+      lookupPipeline({
+        localField: 'organizationId',
+        foreignField: '_id',
+        from: 'organizations',
+        as: 'organization',
+      }),
+      unwindField({
+        asField: 'organization',
+      }),
+      projectStage({
+        _id: 1,
+        role: 1,
+        user: 1,
+        organization: 1,
+        status: 1,
+      }),
+    ]);
   }
 }

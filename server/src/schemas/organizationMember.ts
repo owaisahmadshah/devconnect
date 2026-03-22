@@ -4,6 +4,7 @@ import {
   createOrganizationMemberSchema as cs,
   deleteOrganizationMemberSchema as ds,
   updateOrganizationMemberRoleSchema as us,
+  createOrganizationMemberInviteSchema as comis,
 } from 'shared';
 
 export const createOrganizationMemberBodySchema = z.object({
@@ -20,4 +21,8 @@ export const deleteOrganizationMemberQuerySchema = z.object({
 
 export const updateOrganizationMemberRoleBodySchema = z.object({
   body: us,
+});
+
+export const createOrganizationMemberInviteSchema = z.object({
+  body: comis,
 });

@@ -21,9 +21,9 @@ export const OrganizationMemberRow = ({
   onRoleChange,
   onRemove,
 }: TOrganizationMemberRowProps) => {
-  const { user: member } = org_member;
+  const { user: member, role } = org_member;
 
-  const initials = (member.firstName + member.lastName)
+  const initials = (member.firstName + ' ' + member.lastName)
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -39,13 +39,13 @@ export const OrganizationMemberRow = ({
         </Avatar>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{`${member.firstName + '  ' + member.lastName}`}</p>
-          <p className="text-muted-foreground truncate text-xs">{member.email}</p>
+          {/* <p className="text-muted-foreground truncate text-xs">{role}</p> */}
         </div>
       </div>
 
       <div className="ml-4 flex shrink-0 items-center gap-2">
         <Badge variant={member.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
-          {member.role}
+          {role}
         </Badge>
 
         <DropdownMenu>
@@ -55,7 +55,7 @@ export const OrganizationMemberRow = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {member.role === 'member' ? (
+            {role === 'member' ? (
               <DropdownMenuItem onClick={() => onRoleChange(member._id, 'admin')}>
                 <Shield className="mr-2 h-4 w-4" />
                 Make admin

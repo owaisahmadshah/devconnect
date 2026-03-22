@@ -2,6 +2,7 @@ import { apiPost, apiGet, apiDelete, apiPatch } from '@/lib/api-client';
 
 import type {
   TCreateOrganizationMember,
+  TCreateOrganizationMemberInvite,
   TDeleteOrganizationMember,
   TOrganizationMemberResponse,
   TUpdateOrganizationMemberRole,
@@ -36,4 +37,10 @@ export const addManyMembersService = async (membersData: TCreateOrganizationMemb
 
 export const updateMemberRoleService = async (data: TUpdateOrganizationMemberRole) => {
   return apiPatch<TOrganizationMemberResponse>('/api/v1/organization-members/update-role', data);
+};
+
+export const createOrganizationMemberInviteService = async (
+  data: TCreateOrganizationMemberInvite,
+) => {
+  return apiPost<TOrganizationMemberResponse>('/api/v1/organization-members/invite', data);
 };
