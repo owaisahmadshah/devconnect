@@ -107,6 +107,8 @@ export class OrganizationMemberController {
     const updatedOrganizationMember = await this.service.updateOrganizationMemberRole({
       _id: req.body._id,
       role: req.body.role,
+      organizationId: req.body.organizationId,
+      actorId: String(req.user?.profileId),
     });
 
     return res

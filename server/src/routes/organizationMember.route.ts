@@ -4,7 +4,6 @@ import auth from '../middleware/auth.middleware.js';
 import { organizationMemberController } from '../di/organizationMember.container.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
-  createManyOrganizationMembersBodySchema,
   createOrganizationMemberBodySchema,
   createOrganizationMemberInviteSchema,
   deleteOrganizationMemberQuerySchema,

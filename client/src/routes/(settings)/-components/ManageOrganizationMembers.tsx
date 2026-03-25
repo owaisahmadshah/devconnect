@@ -38,7 +38,7 @@ export const ManageOrganizationMembers = ({ organizationId }: ManageMembersProps
   };
 
   const handleRoleChange = (memberId: string, role: TOrganizationMemberRole) => {
-    updateRole({ _id: memberId, role });
+    updateRole({ _id: memberId, role, organizationId });
   };
 
   const handleRemove = (memberId: string) => {

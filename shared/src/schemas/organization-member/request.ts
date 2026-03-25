@@ -11,6 +11,8 @@ export const createOrganizationMemberSchema = baseOrganizationMemberSchema.exten
 export const updateOrganizationMemberRoleSchema = z.object({
   _id: z.string(),
   role: z.enum(['admin', 'member']),
+  organizationId: z.string(),
+  actorId: z.string().optional(),
 });
 
 // For api request (remove member) - _id required

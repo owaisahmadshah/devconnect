@@ -20,6 +20,16 @@ export class OrganizationMemberService {
   createOrgMember = async (organizationMemberData: TCreateOrganizationMember) => {
     const { repo } = this.deps;
 
+    const admins = await repo.findAdminCount({ orgId: organizationMemberData.organizationId });
+
+    // First member gets in freely (org creator), subsequent members require admin approval
+    if (admins > 0) {
+      await this.checkIsAdmin({
+        orgId: organizationMemberData.organizationId,
+        userId: organizationMemberData.userId,
+      });
+    }
+
     const organizationMember = await repo.createOrganizationMember({
       ...organizationMemberData,
       status: organizationMemberData?.status ?? 'pending',
@@ -34,6 +44,19 @@ export class OrganizationMemberService {
 
   deleteOrganizationMember = async ({ organizationId, userId }: TDeleteOrganizationMember) => {
     const { repo } = this.deps;
+
+    const member = await repo.findOrganizationMember({ orgId: organizationId, userId });
+
+    // Admin can delete even himself if other admins are there
+    if (!member) {
+      throw new ApiError(HttpStatus.NOT_FOUND, "Member doesn't exits.");
+    }
+
+    await this.checkIsAdmin({ orgId: organizationId, userId });
+
+    if (member.role === 'admin') {
+      await this.checkIsLastAdmin({ orgId: organizationId });
+    }
 
     const deletedOrganizationMember = await repo.deleteOrganizationMember({
       organizationId,
@@ -57,8 +80,20 @@ export class OrganizationMemberService {
     return response;
   };
 
-  updateOrganizationMemberRole = async ({ _id, role }: TUpdateOrganizationMemberRole) => {
+  updateOrganizationMemberRole = async ({
+    _id,
+    role,
+    actorId,
+    organizationId,
+  }: TUpdateOrganizationMemberRole) => {
     const { repo, mapper } = this.deps;
+
+    await this.checkIsAdmin({ orgId: organizationId, userId: actorId as string });
+
+    // Admin(Actor) can even change his role if there is atleast on other admin
+    if (role === 'member') {
+      await this.checkIsLastAdmin({ orgId: organizationId });
+    }
 
     const updatedOrganizationMember = await repo.updateOrganizationMemberRole({
       organizationId: _id,
@@ -91,4 +126,31 @@ export class OrganizationMemberService {
 
     return invitation;
   };
+
+  async checkIsAdmin(data: { orgId: string; userId: string }, options?: { message?: string }) {
+    const { repo } = this.deps;
+
+    const member = await repo.findOrganizationMember(data);
+
+    if (!member) {
+      throw new ApiError(HttpStatus.NOT_FOUND, 'User not found.');
+    }
+
+    if (member.role !== 'admin') {
+      throw new ApiError(HttpStatus.FORBIDDEN, options?.message ?? 'Only admin can make changes.');
+    }
+  }
+
+  async checkIsLastAdmin(data: { orgId: string }, options?: { message?: string }) {
+    const { repo } = this.deps;
+
+    const adminsCount = await repo.findAdminCount(data);
+
+    if (adminsCount === 1) {
+      throw new ApiError(
+        HttpStatus.FORBIDDEN,
+        options?.message ?? "Last admin role can't be changed.",
+      );
+    }
+  }
 }

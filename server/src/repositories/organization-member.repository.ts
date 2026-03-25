@@ -10,6 +10,14 @@ import {
 } from '../utils/aggregationHelpers.js';
 
 export class OrganizationMemberRepository {
+  findOrganizationMember({ orgId, userId }: { orgId: string; userId: string }) {
+    return OrganizationMember.findOne({ organizationId: orgId, userId: userId });
+  }
+
+  findAdminCount({ orgId }: { orgId: string }) {
+    return OrganizationMember.countDocuments({ organizationId: orgId, role: 'admin' });
+  }
+
   createOrganizationMember(organizationMemberData: TCreateOrganizationMember) {
     return OrganizationMember.create(organizationMemberData);
   }
