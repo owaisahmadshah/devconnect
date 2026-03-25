@@ -165,7 +165,11 @@ export class PostService {
   fetchPost = async (postId: string): Promise<TPostResponse> => {
     const { repo, postMapper } = this.deps;
 
+    console.log(postId)
+
     const post = await repo.findById(postId);
+
+    console.log(post)
 
     if (!post) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Post not found.');

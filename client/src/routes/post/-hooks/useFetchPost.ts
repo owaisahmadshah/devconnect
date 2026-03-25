@@ -1,14 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+
 import { fetchPost } from '../-services/postService';
 
-export function useFetchPost(postId?: string) {
-  const { postId: paramPostId } = useParams({ strict: false });
-
-  const finalId = postId ?? paramPostId;
-
-  return useQuery({
-    queryKey: [postId],
-    queryFn: () => fetchPost({ postId: finalId }),
+export function useFetchPost(postId: string) {
+  return useSuspenseQuery({
+    queryKey: ['post', postId],
+    queryFn: () => fetchPost({ postId }),
   });
 }

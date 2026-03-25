@@ -2,7 +2,6 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { ProfileWithUrl } from '@/components/organisms/ProfileWithUrl';
 import { Button } from '@/components/ui/button';
 import type { TCreateLike, TPostResponse } from 'shared';
-import { FaShare } from 'react-icons/fa';
 import { HiDotsHorizontal } from 'react-icons/hi';
 import { ImagesCarousel } from '@/components/organisms/ImagesCarousel';
 import { useState } from 'react';
@@ -16,6 +15,7 @@ import {
 import { ReactionButton } from './ReactionButton';
 import { PostComments } from './PostComments';
 import { cn } from '@/lib/utils';
+import ShareDialog from './ShareDialog';
 
 interface PostProps {
   post: TPostResponse;
@@ -161,14 +161,7 @@ export const Post = ({
             onDelete={onDelete}
           />
           {/* Share */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-green-500 dark:text-slate-400 dark:hover:bg-slate-800"
-          >
-            <FaShare className="h-[18px] w-[18px]" />
-            <span className="hidden sm:inline">Share</span>
-          </Button>
+          <ShareDialog postId={post._id} baseUrl='http://localhost:5173' />
         </div>
       </CardFooter>
     </Card>

@@ -22,6 +22,7 @@ import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authSigninImport } from './routes/(auth)/signin'
 import { Route as ProfileIdentifierRouteImport } from './routes/profile/$identifier/route'
+import { Route as PostPPostIdImport } from './routes/post/p.$postId'
 import { Route as settingsOrganizationSelectImport } from './routes/(settings)/organization.select'
 import { Route as settingsOrganizationNewImport } from './routes/(settings)/organization.new'
 import { Route as settingsJobNewImport } from './routes/(settings)/job.new'
@@ -98,6 +99,12 @@ const authSigninRoute = authSigninImport.update({
 const ProfileIdentifierRouteRoute = ProfileIdentifierRouteImport.update({
   id: '/profile/$identifier',
   path: '/profile/$identifier',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PostPPostIdRoute = PostPPostIdImport.update({
+  id: '/post/p/$postId',
+  path: '/post/p/$postId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -289,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof settingsOrganizationSelectImport
       parentRoute: typeof rootRoute
     }
+    '/post/p/$postId': {
+      id: '/post/p/$postId'
+      path: '/post/p/$postId'
+      fullPath: '/post/p/$postId'
+      preLoaderRoute: typeof PostPPostIdImport
+      parentRoute: typeof rootRoute
+    }
     '/(settings)/o/organization/$organizationURL': {
       id: '/(settings)/o/organization/$organizationURL'
       path: '/o/organization/$organizationURL'
@@ -327,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/job/new': typeof settingsJobNewRoute
   '/organization/new': typeof settingsOrganizationNewRoute
   '/organization/select': typeof settingsOrganizationSelectRoute
+  '/post/p/$postId': typeof PostPPostIdRoute
   '/o/organization/$organizationURL': typeof settingsOOrganizationOrganizationURLRoute
   '/organization/$organizationURL/job/$jobId': typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
@@ -350,6 +365,7 @@ export interface FileRoutesByTo {
   '/job/new': typeof settingsJobNewRoute
   '/organization/new': typeof settingsOrganizationNewRoute
   '/organization/select': typeof settingsOrganizationSelectRoute
+  '/post/p/$postId': typeof PostPPostIdRoute
   '/o/organization/$organizationURL': typeof settingsOOrganizationOrganizationURLRoute
   '/organization/$organizationURL/job/$jobId': typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
@@ -374,6 +390,7 @@ export interface FileRoutesById {
   '/(settings)/job/new': typeof settingsJobNewRoute
   '/(settings)/organization/new': typeof settingsOrganizationNewRoute
   '/(settings)/organization/select': typeof settingsOrganizationSelectRoute
+  '/post/p/$postId': typeof PostPPostIdRoute
   '/(settings)/o/organization/$organizationURL': typeof settingsOOrganizationOrganizationURLRoute
   '/(settings)/organization/$organizationURL/job/$jobId': typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
@@ -399,6 +416,7 @@ export interface FileRouteTypes {
     | '/job/new'
     | '/organization/new'
     | '/organization/select'
+    | '/post/p/$postId'
     | '/o/organization/$organizationURL'
     | '/organization/$organizationURL/job/$jobId'
   fileRoutesByTo: FileRoutesByTo
@@ -421,6 +439,7 @@ export interface FileRouteTypes {
     | '/job/new'
     | '/organization/new'
     | '/organization/select'
+    | '/post/p/$postId'
     | '/o/organization/$organizationURL'
     | '/organization/$organizationURL/job/$jobId'
   id:
@@ -443,6 +462,7 @@ export interface FileRouteTypes {
     | '/(settings)/job/new'
     | '/(settings)/organization/new'
     | '/(settings)/organization/select'
+    | '/post/p/$postId'
     | '/(settings)/o/organization/$organizationURL'
     | '/(settings)/organization/$organizationURL/job/$jobId'
   fileRoutesById: FileRoutesById
@@ -467,6 +487,7 @@ export interface RootRouteChildren {
   settingsJobNewRoute: typeof settingsJobNewRoute
   settingsOrganizationNewRoute: typeof settingsOrganizationNewRoute
   settingsOrganizationSelectRoute: typeof settingsOrganizationSelectRoute
+  PostPPostIdRoute: typeof PostPPostIdRoute
   settingsOOrganizationOrganizationURLRoute: typeof settingsOOrganizationOrganizationURLRoute
   settingsOrganizationOrganizationURLJobJobIdRoute: typeof settingsOrganizationOrganizationURLJobJobIdRoute
 }
@@ -490,6 +511,7 @@ const rootRouteChildren: RootRouteChildren = {
   settingsJobNewRoute: settingsJobNewRoute,
   settingsOrganizationNewRoute: settingsOrganizationNewRoute,
   settingsOrganizationSelectRoute: settingsOrganizationSelectRoute,
+  PostPPostIdRoute: PostPPostIdRoute,
   settingsOOrganizationOrganizationURLRoute:
     settingsOOrganizationOrganizationURLRoute,
   settingsOrganizationOrganizationURLJobJobIdRoute:
@@ -524,6 +546,7 @@ export const routeTree = rootRoute
         "/(settings)/job/new",
         "/(settings)/organization/new",
         "/(settings)/organization/select",
+        "/post/p/$postId",
         "/(settings)/o/organization/$organizationURL",
         "/(settings)/organization/$organizationURL/job/$jobId"
       ]
@@ -581,6 +604,9 @@ export const routeTree = rootRoute
     },
     "/(settings)/organization/select": {
       "filePath": "(settings)/organization.select.tsx"
+    },
+    "/post/p/$postId": {
+      "filePath": "post/p.$postId.tsx"
     },
     "/(settings)/o/organization/$organizationURL": {
       "filePath": "(settings)/o.organization.$organizationURL.tsx"
