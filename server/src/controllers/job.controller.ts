@@ -105,7 +105,7 @@ export class JobController {
   /**
    * Retrieves all jobs of an organization.
    *
-   * @route GET /api/v1/organizations/:organizationId/jobs
+   * @route GET /api/v1/job/:organizationId/jobs
    *
    * @param {Request} req - Contains `req.user` (authenticated user), `req.params.organizationId`, and query parameters `limit` and `cursor`
    * @param {Response} res - Express response object
@@ -125,5 +125,55 @@ export class JobController {
     return res
       .status(HttpStatus.OK)
       .json(new ApiResponse(HttpStatus.OK, jobsResponse, 'Jobs retrieved successfully'));
+  });
+
+  /**
+   * Retrieves all jobs of an organization.
+   *
+   * @route GET /api/v1/jobs/feed?limit=10&cursor=null
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user), and query parameters `limit` and `cursor`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TJobListResponseWithCursorPagination[]>>}
+   *
+   * @description
+   * Retrieves feed jobs for an authenticated user, with pagination support.
+   */
+  getJobFeed = asyncHandler(async (req: Request, res: Response) => {
+    const jobs = await this.service.getJobFeed({
+      profileId: req.user?.profileId as string,
+      limit: Number(req.query.limit),
+      cursor: req.query?.cursor ? String(req.query.cursor) : null,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, jobs, 'Feed jobs retrieved successfully'));
+  });
+
+  /**
+   * Retrieves all jobs of an organization.
+   *
+   * @route GET /api/v1/jobs/search?limit=10&cursor=null&q=engineer&type=full-time&location=remote
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user), and query parameters `q`, `type`, `location` `limit` and `cursor`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TJobListResponseWithCursorPagination[]>>}
+   *
+   * @description
+   * Retrieves feed jobs for an authenticated user, with pagination support.
+   */
+  searchJobs = asyncHandler(async (req: Request, res: Response) => {
+    const jobs = await this.service.searchJobs({
+      ...req.query,
+      limit: Number(req.query.limit),
+      cursor: req.query?.cursor ? String(req.query.cursor) : null,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(new ApiResponse(HttpStatus.OK, jobs, 'Feed jobs retrieved successfully'));
   });
 }

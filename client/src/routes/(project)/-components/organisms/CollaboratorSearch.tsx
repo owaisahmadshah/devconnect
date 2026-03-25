@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DismissibleBadge } from '@/components/molecules/DismissibleBadge';
 import { cn } from '@/lib/utils';
-import { useInfiniteUserSearchByFullName } from '@/hooks/useProfile';
+import { useInfiniteUserSearchByFullName } from '@/hooks/useInfiniteUserSearchByFullName';
 import type { TUserProfileSummary } from 'shared';
 
 interface CollaboratorSearchProps {

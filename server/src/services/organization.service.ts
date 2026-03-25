@@ -5,17 +5,20 @@ import {
   type TCreateOrganization,
   type TDeleteOrganization,
   type TOrganizationListResponseWithCursorPagination,
+  type TUpdateOrganizationField,
 } from 'shared';
 import type { OrganizationRepository } from '../repositories/organization.repository.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { OrganizationMapper } from '../mapper/organization.mapper.js';
 import type { OrganizationMemberRepository } from '../repositories/organization-member.repository.js';
+import type { uploadSingleImage } from '../utils/uploadImages.js';
 
 interface IOrganizationServiceDeps {
   repo: OrganizationRepository;
   organizationMemberRepo: OrganizationMemberRepository;
   mapper: OrganizationMapper;
   slugifyFn: typeof slugify;
+  uploadSingleImage: typeof uploadSingleImage;
 }
 
 export class OrganizationService {
@@ -68,6 +71,7 @@ export class OrganizationService {
       organizationId: organization._id as string,
       userId: organizationData.createdBy,
       role: 'admin',
+      status: 'accepted',
     });
 
     const createdOrg = await repo.findOrganization({
@@ -142,5 +146,89 @@ export class OrganizationService {
       ...organization[0],
       isAdmin: organization[0].createdBy._id.toString() === profileId,
     });
+  };
+
+  findRecommendedOrganizationsForUser = async ({
+    profileId,
+    limit,
+    cursor,
+  }: {
+    profileId: string;
+    limit: number;
+    cursor: string | null;
+  }) => {
+    const { repo, mapper } = this.deps;
+
+    const organizations = await repo.findRecommendedOrganizationsForUser({
+      profileId,
+      limit,
+      cursor,
+    });
+
+    return organizations.map(org => mapper.toOrganizationSummaryResponse(org));
+  };
+
+  searchOrganizations = async ({
+    query,
+    profileId,
+    limit,
+    cursor,
+  }: {
+    query: string;
+    profileId: string;
+    limit: number;
+    cursor: string | null;
+  }) => {
+    const { repo, mapper } = this.deps;
+
+    const organizations = await repo.searchOrganizations({
+      query,
+      profileId,
+      limit,
+      cursor,
+    });
+
+    return organizations.map(org => mapper.toOrganizationSummaryResponse(org));
+  };
+
+  updateOrganizationField = async ({ organizationId, field, value }: TUpdateOrganizationField) => {
+    const { repo } = this.deps;
+
+    // TODO: Make sure only admin can update the organization details.
+    const updatedOrganization = await repo.updateOrganizationField({
+      organizationId,
+      field,
+      value,
+    });
+
+    if (!updatedOrganization) {
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Organization not found or user is not an admin.');
+    }
+
+    return updatedOrganization;
+  };
+
+  updateOrganizationLogo = async ({
+    organizationId,
+    file,
+  }: {
+    organizationId: string;
+    file: Express.Multer.File;
+  }) => {
+    const { repo, uploadSingleImage } = this.deps;
+
+    const { url } = await uploadSingleImage(file.path);
+
+    const updatedOrganization = await repo.updateOrganizationField({
+      organizationId,
+      field: 'logo',
+      value: url,
+    });
+
+    if (!updatedOrganization) {
+      throw new ApiError(HttpStatus.NOT_FOUND, 'Organization not found or user is not an admin.');
+    }
+
+    return updatedOrganization;
   };
 }

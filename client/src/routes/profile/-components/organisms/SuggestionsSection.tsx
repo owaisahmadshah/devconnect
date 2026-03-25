@@ -17,6 +17,8 @@ interface SuggestionsSectionProps {
   showAddEducationButton: boolean;
   showAddGithubProject: boolean;
   navigateProfileUrl?: string;
+  showOrganizationsButton?: boolean;
+  showPostAJobButton?: boolean;
 }
 
 export const SuggestionsSection = ({
@@ -28,6 +30,8 @@ export const SuggestionsSection = ({
   showAddEducationButton,
   showAddGithubProject,
   navigateProfileUrl,
+  showOrganizationsButton,
+  showPostAJobButton,
 }: SuggestionsSectionProps) => {
   const RenderButton = ({ text, children }: { text: string; children: React.ReactNode }) => {
     return (
@@ -47,6 +51,22 @@ export const SuggestionsSection = ({
             className="group bg-secondary flex items-center justify-center rounded-sm px-4 hover:cursor-pointer"
           >
             Projects
+          </Link>
+        )}
+        {showOrganizationsButton && (
+          <Link
+            to="/organizations-list"
+            className="group bg-secondary flex items-center justify-center rounded-sm px-4 hover:cursor-pointer"
+          >
+            Organizations
+          </Link>
+        )}
+        {showPostAJobButton && (
+          <Link
+            to="/job/new"
+            className="group bg-secondary flex items-center justify-center rounded-sm px-4 hover:cursor-pointer"
+          >
+            Post a Job
           </Link>
         )}
         {showGithubAddButton && <ConnectGithub />}

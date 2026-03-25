@@ -15,7 +15,23 @@ export const deleteJobSchema = z.object({
   _id: z.string(),
 });
 
+// For api request (get)
+export const getSearchJobBaseSchema = z.object({
+  q: z.string().min(1, 'Job title is required.').optional(),
+  location: z.string().optional(),
+  type: z.enum(['full-time', 'part-time', 'contract', 'internship']).optional(),
+  status: z.enum(['open', 'closed']).optional(),
+});
+
+export const getSearchJobSchema = getSearchJobBaseSchema.refine(
+  data => Object.values(data).some(Boolean),
+  {
+    message: 'At least one search parameter is required.',
+  },
+);
+
 // For typescript types
 export type TCreateJob = z.infer<typeof createJobSchema>;
 export type TUpdateJob = z.infer<typeof updateJobSchema>;
 export type TDeleteJob = z.infer<typeof deleteJobSchema>;
+export type TGetSearchJob = z.infer<typeof getSearchJobSchema>;

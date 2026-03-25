@@ -3,7 +3,12 @@ import { Router } from 'express';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import auth from '../middleware/auth.middleware.js';
 
-import { createJobSchema, deleteJobSchema, updateJobStatusSchema } from '../schemas/job.js';
+import {
+  createJobSchema,
+  deleteJobSchema,
+  getSearchJobSchema,
+  updateJobStatusSchema,
+} from '../schemas/job.js';
 
 import { jobController } from '../di/job.container.js';
 
@@ -17,6 +22,8 @@ router.patch(
   validateSchema(updateJobStatusSchema),
   jobController.updateJobStatus,
 );
+router.get('/feed', auth, jobController.getJobFeed);
+router.get('/search', auth, validateSchema(getSearchJobSchema), jobController.searchJobs);
 router.get('/:_id', auth, jobController.findJobById);
 router.get('/:organizationId/jobs', auth, jobController.findAllJobsOfOrganization);
 

@@ -76,6 +76,8 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
                 showAddEducationButton={!hasEducation}
                 showAddGithubProject={isGithubConnected}
                 navigateProfileUrl={profile.profileUrls[0].url}
+                showOrganizationsButton={isCurrentUser}
+                showPostAJobButton={isCurrentUser}
               />
             )}
 

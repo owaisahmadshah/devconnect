@@ -13,7 +13,7 @@ export const JobSummaryCard = (props: IJobSummaryCardProps) => {
   return (
     <Link
       className="group border-border bg-card hover:bg-accent/50 relative flex cursor-pointer gap-4 border-b p-4 transition-colors"
-      to="/o/organization/$organizationURL/job/$jobId"
+      to="/organization/$organizationURL/job/$jobId"
       params={{ organizationURL: organization.organizationURL, jobId: _id }}
     >
       <div className="border-border bg-muted h-12 w-12 shrink-0 overflow-hidden rounded-md border">

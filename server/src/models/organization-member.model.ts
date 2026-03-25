@@ -25,6 +25,11 @@ const organizationMemberSchema = new Schema<IOrganizationMember>(
       enum: ['admin', 'member'],
       default: 'member',
     },
+    status: {
+      type: String,
+      enum: ['pending', 'accepted'],
+      default: 'pending',
+    },
   },
   {
     timestamps: true,

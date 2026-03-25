@@ -1,11 +1,12 @@
-import { apiPost, apiGet, apiDelete } from '@/lib/api-client';
+import { apiPost, apiGet, apiDelete, apiPatch } from '@/lib/api-client';
 
-import type {
-  TCreateOrganization,
-  TDeleteOrganization,
-  TOrganizationListResponseWithCursorPagination,
-  TOrganizationResponse,
-  TPagination,
+import {
+  type TCreateOrganization,
+  type TDeleteOrganization,
+  type TOrganizationListResponseWithCursorPagination,
+  type TOrganizationResponse,
+  type TPagination,
+  type TUpdateOrganizationField,
 } from 'shared';
 
 export const createOrganizationService = async (data: TCreateOrganization) => {
@@ -26,4 +27,38 @@ export const fetchOrganizationByIdService = async (pag_query: TPagination) => {
 
 export const fetchOrganizationByURLService = async ({ query }: { query: string }) => {
   return apiGet<TOrganizationResponse>(`/api/v1/organizations/${query}`);
+};
+
+export const fetchRecommendedOrganizationsService = async (query: TPagination) => {
+  return apiGet<TOrganizationListResponseWithCursorPagination>(
+    '/api/v1/organizations/recommendations',
+    query,
+  );
+};
+
+export const searchOrganizationService = async (query: { query: string } & TPagination) => {
+  return apiGet<TOrganizationListResponseWithCursorPagination>('/api/v1/organizations/search', query);
+};
+
+export const updateOrganizationFieldService = async ({
+  organizationId,
+  field,
+  value,
+}: {
+  organizationId: string;
+} & TUpdateOrganizationField) => {
+  return apiPatch<TOrganizationResponse>(`/api/v1/organizations/field/${organizationId}`, {
+    field,
+    value,
+  });
+};
+
+export const updateOrganizationLogoService = async ({
+  formData,
+  organizationId,
+}: {
+  formData: FormData;
+  organizationId: string;
+}) => {
+  return apiPatch<TOrganizationResponse>(`/api/v1/organizations/logo/${organizationId}`, formData);
 };

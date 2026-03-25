@@ -4,9 +4,11 @@ import auth from '../middleware/auth.middleware.js';
 import { organizationMemberController } from '../di/organizationMember.container.js';
 import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
-  createManyOrganizationMembersBodySchema,
   createOrganizationMemberBodySchema,
+  createOrganizationMemberInviteSchema,
+  deleteOrganizationMemberInviteSchema,
   deleteOrganizationMemberQuerySchema,
+  updateOrganizationMemberInviteSchema,
   updateOrganizationMemberRoleBodySchema,
 } from '../schemas/organizationMember.js';
 
@@ -29,17 +31,20 @@ router.get(
   auth,
   organizationMemberController.findOrganizationAllMembers,
 );
-router.post(
-  '/add-many',
-  auth,
-  validateSchema(createManyOrganizationMembersBodySchema),
-  organizationMemberController.createManyOrganizationMembers,
-);
-router.put(
+router.patch(
   '/update-role',
   auth,
   validateSchema(updateOrganizationMemberRoleBodySchema),
   organizationMemberController.updateOrganizationMemberRole,
 );
+router.get('/invitations', auth, organizationMemberController.organizationMemberInvitations);
+router.post(
+  '/invite',
+  auth,
+  validateSchema(createOrganizationMemberInviteSchema),
+  organizationMemberController.createOrganizationMemberInvite,
+);
+router.delete('/reject-invite/:inviteId', auth, validateSchema(deleteOrganizationMemberInviteSchema))
+router.patch('/accept-invite/:inviteId', auth, validateSchema(updateOrganizationMemberInviteSchema));
 
 export default router;

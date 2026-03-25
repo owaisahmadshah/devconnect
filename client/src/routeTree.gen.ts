@@ -15,6 +15,8 @@ import { Route as AppImport } from './routes/_app'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostNewImport } from './routes/post/new'
 import { Route as settingsOrganizationsListImport } from './routes/(settings)/organizations-list'
+import { Route as settingsJobsImport } from './routes/(settings)/jobs'
+import { Route as notificationsNotificationsImport } from './routes/(notifications)/notifications'
 import { Route as networkNetworkImport } from './routes/(network)/network'
 import { Route as authVerifyOtpImport } from './routes/(auth)/verify-otp'
 import { Route as authSignupImport } from './routes/(auth)/signup'
@@ -54,6 +56,20 @@ const settingsOrganizationsListRoute = settingsOrganizationsListImport.update({
   path: '/organizations-list',
   getParentRoute: () => rootRoute,
 } as any)
+
+const settingsJobsRoute = settingsJobsImport.update({
+  id: '/(settings)/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const notificationsNotificationsRoute = notificationsNotificationsImport.update(
+  {
+    id: '/(notifications)/notifications',
+    path: '/notifications',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
 
 const networkNetworkRoute = networkNetworkImport.update({
   id: '/(network)/network',
@@ -196,6 +212,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof networkNetworkImport
       parentRoute: typeof rootRoute
     }
+    '/(notifications)/notifications': {
+      id: '/(notifications)/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof notificationsNotificationsImport
+      parentRoute: typeof rootRoute
+    }
+    '/(settings)/jobs': {
+      id: '/(settings)/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof settingsJobsImport
+      parentRoute: typeof rootRoute
+    }
     '/(settings)/organizations-list': {
       id: '/(settings)/organizations-list'
       path: '/organizations-list'
@@ -286,6 +316,8 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
   '/network': typeof networkNetworkRoute
+  '/notifications': typeof notificationsNotificationsRoute
+  '/jobs': typeof settingsJobsRoute
   '/organizations-list': typeof settingsOrganizationsListRoute
   '/post/new': typeof PostNewRoute
   '/network/connections': typeof networkNetworkConnectionsRoute
@@ -307,6 +339,8 @@ export interface FileRoutesByTo {
   '/signup': typeof authSignupRoute
   '/verify-otp': typeof authVerifyOtpRoute
   '/network': typeof networkNetworkRoute
+  '/notifications': typeof notificationsNotificationsRoute
+  '/jobs': typeof settingsJobsRoute
   '/organizations-list': typeof settingsOrganizationsListRoute
   '/post/new': typeof PostNewRoute
   '/network/connections': typeof networkNetworkConnectionsRoute
@@ -329,6 +363,8 @@ export interface FileRoutesById {
   '/(auth)/signup': typeof authSignupRoute
   '/(auth)/verify-otp': typeof authVerifyOtpRoute
   '/(network)/network': typeof networkNetworkRoute
+  '/(notifications)/notifications': typeof notificationsNotificationsRoute
+  '/(settings)/jobs': typeof settingsJobsRoute
   '/(settings)/organizations-list': typeof settingsOrganizationsListRoute
   '/post/new': typeof PostNewRoute
   '/(network)/network_/connections': typeof networkNetworkConnectionsRoute
@@ -352,6 +388,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-otp'
     | '/network'
+    | '/notifications'
+    | '/jobs'
     | '/organizations-list'
     | '/post/new'
     | '/network/connections'
@@ -372,6 +410,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-otp'
     | '/network'
+    | '/notifications'
+    | '/jobs'
     | '/organizations-list'
     | '/post/new'
     | '/network/connections'
@@ -392,6 +432,8 @@ export interface FileRouteTypes {
     | '/(auth)/signup'
     | '/(auth)/verify-otp'
     | '/(network)/network'
+    | '/(notifications)/notifications'
+    | '/(settings)/jobs'
     | '/(settings)/organizations-list'
     | '/post/new'
     | '/(network)/network_/connections'
@@ -414,6 +456,8 @@ export interface RootRouteChildren {
   authSignupRoute: typeof authSignupRoute
   authVerifyOtpRoute: typeof authVerifyOtpRoute
   networkNetworkRoute: typeof networkNetworkRoute
+  notificationsNotificationsRoute: typeof notificationsNotificationsRoute
+  settingsJobsRoute: typeof settingsJobsRoute
   settingsOrganizationsListRoute: typeof settingsOrganizationsListRoute
   PostNewRoute: typeof PostNewRoute
   networkNetworkConnectionsRoute: typeof networkNetworkConnectionsRoute
@@ -435,6 +479,8 @@ const rootRouteChildren: RootRouteChildren = {
   authSignupRoute: authSignupRoute,
   authVerifyOtpRoute: authVerifyOtpRoute,
   networkNetworkRoute: networkNetworkRoute,
+  notificationsNotificationsRoute: notificationsNotificationsRoute,
+  settingsJobsRoute: settingsJobsRoute,
   settingsOrganizationsListRoute: settingsOrganizationsListRoute,
   PostNewRoute: PostNewRoute,
   networkNetworkConnectionsRoute: networkNetworkConnectionsRoute,
@@ -467,6 +513,8 @@ export const routeTree = rootRoute
         "/(auth)/signup",
         "/(auth)/verify-otp",
         "/(network)/network",
+        "/(notifications)/notifications",
+        "/(settings)/jobs",
         "/(settings)/organizations-list",
         "/post/new",
         "/(network)/network_/connections",
@@ -500,6 +548,12 @@ export const routeTree = rootRoute
     },
     "/(network)/network": {
       "filePath": "(network)/network.tsx"
+    },
+    "/(notifications)/notifications": {
+      "filePath": "(notifications)/notifications.tsx"
+    },
+    "/(settings)/jobs": {
+      "filePath": "(settings)/jobs.tsx"
     },
     "/(settings)/organizations-list": {
       "filePath": "(settings)/organizations-list.tsx"

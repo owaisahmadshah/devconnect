@@ -2,7 +2,9 @@ import {
   HttpStatus,
   type TCreateJob,
   type TDeleteJob,
+  type TGetSearchJob,
   type TJobListResponseWithCursorPagination,
+  type TPagination,
   type TUpdateJob,
 } from 'shared';
 import type { JobMapper } from '../mapper/job.mapper.js';
@@ -91,4 +93,34 @@ export class JobService {
       nextCursor,
     };
   }
+
+  searchJobs = async (query: TGetSearchJob & TPagination) => {
+    const { repo, mapper } = this.deps;
+
+    const jobs = await repo.searchJobs(query);
+
+    const hasMore = jobs.length === query.limit;
+    const nextCursor = hasMore ? (jobs[jobs.length - 1]._id as string) : null;
+
+    return {
+      jobs: jobs.map(job => mapper.toJobSummaryResponse(job)),
+      hasMore,
+      nextCursor,
+    };
+  };
+
+  getJobFeed = async (query: { profileId: string; limit: number; cursor: string | null }) => {
+    const { repo, mapper } = this.deps;
+
+    const jobs = await repo.getJobFeed(query);
+
+    const hasMore = jobs.length === query.limit;
+    const nextCursor = hasMore ? (jobs[jobs.length - 1]._id as string) : null;
+
+    return {
+      jobs: jobs.map(job => mapper.toJobSummaryResponse(job)),
+      hasMore,
+      nextCursor,
+    };
+  };
 }
