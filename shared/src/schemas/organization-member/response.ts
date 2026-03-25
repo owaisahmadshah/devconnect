@@ -1,4 +1,4 @@
-import { TOrganizationResponse } from '../organization/response';
+import { TOrganizationSummaryResponse } from '../organization/response';
 import { TUserProfileSummary } from '../profile/profileResponse';
 import { TBaseOrganizationMember } from './organization-member';
 
@@ -7,7 +7,7 @@ export type TOrganizationMemberResponse = Omit<
   'organizationId' | 'userId'
 > & {
   _id: string;
-  organization: TOrganizationResponse;
+  organization: TOrganizationSummaryResponse;
   user: TUserProfileSummary;
   createdAt: Date;
 };

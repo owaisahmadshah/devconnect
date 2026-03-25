@@ -3,6 +3,8 @@ import {
   type TCreateOrganizationMember,
   type TCreateOrganizationMemberInvite,
   type TDeleteOrganizationMember,
+  type TDeleteOrganizationMemberInvite,
+  type TUpdateOrganizationMemberInvite,
   type TUpdateOrganizationMemberRole,
 } from 'shared';
 import type { OrganizationMemberRepository } from '../repositories/organization-member.repository.js';
@@ -125,6 +127,22 @@ export class OrganizationMemberService {
     const invitation = await repo.createOrganizationMember({ ...data, status: 'pending' });
 
     return invitation;
+  };
+
+  deleteOrganizationMemberInvite = async (data: TDeleteOrganizationMemberInvite) => {
+    const { repo } = this.deps;
+
+    const updatedMember = await repo.deleteOrganizationMemberInvite({ memberId: data.inviteId });
+
+    return updatedMember;
+  };
+
+  acceptOrganizationMemberInvite = async (data: TUpdateOrganizationMemberInvite) => {
+    const { repo } = this.deps;
+
+    const updatedMember = await repo.deleteOrganizationMemberInvite({ memberId: data.inviteId });
+
+    return updatedMember;
   };
 
   async checkIsAdmin(data: { orgId: string; userId: string }, options?: { message?: string }) {

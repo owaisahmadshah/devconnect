@@ -6,7 +6,9 @@ import { validateSchema } from '../middleware/validateRequest.middleware.js';
 import {
   createOrganizationMemberBodySchema,
   createOrganizationMemberInviteSchema,
+  deleteOrganizationMemberInviteSchema,
   deleteOrganizationMemberQuerySchema,
+  updateOrganizationMemberInviteSchema,
   updateOrganizationMemberRoleBodySchema,
 } from '../schemas/organizationMember.js';
 
@@ -42,5 +44,7 @@ router.post(
   validateSchema(createOrganizationMemberInviteSchema),
   organizationMemberController.createOrganizationMemberInvite,
 );
+router.delete('/reject-invite/:inviteId', auth, validateSchema(deleteOrganizationMemberInviteSchema))
+router.patch('/accept-invite/:inviteId', auth, validateSchema(updateOrganizationMemberInviteSchema));
 
 export default router;

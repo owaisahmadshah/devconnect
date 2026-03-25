@@ -150,4 +150,12 @@ export class OrganizationMemberRepository {
       }),
     ]);
   }
+
+  deleteOrganizationMemberInvite({ memberId }: { memberId: string }) {
+    return OrganizationMember.findByIdAndDelete(memberId);
+  }
+
+  acceptOrganizationMemberInvite({ memberId }: { memberId: string }) {
+    return OrganizationMember.findByIdAndUpdate(memberId, { status: 'accepted' });
+  }
 }

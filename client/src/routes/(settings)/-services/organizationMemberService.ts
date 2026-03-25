@@ -28,13 +28,6 @@ export const fetchAllMembersOfOrganizationService = async ({
   );
 };
 
-export const addManyMembersService = async (membersData: TCreateOrganizationMember[]) => {
-  return apiPost<TOrganizationMemberResponse[]>(
-    '/api/v1/organization-members/add-many',
-    membersData,
-  );
-};
-
 export const updateMemberRoleService = async (data: TUpdateOrganizationMemberRole) => {
   return apiPatch<TOrganizationMemberResponse>('/api/v1/organization-members/update-role', data);
 };

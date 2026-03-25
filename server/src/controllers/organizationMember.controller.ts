@@ -152,7 +152,7 @@ export class OrganizationMemberController {
   });
 
   /**
-   * Updates an organization member's role.
+   * Creates a new invitation for organization.
    *
    * @route POST /api/v1/organization-members/invite
    *
@@ -175,7 +175,65 @@ export class OrganizationMemberController {
         new ApiResponse(
           HttpStatus.OK,
           updatedOrganizationMember,
-          'Organization member role updated successfully',
+          'Created organization member invitation successfully.',
+        ),
+      );
+  });
+
+  /**
+   * Delete organization member invite.
+   *
+   * @route Delete /api/v1/organization-members/delete-invite/:inviteId
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user), and `req.param.inviteId`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationMemberResponse>>}
+   *
+   * @description
+   * Deletes organization member.
+   */
+  deleteOrganizationMemberInvite = asyncHandler(async (req: Request, res: Response) => {
+    const updatedOrganizationMember = await this.service.deleteOrganizationMemberInvite({
+      ...req.body,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          updatedOrganizationMember,
+          'Delete organization member invite successfully',
+        ),
+      );
+  });
+
+  /**
+   * Accepts organization member invite.
+   *
+   * @route PATCH /api/v1/organization-members/accept-invite/:inviteId
+   *
+   * @param {Request} req - Contains `req.user` (authenticated user), and `req.param.inviteId`
+   * @param {Response} res - Express response object
+   *
+   * @returns {Promise<ApiResponse<TOrganizationMemberResponse>>}
+   *
+   * @description
+   * Accepts organization member.
+   */
+  acceptOrganizationMemberInvite = asyncHandler(async (req: Request, res: Response) => {
+    const updatedOrganizationMember = await this.service.acceptOrganizationMemberInvite({
+      ...req.body,
+    });
+
+    return res
+      .status(HttpStatus.OK)
+      .json(
+        new ApiResponse(
+          HttpStatus.OK,
+          updatedOrganizationMember,
+          'Accepted organization member invite successfully',
         ),
       );
   });

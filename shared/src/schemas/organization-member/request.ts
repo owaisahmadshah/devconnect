@@ -35,8 +35,20 @@ export const createOrganizationMemberInviteSchema = z.object({
   status: z.enum(['pending', 'accepted']).optional(),
 });
 
+// For api request (delete) - _id required
+export const deleteOrganizationMemberInviteSchema = z.object({
+  inviteId: z.string(),
+});
+
+// For api request (accept) - _id required
+export const updateOrganizationMemberInviteSchema = z.object({
+  inviteId: z.string(),
+});
+
 export type TCreateOrganizationMember = z.infer<typeof createOrganizationMemberSchema>;
 export type TUpdateOrganizationMemberRole = z.infer<typeof updateOrganizationMemberRoleSchema>;
 export type TDeleteOrganizationMember = z.infer<typeof deleteOrganizationMemberSchema>;
 export type TChangeOrganizationMemberRole = z.infer<typeof changeOrganizationMemberRoleSchema>;
 export type TCreateOrganizationMemberInvite = z.infer<typeof createOrganizationMemberInviteSchema>;
+export type TDeleteOrganizationMemberInvite = z.infer<typeof deleteOrganizationMemberInviteSchema>;
+export type TUpdateOrganizationMemberInvite = z.infer<typeof updateOrganizationMemberInviteSchema>;
