@@ -1,12 +1,17 @@
+import { Trash2 } from 'lucide-react';
+import { MdLocationOn, MdCalendarToday } from 'react-icons/md';
+
+import { Button } from '@/components/ui/button';
 import { getDateRange, getDuration } from '@/lib/dateUtils';
-import { MdEdit, MdLocationOn, MdCalendarToday } from 'react-icons/md';
 import { type TExperienceWithId } from 'shared';
+import { useProfileArrayDelete } from '../../-hooks/useProfile';
 
 interface ExperienceItemProps extends Partial<TExperienceWithId> {
   isCurrentUser: boolean;
 }
 
 export const ExperienceItem = ({
+  _id,
   type,
   description,
   role,
@@ -17,6 +22,12 @@ export const ExperienceItem = ({
   ended,
   isCurrentUser,
 }: ExperienceItemProps) => {
+  const { mutateAsync, isPending } = useProfileArrayDelete();
+
+  const deleteAchievement = async () => {
+    await mutateAsync({ fieldName: 'experiences', deleteObjectId: _id as string });
+  };
+
   return (
     <div className="flex w-full justify-between">
       <div className="grid flex-1 gap-3">
@@ -65,11 +76,11 @@ export const ExperienceItem = ({
 
       {/* Edit button for current user */}
       {isCurrentUser && (
-        <div className="ml-4 flex-shrink-0">
-          <span className="hover: cursor-pointer transition-colors">
-            <MdEdit size={20} />
+        <Button variant={'ghost'} onClick={deleteAchievement} disabled={isPending}>
+          <span className="cursor-pointer transition-colors hover:text-gray-600">
+            <Trash2 size={20} />
           </span>
-        </div>
+        </Button>
       )}
     </div>
   );

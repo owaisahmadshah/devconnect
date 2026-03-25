@@ -1,7 +1,10 @@
-import { MdEdit, MdEmojiEvents, MdCalendarToday } from 'react-icons/md';
+import { MdEmojiEvents, MdCalendarToday } from 'react-icons/md';
+import { Trash2 } from 'lucide-react';
 
 import { type TAchievementWithId } from 'shared';
 import { formatDate } from '@/lib/dateUtils';
+import { Button } from '@/components/ui/button';
+import { useProfileArrayDelete } from '../../-hooks/useProfile';
 
 interface AchievementItemProps extends Partial<TAchievementWithId> {
   isCurrentUser: boolean;
@@ -15,6 +18,12 @@ export const AchievementItem = ({
   date,
   isCurrentUser,
 }: AchievementItemProps) => {
+  const { mutateAsync, isPending } = useProfileArrayDelete();
+
+  const deleteAchievement = async () => {
+    await mutateAsync({ fieldName: 'achievements', deleteObjectId: _id as string });
+  };
+
   return (
     <div className="flex w-full justify-between">
       <div className="grid flex-1 gap-3">
@@ -45,11 +54,11 @@ export const AchievementItem = ({
 
       {/* Edit button for current user */}
       {isCurrentUser && (
-        <div className="ml-4 flex-shrink-0">
+        <Button variant={'ghost'} onClick={deleteAchievement} disabled={isPending}>
           <span className="cursor-pointer transition-colors hover:text-gray-600">
-            <MdEdit size={20} />
+            <Trash2 size={20} />
           </span>
-        </div>
+        </Button>
       )}
     </div>
   );

@@ -1,13 +1,17 @@
-import { MdEdit, MdVerified, MdOpenInNew } from 'react-icons/md';
+import { MdVerified, MdOpenInNew } from 'react-icons/md';
 
 import { formatDate } from '@/lib/dateUtils';
 import { type TCertificationWithId } from 'shared';
+import { useProfileArrayDelete } from '../../-hooks/useProfile';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 interface CertificationItemProps extends Partial<TCertificationWithId> {
   isCurrentUser: boolean;
 }
 
 export const CertificationItem = ({
+  _id,
   title,
   issuer,
   issuedDate,
@@ -15,6 +19,12 @@ export const CertificationItem = ({
   credentialsUrl,
   isCurrentUser = false,
 }: CertificationItemProps) => {
+  const { mutateAsync, isPending } = useProfileArrayDelete();
+
+  const deleteAchievement = async () => {
+    await mutateAsync({ fieldName: 'certifications', deleteObjectId: _id as string });
+  };
+
   return (
     <div className="flex w-full justify-between">
       <div className="grid gap-3">
@@ -51,11 +61,11 @@ export const CertificationItem = ({
 
       {/* If the user is signed and looking at his own profile then he can perform action on his profile */}
       {isCurrentUser && (
-        <div>
+        <Button variant={'ghost'} onClick={deleteAchievement} disabled={isPending}>
           <span className="cursor-pointer transition-colors hover:text-gray-600">
-            <MdEdit />
+            <Trash2 size={20} />
           </span>
-        </div>
+        </Button>
       )}
     </div>
   );
