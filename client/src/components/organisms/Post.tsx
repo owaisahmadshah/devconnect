@@ -147,6 +147,7 @@ export const Post = ({
         <div className="flex w-full justify-between gap-1">
           {/* Like */}
           <ReactionButton
+            postOwnerId={post.createdBy._id}
             postId={post._id}
             onAction={onReaction}
             likeType={post.likeType}
@@ -161,7 +162,7 @@ export const Post = ({
             onDelete={onDelete}
           />
           {/* Share */}
-          <ShareDialog postId={post._id} baseUrl='http://localhost:5173' />
+          <ShareDialog postId={post._id} baseUrl="http://localhost:5173" />
         </div>
       </CardFooter>
     </Card>

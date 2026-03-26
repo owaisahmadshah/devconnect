@@ -52,6 +52,7 @@ export function PostComments({ post, onReaction }: PostCommentsProps) {
       body: '',
       commentBy: '',
       postId: post._id,
+      postOwnerId: post.createdBy._id,
     },
   });
 

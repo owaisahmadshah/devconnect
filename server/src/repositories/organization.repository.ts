@@ -19,6 +19,10 @@ export class OrganizationRepository {
     return Organization.findByIdAndDelete(organizationId);
   }
 
+  findOrganizationSummaryById(orgId: string) {
+    return Organization.findById(orgId).select('_id name organizationURL')
+  }
+
   findOrganization({ query }: { query: string }) {
     let matchState: any = {};
 

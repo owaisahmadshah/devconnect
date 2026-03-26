@@ -5,6 +5,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import type { MyRouterContext } from '@/lib/router-context';
 import { Navbar } from '@/components/Navbar';
 import { useRouterState } from '@tanstack/react-router';
+import { useSSE } from '@/hooks/useSSE';
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: RootLayout,
@@ -17,6 +18,9 @@ function RootLayout() {
 
   const noNavbarPaths = ['/signin', '/signup', '/project/new', '/post/new'];
   const hideNavbar = noNavbarPaths.some(p => path.startsWith(p));
+
+  // TODO: Move it to _authenticated
+  useSSE();
 
   return (
     <>

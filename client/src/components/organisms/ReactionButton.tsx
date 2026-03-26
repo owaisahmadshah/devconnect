@@ -9,6 +9,7 @@ interface ReactionButtonProps {
   onAction: ({ postId, value }: TCreateLike & { profileUrl?: string }) => void;
   likeType?: TlikeEnum;
   currentUserProfileUrl?: string;
+  postOwnerId: string;
 }
 
 const reactions = [
@@ -40,6 +41,7 @@ export function ReactionButton({
   onAction,
   likeType,
   currentUserProfileUrl,
+  postOwnerId,
 }: ReactionButtonProps) {
   const [showReactions, setShowReactions] = useState(false);
   const [hoveredReaction, setHoveredReaction] = useState<TlikeEnum | null>(null);
@@ -72,14 +74,14 @@ export function ReactionButton({
   };
 
   const handleReactionClick = (TlikeEnum: TlikeEnum) => {
-    onAction({ postId, value: TlikeEnum, profileUrl: currentUserProfileUrl });
+    onAction({ postId, value: TlikeEnum, profileUrl: currentUserProfileUrl, postOwnerId });
     setShowReactions(false);
     setHoveredReaction(null);
   };
 
   const handleButtonClick = () => {
     if (likeType) {
-      onAction({ postId, value: 'delete', profileUrl: currentUserProfileUrl });
+      onAction({ postId, value: 'delete', profileUrl: currentUserProfileUrl, postOwnerId });
     }
   };
 

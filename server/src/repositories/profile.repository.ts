@@ -4,6 +4,12 @@ import { Profile } from '../models/profile.model.js';
 import type { TAddProfileArrayField } from 'shared';
 
 export class ProfileRepository {
+  findSummaryByProfileId(profileId: string) {
+    return Profile.findById(profileId).select(
+      '_id firstName lastName profilePictureUrl profileUrls isVerified',
+    );
+  }
+
   findByUserIdOrProfileUrl(queryText: string) {
     const conditions: any[] = [];
 

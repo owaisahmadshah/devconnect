@@ -8,23 +8,32 @@ import {
 } from 'shared';
 import type { ConnectionMapper } from '../mapper/connection.mapper.js';
 import { ApiError } from '../utils/ApiError.js';
+import type { NotificationService } from './notification.service.js';
+import logger from '../utils/logger.js';
 
 interface IConnectionServiceDeps {
   connectionRepository: ConnectionRepository;
   connectionMapper: ConnectionMapper;
+  notificationService: NotificationService;
 }
 
 export class ConnectionService {
   constructor(private deps: IConnectionServiceDeps) {}
 
   async createConnection(data: TCreateConnection) {
-    const { connectionRepository, connectionMapper } = this.deps;
+    const { connectionRepository, connectionMapper, notificationService } = this.deps;
 
     data.state = 'pending';
 
     const connection = await connectionRepository.createConnection(data);
 
-    return connectionMapper.toClientConnection(connection);
+    const response = connectionMapper.toClientConnection(connection);
+
+    notificationService
+      .notifyConnectionRequest(data.sender as string, data.receiver, response._id)
+      .catch(logger.error);
+
+    return response;
   }
 
   async deleteConnection(data: TDeleteConnection) {
@@ -39,7 +48,7 @@ export class ConnectionService {
   }
 
   async updateConnection(data: TUpdateConnection) {
-    const { connectionRepository, connectionMapper } = this.deps;
+    const { connectionRepository, connectionMapper, notificationService } = this.deps;
 
     const updatedConnection = await connectionRepository.updateConnection(data);
 
@@ -47,7 +56,15 @@ export class ConnectionService {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Connection not found.');
     }
 
-    return connectionMapper.toClientConnection(updatedConnection);
+    const response = connectionMapper.toClientConnection(updatedConnection);
+
+    if (data.state === 'accepted') {
+      notificationService
+        .notifyConnectionAccepted(response.receiver, response.sender, response._id)
+        .catch(logger.error);
+    }
+
+    return response;
   }
 
   async fetchPendingConnections({

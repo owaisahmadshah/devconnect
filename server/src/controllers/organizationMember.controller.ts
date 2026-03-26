@@ -165,9 +165,12 @@ export class OrganizationMemberController {
    * Creates a new invite for an organization.
    */
   createOrganizationMemberInvite = asyncHandler(async (req: Request, res: Response) => {
-    const updatedOrganizationMember = await this.service.createOrganizationMemberInvite({
-      ...req.body,
-    });
+    const updatedOrganizationMember = await this.service.createOrganizationMemberInvite(
+      {
+        ...req.body,
+      },
+      String(req.user?.profileId),
+    );
 
     return res
       .status(HttpStatus.OK)

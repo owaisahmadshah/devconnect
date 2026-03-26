@@ -10,10 +10,13 @@ import {
 import type { OrganizationMemberRepository } from '../repositories/organization-member.repository.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { OrganizationMemberMapper } from '../mapper/organizationMember.mapper.js';
+import type { NotificationService } from './notification.service.js';
+import logger from '../utils/logger.js';
 
 interface IOrganizationMemberService {
   repo: OrganizationMemberRepository;
   mapper: OrganizationMemberMapper;
+  notificationService: NotificationService;
 }
 
 export class OrganizationMemberService {
@@ -121,10 +124,17 @@ export class OrganizationMemberService {
     return response;
   };
 
-  createOrganizationMemberInvite = async (data: TCreateOrganizationMemberInvite) => {
-    const { repo } = this.deps;
+  createOrganizationMemberInvite = async (
+    data: TCreateOrganizationMemberInvite,
+    invitedBy: string,
+  ) => {
+    const { repo, notificationService } = this.deps;
 
     const invitation = await repo.createOrganizationMember({ ...data, status: 'pending' });
+
+    notificationService
+      .notifyOrganizationInvite(invitedBy, data.userId, data.organizationId)
+      .catch(logger.error);
 
     return invitation;
   };
@@ -140,7 +150,10 @@ export class OrganizationMemberService {
   acceptOrganizationMemberInvite = async (data: TUpdateOrganizationMemberInvite) => {
     const { repo } = this.deps;
 
-    const updatedMember = await repo.deleteOrganizationMemberInvite({ memberId: data.inviteId });
+    const updatedMember = await repo.acceptOrganizationMemberInvite({ memberId: data.inviteId });
+
+    // TODO: Add inviteBy field in organizationMember model and also push notification
+    // notificationService.notifyConnectionAccepted();
 
     return updatedMember;
   };

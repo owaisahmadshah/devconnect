@@ -53,6 +53,7 @@ import connectionRouter from './routes/connection.route.js';
 import organizationRouter from './routes/organization.route.js';
 import organizationMemberRouter from './routes/organizationMember.route.js';
 import jobRouter from './routes/job.route.js';
+import notificationRouter from './routes/notification.route.js';
 
 // Register API routes
 app.use('/api/v1/health-check', healthCheckRouter);
@@ -67,6 +68,7 @@ app.use('/api/v1/connection', connectionRouter);
 app.use('/api/v1/organizations', organizationRouter);
 app.use('/api/v1/organization-members', organizationMemberRouter);
 app.use('/api/v1/jobs', jobRouter);
+app.use('/api/v1/notifications', notificationRouter);
 
 // Error middleware
 import { errorHandler } from './middleware/error.middleware.js';

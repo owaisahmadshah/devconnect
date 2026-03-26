@@ -2,6 +2,7 @@ import { lazy, Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback2 from '@/components/ErrorFallback2';
 import { InvitationsSkeleton } from './skeletons/InvitationsSkeleton';
+import { NotificationsPanel } from './NotificationsPanel';
 
 const Invitations = lazy(() => import('./Invitations').then(m => ({ default: m.Invitations })));
 
@@ -30,7 +31,7 @@ export const Notifications = () => {
       </div>
 
       <div className="w-full">
-        {activeTab === 'notifications' && <div>Notifications comming soon...</div>}
+        {activeTab === 'notifications' && <NotificationsPanel />}
 
         {activeTab === 'invitations' && (
           <ErrorBoundary FallbackComponent={ErrorFallback2}>

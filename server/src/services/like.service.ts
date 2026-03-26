@@ -1,9 +1,15 @@
 import { type TCreateLike } from 'shared';
 import type { ProfileService } from './profile.service.js';
 import type { LikeRepository } from '../repositories/like.repository.js';
+import type { NotificationService } from './notification.service.js';
+import logger from '../utils/logger.js';
 
 export class LikeService {
-  constructor(private repo: LikeRepository, private profileServ: ProfileService) {}
+  constructor(
+    private repo: LikeRepository,
+    private profileServ: ProfileService,
+    private notificationService: NotificationService,
+  ) {}
 
   /**
    * Create a new reaction (like/love/dislike)
@@ -26,6 +32,13 @@ export class LikeService {
       ...data,
       likedBy: profile._id,
     });
+
+    // If post owner id is missing skip notification
+    if (data.postOwnerId) {
+      this.notificationService
+        .notifyPostLiked(profile._id.toString(), data.postOwnerId, data.postId)
+        .catch(logger.error);
+    }
 
     return { isCreated: true };
   };

@@ -4,6 +4,7 @@ export const baseCommentSchema = z.object({
   postId: z.string(),
   body: z.string().min(1),
   commentBy: z.string().optional(),
+  postOwnerId: z.string().optional(),
 });
 
 // For api request (create) - no _id required

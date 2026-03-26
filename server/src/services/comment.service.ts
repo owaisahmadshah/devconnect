@@ -3,12 +3,15 @@ import { CommentRepository } from '../repositories/comment.repository.js';
 import { ProfileService } from './profile.service.js';
 import { CommentMapper } from '../mapper/comment.mapper.js';
 import { ApiError } from '../utils/ApiError.js';
+import type { NotificationService } from './notification.service.js';
+import logger from '../utils/logger.js';
 
 export class CommentService {
   constructor(
     private repo: CommentRepository,
     private mapper: CommentMapper,
     private proService: ProfileService,
+    private notificationService: NotificationService,
   ) {}
 
   async createComment(data: TCreateComment, userId: string): Promise<TCommentResponse> {
@@ -18,6 +21,12 @@ export class CommentService {
 
     const dbComment = await this.repo.createComment(data);
     const responseComment = this.mapper.toPublicComment(dbComment);
+
+    this.notificationService.notifyPostComment(
+      data.commentBy,
+      data.postId,
+      data.postOwnerId as string,
+    ).catch(logger.error);
 
     return { ...responseComment, commentBy: profile };
   }

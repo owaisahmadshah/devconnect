@@ -6,6 +6,7 @@ export const baseLikeSchema = z.object({
   postId: z.string(),
   value: likeEnum,
   likedBy: z.string().optional(),
+  postOwnerId: z.string().optional(),
 });
 
 export const createLikeSchema = baseLikeSchema;
