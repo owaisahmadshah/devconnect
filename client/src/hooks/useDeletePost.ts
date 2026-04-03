@@ -7,7 +7,7 @@ export function useDeletePost() {
 
   return useMutation({
     mutationFn: deletePostService,
-    onSuccess: (_data, postId) => {
+    onSuccess: () => {
       // Invalidate user posts cache
       queryClient.invalidateQueries({ queryKey: ['user-posts'] });
     },

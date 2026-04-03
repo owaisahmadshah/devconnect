@@ -1,8 +1,8 @@
-import type { TCommentResponse } from 'shared';
+import type { TBaseComment, TCommentResponse } from 'shared';
 import { Document } from 'mongoose';
 
 export class CommentMapper {
-  toPublicComment(commentObj: Document): TCommentResponse {
+  toPublicComment(commentObj: Document | TBaseComment): TCommentResponse {
     const comment = commentObj instanceof Document ? commentObj.toObject() : commentObj;
 
     return {

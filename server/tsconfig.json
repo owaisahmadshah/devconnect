@@ -31,5 +31,6 @@
         "../shared/dist/*"
       ]
     }
-  }
+  },
+  "exclude": ["tests"]
 }

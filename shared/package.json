@@ -1,12 +1,17 @@
 {
   "name": "shared",
   "version": "0.0.0",
-  "main": "src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "scripts": {
+    "build": "tsc",
     "barrels": "barrelsby --config ./barrelsby.json",
     "barrels:watch": "barrelsby --config ./barrelsby.json --watch"
   },
@@ -14,6 +19,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
-    "barrelsby": "^2.8.1"
+    "barrelsby": "^2.8.1",
+    "typescript": "^5.9.3"
   }
 }

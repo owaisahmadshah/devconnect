@@ -1,9 +1,9 @@
-import type { TPostResponse } from 'shared';
-import type { Document } from 'mongoose';
+import type {  TPostResponse } from 'shared';
+import { Document } from 'mongoose';
 
 export class PostMapper {
-  toPublicPost = (postData: Document): TPostResponse => {
-    const post = postData;
+  toPublicPost = (postData: any): TPostResponse => {
+    const post = postData instanceof Document ? postData.toObject() : postData;
 
     const response: TPostResponse = {
       _id: post._id.toString(),

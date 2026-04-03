@@ -1,9 +1,11 @@
-import type { Document } from 'mongoose';
+import { Document } from 'mongoose';
 
-import type { TNotificationSummaryResponse } from 'shared';
+import type { TBaseNotification, TNotificationSummaryResponse } from 'shared';
 
 export class NotificationMapper {
-  toNotificationSummary(data: Document): TNotificationSummaryResponse {
+  toNotificationSummary(res: Document | TBaseNotification): TNotificationSummaryResponse {
+    const data = res instanceof Document ? res.toObject() : res;
+
     return {
       _id: data._id as string,
       actor: data.actor,

@@ -1,11 +1,19 @@
-import type { Document } from 'mongoose';
+import { Document } from 'mongoose';
 
-import type { TOrganizationMemberResponse, TOrganizationMemberWithStatusResponse } from 'shared';
+import type {
+  TBaseOrganizationMember,
+  TOrganizationMemberResponse,
+  TOrganizationMemberWithStatusResponse,
+} from 'shared';
 
 export class OrganizationMemberMapper {
-  toOrganizationMemberResponse(organizationMemberData: Document): TOrganizationMemberResponse {
-    // const orgMemData = organizationMemberData.toObject();
-    const orgMemData = organizationMemberData;
+  toOrganizationMemberResponse(
+    organizationMemberData: Document | TBaseOrganizationMember,
+  ): TOrganizationMemberResponse {
+    const orgMemData =
+      organizationMemberData instanceof Document
+        ? organizationMemberData.toObject()
+        : organizationMemberData;
 
     return {
       _id: orgMemData._id,
@@ -17,10 +25,12 @@ export class OrganizationMemberMapper {
   }
 
   toOrganizationMemberWithStatusResponse(
-    organizationMemberData: Document,
+    organizationMemberData: Document | TBaseOrganizationMember,
   ): TOrganizationMemberWithStatusResponse {
-    // const orgMemData = organizationMemberData.toObject();
-    const orgMemData = organizationMemberData;
+    const orgMemData =
+      organizationMemberData instanceof Document
+        ? organizationMemberData.toObject()
+        : organizationMemberData;
 
     return {
       _id: orgMemData._id,

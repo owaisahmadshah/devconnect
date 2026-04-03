@@ -24,8 +24,6 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
 
   const { profile, isCurrentUser } = useSelector((state: RootState) => state.profile);
 
-  const isGithubConnected = profile?.github_html_url ? true : false;
-
   const hasSkills = profile.skills.length > 0;
   const hasAchievements = profile.achievements.length > 0;
   const hasCertfications = profile.certifications.length > 0;
@@ -68,13 +66,11 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
           <div className="space-y-2">
             {isCurrentUser && (
               <SuggestionsSection
-                showGithubAddButton={!isGithubConnected}
                 showAddSkillButton={!hasSkills}
                 showAddAchievementButton={!hasAchievements}
                 showAddCertficationButton={!hasCertfications}
                 showAddExperienceButton={!hasExperience}
                 showAddEducationButton={!hasEducation}
-                showAddGithubProject={isGithubConnected}
                 navigateProfileUrl={profile.profileUrls[0].url}
                 showOrganizationsButton={isCurrentUser}
                 showPostAJobButton={isCurrentUser}

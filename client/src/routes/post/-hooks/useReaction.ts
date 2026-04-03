@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { reactionService } from '../-services/postService';
+import type { TPostsResponseWithCursorPaginationResponse } from 'shared';
 
 export const useReaction = () => {
   const queryClient = useQueryClient();
@@ -10,7 +11,9 @@ export const useReaction = () => {
       const { postId, value, profileUrl } = variables;
       const isCreated = data.isCreated;
 
-      const updatePostCache = (oldData: any) => {
+      const updatePostCache = (
+        oldData: InfiniteData<TPostsResponseWithCursorPaginationResponse> | undefined,
+      ) => {
         if (!oldData) return oldData;
 
         return {
@@ -20,7 +23,7 @@ export const useReaction = () => {
             posts: page.posts.map(post => {
               if (post._id !== postId) return post;
 
-              const updatedTotalLikes = isCreated ? post.totalLikes + 1 : post.totalLikes - 1;
+              const updatedTotalLikes = isCreated ? post.totalLikes! + 1 : post.totalLikes! - 1;
 
               const updatedLikeType = isCreated ? value : undefined;
 

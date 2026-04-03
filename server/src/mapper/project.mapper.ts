@@ -2,8 +2,8 @@ import type { TProjectResponse, TProjectSummaryResponse } from 'shared';
 import { Document } from 'mongoose';
 
 export class ProjectMapper {
-  static toPublicProject = (projectData: Document): TProjectResponse => {
-    const projectObj = projectData.toObject();
+  static toPublicProject = (projectData: any): TProjectResponse => {
+    const projectObj = projectData instanceof Document ? projectData.toObject() : projectData;
     return {
       _id: projectData._id as string,
       title: projectObj.title,
@@ -23,8 +23,8 @@ export class ProjectMapper {
     };
   };
 
-  static toProjectSummary = (projectData: Document): TProjectSummaryResponse => {
-    const projectObj = projectData.toObject();
+  static toProjectSummary = (projectData: any): TProjectSummaryResponse => {
+    const projectObj = projectData instanceof Document ? projectData.toObject() : projectData;
     return {
       _id: projectData._id as string,
       title: projectObj.title,

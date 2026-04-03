@@ -30,6 +30,7 @@ const attachUser = async (req: Request, _: Response, next: NextFunction): Promis
       username: user.username,
       email: user.email,
       role: user.role,
+      profileId: user.profileId ?? '',
     };
 
     req.user = reqUser;

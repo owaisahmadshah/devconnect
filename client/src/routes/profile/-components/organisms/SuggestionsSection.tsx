@@ -1,34 +1,28 @@
 import { ProfileSectionCard } from '../molecules/ProfileSectionCard';
-import { ConnectGithub } from '../../../../components/ConnectGithub';
 import { AddSkillForm } from './AddSkillForm';
 import { AddAchivementForm } from './AddAchievementForm';
 import { AddCertificationForm } from './AddCertificationForm';
 import { AddExperienceForm } from './AddExperience';
 import { AddEducationForm } from './AddEducationForm';
-import { AddGithubProject } from './AddGithubProject';
 import { Link } from '@tanstack/react-router';
 
 interface SuggestionsSectionProps {
-  showGithubAddButton: boolean;
   showAddSkillButton: boolean;
   showAddAchievementButton: boolean;
   showAddCertficationButton: boolean;
   showAddExperienceButton: boolean;
   showAddEducationButton: boolean;
-  showAddGithubProject: boolean;
   navigateProfileUrl?: string;
   showOrganizationsButton?: boolean;
   showPostAJobButton?: boolean;
 }
 
 export const SuggestionsSection = ({
-  showGithubAddButton,
   showAddSkillButton,
   showAddAchievementButton,
   showAddCertficationButton,
   showAddExperienceButton,
   showAddEducationButton,
-  showAddGithubProject,
   navigateProfileUrl,
   showOrganizationsButton,
   showPostAJobButton,
@@ -69,7 +63,6 @@ export const SuggestionsSection = ({
             Post a Job
           </Link>
         )}
-        {showGithubAddButton && <ConnectGithub />}
         {showAddSkillButton && (
           <RenderButton text="Skill">
             <AddSkillForm />
@@ -93,12 +86,6 @@ export const SuggestionsSection = ({
         {showAddEducationButton && (
           <RenderButton text="Education">
             <AddEducationForm />
-          </RenderButton>
-        )}
-        {showAddGithubProject && (
-          <RenderButton text="Add Github Repo">
-            {' '}
-            <AddGithubProject />{' '}
           </RenderButton>
         )}
       </div>

@@ -11,21 +11,21 @@ export interface ApiErrorResponse {
 
 // Type guard to check if error is an AxiosError with ApiErrorResponse
 export const isApiError = (error: unknown): error is AxiosError<ApiErrorResponse> => {
-  return (
-    error !== null &&
+  return error !== null &&
     typeof error === 'object' &&
     'response' in error &&
     (error as AxiosError).response?.data &&
     typeof (error as AxiosError).response?.data === 'object' &&
     (error as AxiosError).response?.data !== null &&
     'statusCode' in ((error as AxiosError).response?.data as object)
-  );
+    ? true
+    : false;
 };
 
 // Extract error message with fallbacks
 export const getErrorMessage = (error: unknown): string => {
   if (isApiError(error)) {
-    return error.response?.data.message;
+    return error.response?.data.message ?? 'Something went wrong.';
   }
 
   if (error instanceof Error) {

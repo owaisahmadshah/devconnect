@@ -1,9 +1,15 @@
-import type { TOrganizationResponse, TOrganizationSummaryResponse } from 'shared';
-import type { Document } from 'mongoose';
+import type {
+  TBaseOrganization,
+  TOrganizationResponse,
+  TOrganizationSummaryResponse,
+} from 'shared';
+import { Document } from 'mongoose';
 
 export class OrganizationMapper {
-  toOrganizationSummaryResponse(organization: Document): TOrganizationSummaryResponse {
-    const orgObj = organization;
+  toOrganizationSummaryResponse(
+    organization: Document | TBaseOrganization,
+  ): TOrganizationSummaryResponse {
+    const orgObj = organization instanceof Document ? organization.toObject() : organization;
 
     return {
       _id: orgObj._id,
@@ -13,8 +19,8 @@ export class OrganizationMapper {
     };
   }
 
-  toOrganizationResponse(organization: Document): TOrganizationResponse {
-    const orgObj = organization;
+  toOrganizationResponse(organization: Document | TBaseOrganization): TOrganizationResponse {
+    const orgObj = organization instanceof Document ? organization.toObject() : organization;
 
     return {
       _id: orgObj._id,

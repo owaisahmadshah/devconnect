@@ -57,11 +57,7 @@ const userSchema = new Schema<IDbUser>(
     password: {
       type: String,
       required: [true, 'Password is required.'],
-    },
-    github_id: { type: Number, unique: true, sparse: true },
-    github_login: { type: String, default: '' },
-    github_access_token: { type: String, default: '' },
-    github_access_token_type: { type: String, default: '' },
+    }
   },
   {
     timestamps: true,

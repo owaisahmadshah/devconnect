@@ -1,6 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 
 import { deleteComment } from '../-services/postService';
+import type {
+  TCommentsResponseWithCursorPaginationResponse,
+  TPostsResponseWithCursorPaginationResponse,
+} from 'shared';
 
 export function useDeleteComment() {
   const queryClient = useQueryClient();
@@ -11,21 +15,26 @@ export function useDeleteComment() {
       const { postId, commentId } = data;
       const { profileUrl } = variables;
 
-      queryClient.setQueryData(['comments', postId], oldData => {
-        if (!oldData) return oldData;
+      queryClient.setQueryData(
+        ['comments', postId],
+        (oldData: InfiniteData<TCommentsResponseWithCursorPaginationResponse> | undefined) => {
+          if (!oldData) return oldData;
 
-        return {
-          ...oldData,
-          pages: oldData.pages.map(page => ({
-            ...page,
-            comments: page.comments.filter(comment => {
-              return comment._id != commentId;
-            }),
-          })),
-        };
-      });
+          return {
+            ...oldData,
+            pages: oldData.pages.map(page => ({
+              ...page,
+              comments: page.comments.filter(comment => {
+                return comment._id != commentId;
+              }),
+            })),
+          };
+        },
+      );
 
-      const updatePostsCache = (oldData: any) => {
+      const updatePostsCache = (
+        oldData: InfiniteData<TPostsResponseWithCursorPaginationResponse> | undefined,
+      ) => {
         if (!oldData) return oldData;
 
         return {
@@ -37,7 +46,7 @@ export function useDeleteComment() {
 
               return {
                 ...post,
-                totalComments: post.totalComments - 1,
+                totalComments: post.totalComments! - 1,
               };
             }),
           })),

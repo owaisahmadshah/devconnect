@@ -74,11 +74,11 @@ const profileSlice = createSlice({
         state.profile['connection'] = action.payload;
       }
       if (action.payload.state === 'rejected') {
-        state.profile['connection'] = {};
+        state.profile['connection'] = {} as any;
       }
     },
     deleteConnection: (state, _: PayloadAction<{ connectionId: string }>) => {
-      state.profile['connection'] = {};
+      state.profile['connection'] = {} as any;
       state.profile['connections'] =
         state.profile['connections'] && state.profile['connections'] - 1;
     },

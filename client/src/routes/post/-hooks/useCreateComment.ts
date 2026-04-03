@@ -1,6 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { createComment } from '../-services/postService';
+import {
+  type TCommentsResponseWithCursorPaginationResponse,
+  type TPostsResponseWithCursorPaginationResponse,
+} from 'shared';
 
 export function useCreateComment() {
   const queryClient = useQueryClient();
@@ -11,15 +15,22 @@ export function useCreateComment() {
       const { postId } = data;
       const { profileUrl } = variables;
 
-      queryClient.setQueryData(['comments', postId], oldData => {
-        if (!oldData) return oldData;
+      queryClient.setQueryData<InfiniteData<TCommentsResponseWithCursorPaginationResponse>>(
+        ['comments', postId],
+        oldData => {
+          if (!oldData) return oldData;
 
-        oldData.pages[0].comments.unshift(data);
+          console.log(oldData);
 
-        return oldData;
-      });
+          oldData.pages[0].comments.unshift(data);
 
-      const updatePostsCache = (oldData: any) => {
+          return oldData;
+        },
+      );
+
+      const updatePostsCache = (
+        oldData: InfiniteData<TPostsResponseWithCursorPaginationResponse> | undefined,
+      ) => {
         if (!oldData) return oldData;
 
         return {

@@ -1,13 +1,9 @@
 import api from '@/lib/axios';
-import { apiGet, apiPost } from '@/lib/api-client';
 import {
   type TAddProfileArrayField,
   type TUserProfileParams,
   type TDeleteProfileArrayItem,
   type TUpdateProfileField,
-  type TReposListResponse,
-  type TCreateGithubProject,
-  type TProjectResponse,
 } from 'shared';
 
 export const profileService = async (data: TUserProfileParams) => {
@@ -37,14 +33,4 @@ export const updateProfilePicture = async (data: FormData) => {
 export const updateProfileFieldService = async (data: TUpdateProfileField) => {
   const response = await api.patch('/api/v1/profile/update-field', data);
   return response.data;
-};
-
-export const fetchRepoService = async (): Promise<TReposListResponse[]> => {
-  return apiGet<TReposListResponse[]>('/api/v1/github/repos');
-};
-
-export const addRepoProjectService = async (
-  data: TCreateGithubProject,
-): Promise<TProjectResponse> => {
-  return apiPost<TProjectResponse>('/api/v1/github/repo/add', data);
 };

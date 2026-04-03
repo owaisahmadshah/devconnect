@@ -17,10 +17,6 @@ export const dbUserSchema = baseUserSchema.extend({
   otp: z.string().length(6),
   otpExpiry: z.date(),
   isVerified: z.boolean(),
-  github_id: z.number().optional(),
-  github_login: z.string().optional(),
-  github_access_token: z.string().optional(),
-  github_access_token_type: z.string().optional(),
   profileId: z.string().optional(),
 });
 

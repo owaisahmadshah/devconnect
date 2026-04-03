@@ -1,10 +1,10 @@
-import type { Document } from 'mongoose';
+import { Document } from 'mongoose';
 
-import type { TJobSummaryResponse } from 'shared';
+import type { TBaseJob, TJobResponse, TJobSummaryResponse } from 'shared';
 
 export class JobMapper {
-  toJobSummaryResponse(jobDoc: Document): TJobSummaryResponse {
-    const job = jobDoc;
+  toJobSummaryResponse(jobDoc: Document | TBaseJob): TJobSummaryResponse {
+    const job = jobDoc instanceof Document ? jobDoc.toObject() : jobDoc;
 
     return {
       _id: job._id.toString(),
@@ -16,8 +16,8 @@ export class JobMapper {
     };
   }
 
-  toJobResponse(jobDoc: Document) {
-    const job = jobDoc;
+  toJobResponse(jobDoc: Document | TBaseJob): TJobResponse {
+    const job = jobDoc instanceof Document ? jobDoc.toObject() : jobDoc;
 
     return {
       _id: job._id.toString(),
