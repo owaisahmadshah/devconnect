@@ -14,6 +14,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { UserService } from '../services/user.service.js';
 import { HttpStatus } from 'shared';
+import { accessTokenCookieOptions, refreshTokenCookieOptions } from '../config/cookie.config.js';
 
 export class UserController {
   constructor(private service: UserService) {}
@@ -67,15 +68,10 @@ export class UserController {
 
     const { accessToken, refreshToken } = await this.service.signInUser(userData);
 
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-    };
-
     return res
       .status(HttpStatus.NO_CONTENT)
-      .cookie('accessToken', accessToken, options)
-      .cookie('refreshToken', refreshToken, options)
+      .cookie('accessToken', accessToken, accessTokenCookieOptions)
+      .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
       .end();
   });
 
@@ -142,15 +138,10 @@ export class UserController {
    * Clears access and refresh tokens cookies to log out the user.
    */
   signOutUser = asyncHandler(async (req: Request, res: Response) => {
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-    };
-
     return res
       .status(HttpStatus.NO_CONTENT)
-      .clearCookie('accessToken', options)
-      .clearCookie('refreshToken', options)
+      .clearCookie('accessToken', accessTokenCookieOptions)
+      .clearCookie('refreshToken', refreshTokenCookieOptions)
       .end();
   });
 
@@ -174,15 +165,10 @@ export class UserController {
 
     const { accessToken, refreshToken } = await this.service.forgetPassword(userData);
 
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-    };
-
     return res
       .status(HttpStatus.OK)
-      .cookie('accessToken', accessToken, options)
-      .cookie('refreshToken', refreshToken, options)
+      .cookie('accessToken', accessToken, accessTokenCookieOptions)
+      .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
       .json(new ApiResponse(HttpStatus.OK, {}, 'Password reset successfully.'));
   });
 
@@ -235,19 +221,13 @@ export class UserController {
     const incommingRefreshToken =
       req.cookies.refreshToken || req.headers['authorization']?.replace(/^Bearer\s+/i, '').trim();
 
-    const { accessToken, refreshToken } = await this.service.generateRefreshAccessToken(
-      incommingRefreshToken,
-    );
-
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-    };
+    const { accessToken, refreshToken } =
+      await this.service.generateRefreshAccessToken(incommingRefreshToken);
 
     return res
       .status(HttpStatus.OK)
-      .cookie('accessToken', accessToken, options)
-      .cookie('refreshToken', refreshToken, options)
+      .cookie('accessToken', accessToken, accessTokenCookieOptions)
+      .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
       .json(new ApiResponse(HttpStatus.OK, {}, 'Tokens refreshed successfully.'));
   });
 }
