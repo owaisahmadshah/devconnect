@@ -33,5 +33,7 @@ router.get(
   userController.uniqueIdentifier,
 );
 router.post('/refresh-token', userController.refreshAccessToken);
+router.get('/google', userController.googleSignIn);
+router.get('/google/callback', userController.googleSignInCallback);
 
 export default router;

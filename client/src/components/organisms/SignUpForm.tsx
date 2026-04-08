@@ -8,6 +8,7 @@ import { SubmitButton } from '@/components/atoms/SubmitButton';
 import { authUserSchemaClient, type TAuthUserClient } from 'shared';
 import { RadioFormField } from '../molecules/RadioFormField';
 import { toast } from 'sonner';
+import { ContinueWithGoogle } from '@/routes/(auth)/-component/ContinueWithGoogle';
 
 interface SignInProps {
   onSubmit: (data: TAuthUserClient) => Promise<void>;
@@ -109,6 +110,7 @@ const SignUpForm = ({ onSubmit, isLoading, error }: SignInProps) => {
         />
 
         <SubmitButton isLoading={isLoading}>Create Account</SubmitButton>
+        <ContinueWithGoogle />
       </form>
     </Form>
   );

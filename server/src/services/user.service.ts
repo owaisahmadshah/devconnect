@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+import crypto from 'crypto';
 
 import { UserMapper } from '../mapper/user.mapper.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -29,6 +30,7 @@ export interface IUserServiceProps {
   profileModel: typeof Profile;
   jwt: typeof import('jsonwebtoken');
   slugifyFn: typeof slugify;
+  crypto: typeof crypto;
 }
 
 export class UserService {
@@ -235,6 +237,124 @@ export class UserService {
     }
   };
 
+  createGoogleUser = async ({
+    googleId,
+    email,
+    imageUrl,
+    displayName,
+  }: {
+    googleId: string;
+    email: string;
+    imageUrl: string;
+    displayName: string;
+  }): Promise<{ accessToken: string; refreshToken: string }> => {
+    const { repo, startSession, profileModel, slugifyFn } = this.deps;
+
+    // Check if already exists (by googleId or email)
+    let user = await repo.findByAuthProviderId('google', googleId);
+
+    if (!user) {
+      const existingByEmail = await repo.findByIdentifier(email);
+
+      if (existingByEmail) {
+        // Local account exists, link Google to it
+        await repo.linkAuthProviderAccount(existingByEmail._id as string, 'google', googleId);
+        const tokens = await this.generateAccessAndRefreshToken(existingByEmail._id as string);
+        return tokens;
+      }
+
+      // Brand new user — run the same transaction pattern as createUser
+      const nameParts = displayName.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const username = await this.generateUniqueUsername(email.split('@')[0] ?? nameParts.join(''));
+
+      const session = await startSession();
+      session.startTransaction();
+
+      try {
+        // @ts-ignore
+        const [newUser] = await repo.create(
+          {
+            googleId,
+            email,
+            username,
+            imageUrl,
+            authProvider: 'google',
+            isVerified: true,
+          },
+          session,
+        );
+
+        if (!newUser) {
+          throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Unable to create user.');
+        }
+
+        const baseSlug = (slugifyFn as any)(`${firstName} ${lastName.split(' ').join('')}`, {
+          lower: true,
+          strict: true,
+        });
+
+        let slug = baseSlug;
+        let attempt = 0;
+        let uniqueSlugFound = false;
+
+        while (!uniqueSlugFound) {
+          try {
+            const [profile] = await profileModel.create(
+              [
+                {
+                  user: newUser._id,
+                  firstName,
+                  lastName,
+                  avatar: imageUrl,
+                  profileUrls: [{ url: slug }],
+                },
+              ],
+              { session },
+            );
+
+            if (!profile) {
+              throw new ApiError(500, 'Internal server errror. Unable to create profile');
+            }
+
+            newUser.profileId = profile._id;
+            await repo.save(newUser);
+            uniqueSlugFound = true;
+          } catch (err: any) {
+            if (err.code === 11000) {
+              attempt++;
+              slug =
+                attempt === 1
+                  ? `${baseSlug}-${email.split('@')[0]}`
+                  : `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+            } else {
+              throw err;
+            }
+          }
+        }
+
+        await session.commitTransaction();
+        user = newUser;
+      } catch (error) {
+        await session.abortTransaction();
+
+        if (error instanceof ApiError) throw error;
+        throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to create Google user.');
+      } finally {
+        session.endSession();
+      }
+    }
+
+    if (!user) {
+      throw new ApiError(HttpStatus.BAD_REQUEST, 'Something went wrong.');
+    }
+
+    const tokens = await this.generateAccessAndRefreshToken(user._id as string);
+    return tokens;
+  };
+
   signInUser = async (
     userData: TSignInUser,
   ): Promise<{ accessToken: string; refreshToken: string }> => {
@@ -352,5 +472,20 @@ export class UserService {
     const responseUser: TPublicUser = userMapper.toPublicUser(user);
 
     return responseUser;
+  };
+
+  private generateUniqueUsername = async (name: string): Promise<string> => {
+    const base = name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '')
+      .slice(0, 20);
+
+    const baseIsUnique = await this.isIdentifierUnique({ identifier: base });
+    if (baseIsUnique) return base;
+
+    const suffix = this.deps.crypto.randomBytes(3).toString('hex');
+    return `${base}_${suffix}`;
   };
 }
