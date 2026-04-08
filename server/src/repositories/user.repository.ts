@@ -1,5 +1,6 @@
 import mongoose, { Document } from 'mongoose';
 import { User } from '../models/user.model.js';
+import type { TAuthProvider } from '../types/user.type.js';
 
 export class UserRepository {
   findById(userId: string) {
@@ -18,6 +19,17 @@ export class UserRepository {
     });
   }
 
+  findByAuthProviderId(provider: TAuthProvider, providerId: string) {
+    return User.findOne({ authProvider: provider, providerId });
+  }
+
+  create(userData: any, session?: mongoose.ClientSession) {
+    if (session) {
+      return User.create([userData], { session });
+    }
+    return User.create(userData);
+  }
+
   updateRefreshToken(userId: string, refreshToken: string) {
     return User.updateOne({ _id: userId }, { refreshToken });
   }
@@ -26,11 +38,8 @@ export class UserRepository {
     return User.updateOne({ _id: userId }, { isVerified });
   }
 
-  create(userData: any, session?: mongoose.ClientSession) {
-    if (session) {
-      return User.create([userData], { session });
-    }
-    return User.create(userData);
+  linkAuthProviderAccount(userId: string, provider: TAuthProvider, providerId: string) {
+    return User.findByIdAndUpdate(userId, { provider, providerId }, { new: true });
   }
 
   save(doc: Document) {

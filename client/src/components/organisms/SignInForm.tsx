@@ -6,6 +6,7 @@ import { Form } from '@/components/ui/form';
 import FormField from '@/components/molecules/FormField';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
 import { signInUserSchema, type TSignInUser } from 'shared';
+import { ContinueWithGoogle } from '@/routes/(auth)/-component/ContinueWithGoogle';
 
 interface SignInProps {
   onSubmit: (data: TSignInUser) => Promise<void>;
@@ -51,6 +52,7 @@ const SignInForm = ({ onSubmit, isLoading, isError, error }: SignInProps) => {
         />
 
         <SubmitButton isLoading={isLoading}>Sign In</SubmitButton>
+        <ContinueWithGoogle />
         <Link to="/">
           <span className="text-primary text-sm hover:underline">Forget Password</span>
         </Link>

@@ -42,3 +42,7 @@ export const uniqueIdentifierService = async (data: TUniqueIdentifier) => {
   const response = await api.get(`/unique-identifier/:${data.identifier}`);
   return response.data;
 };
+
+export const handleGoogleSignIn = async () => {
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/v1/users/google`;
+};

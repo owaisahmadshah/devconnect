@@ -3,8 +3,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import type { TDbUser } from 'shared';
+import type { TAuthProvider } from '../types/user.type.js';
 
-export interface IDbUser extends Document, TDbUser {
+export interface IDbUser extends Document, Omit<TDbUser, 'password'> {
+  authProvider: TAuthProvider;
+  providerId?: string;
+  password?: string;
   isPasswordCorrect(password: string): Promise<boolean>;
   generateAccessToken(): string;
   generateRefreshToken(): string;
@@ -54,10 +58,23 @@ const userSchema = new Schema<IDbUser>(
       type: Boolean,
       default: false,
     },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
+    providerId: {
+      type: String,
+      default: null,
+      sparse: true,
+    },
     password: {
       type: String,
-      required: [true, 'Password is required.'],
-    }
+      required: function () {
+        return this.authProvider === 'local';
+      },
+      minlength: [8, 'Password must be at least 8 characters long.'],
+    },
   },
   {
     timestamps: true,
@@ -66,7 +83,7 @@ const userSchema = new Schema<IDbUser>(
 
 // Use regular function (not arrow) for `this` binding
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password || this.authProvider !== 'local') {
     return next();
   }
 
@@ -76,6 +93,9 @@ userSchema.pre('save', async function (next) {
 
 // Add instance methods
 userSchema.methods.isPasswordCorrect = async function (password: string) {
+  if (!this.password) {
+    return false;
+  }
   return await bcrypt.compare(password, this.password);
 };
 

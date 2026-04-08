@@ -1,6 +1,7 @@
 import { startSession } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import slugify from 'slugify';
+import crypto from 'crypto';
 
 import { UserRepository } from '../repositories/user.repository.js';
 import { UserService } from '../services/user.service.js';
@@ -25,6 +26,7 @@ const userService = new UserService({
   profileModel: Profile,
   jwt,
   slugifyFn: slugify,
+  crypto,
 });
 const userController = new UserController(userService);
 

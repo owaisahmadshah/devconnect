@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import crypto from 'crypto';
 
 import type {
   IUniqueIdentifierResponse,
@@ -229,5 +230,99 @@ export class UserController {
       .cookie('accessToken', accessToken, accessTokenCookieOptions)
       .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
       .json(new ApiResponse(HttpStatus.OK, {}, 'Tokens refreshed successfully.'));
+  });
+
+  /**
+   * @desc    Redirects user to Google OAuth consent screen.
+   * @route   GET /api/v1/user/google
+   * @access  Public
+   *
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response that redirects to Google OAuth consent screen
+   */
+  googleSignIn = asyncHandler(async (req: Request, res: Response) => {
+    const state = crypto.randomBytes(16).toString('hex');
+
+    const params = new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID!,
+      redirect_uri: `${process.env.BACKEND_URL}/api/v1/users/google/callback`,
+      response_type: 'code',
+      scope: 'openid email profile',
+      state,
+      access_type: 'offline',
+    });
+
+    res
+      .cookie('oauth_state', state, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'PRODUCTION',
+        sameSite: process.env.NODE_ENV === 'PRODUCTION' ? 'none' : 'lax',
+        maxAge: 10 * 60 * 1000, // 10 minutes
+      })
+      .redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  });
+
+  /**
+   * @desc    Handles the Google OAuth callback.
+   * @route   GET /api/v1/user/google/callback
+   * @access  Public
+   *
+   * @param {Request} req - Express request object
+   * @param {Response} res - Express response that redirects user to frontend with access and refresh tokens set in cookies
+   */
+  googleSignInCallback = asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { code, state } = req.query;
+
+      const storedState = req.cookies.oauth_state;
+
+      if (!state || state !== storedState) {
+        return res.redirect(`${process.env.FRONTEND_BASE_URL}/signin?error=invalid_state`);
+      }
+
+      res.clearCookie('oauth_state');
+
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code: code as string,
+          client_id: process.env.GOOGLE_CLIENT_ID!,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+          redirect_uri: `${process.env.BACKEND_URL}/api/v1/users/google/callback`,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      if (!tokenRes.ok) {
+        return res.redirect(`${process.env.FRONTEND_BASE_URL}/signin?error=google_token_failed`);
+      }
+
+      const tokenResJson = await tokenRes.json();
+
+      //@ts-ignore
+      const { id_token } = tokenResJson;
+
+      if (!id_token) {
+        return res.redirect(`${process.env.FRONTEND_BASE_URL}/signin?error=no_token`);
+      }
+
+      const payload = JSON.parse(Buffer.from(id_token.split('.')[1], 'base64url').toString());
+
+      const { accessToken, refreshToken } = await this.service.createGoogleUser({
+        googleId: payload.sub,
+        email: payload.email,
+        imageUrl: payload.picture,
+        displayName: payload.name,
+      });
+
+      return res
+        .status(200)
+        .cookie('accessToken', accessToken, accessTokenCookieOptions)
+        .cookie('refreshToken', refreshToken, refreshTokenCookieOptions)
+        .redirect(`${process.env.FRONTEND_BASE_URL}/`);
+    } catch (error) {
+      return res.redirect(`${process.env.FRONTEND_BASE_URL}/signin?error=google_callback_failed`);
+    }
   });
 }
