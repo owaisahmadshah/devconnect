@@ -1,5 +1,5 @@
-import { TUserProfileSummary } from '../profile/profileResponse';
-import { TBaseOrganization } from './organization';
+import { TUserProfileSummary } from '../profile/profileResponse.js';
+import { TBaseOrganization } from './organization.js';
 
 export type TOrganizationResponse = Omit<TBaseOrganization, 'createdBy'> & {
   _id: string;

@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { baseConnectionSchema, connectionPendingState } from './connection';
+import { baseConnectionSchema, connectionPendingState } from './connection.js';
 
 // Do not requires _id
 export const createConnectionSchema = baseConnectionSchema;

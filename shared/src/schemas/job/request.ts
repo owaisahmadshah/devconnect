@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { baseJobSchema } from './job';
+import { baseJobSchema } from './job.js';
 
 // For api request (create) - no _id required
 export const createJobSchema = baseJobSchema;

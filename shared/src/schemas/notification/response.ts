@@ -1,5 +1,5 @@
-import { TUserProfileSummaryResponse } from '../profile/profileResponse';
-import { TNotificationType } from './notification';
+import { TUserProfileSummaryResponse } from '../profile/profileResponse.js';
+import { TNotificationType } from './notification.js';
 
 export type TNotificationSummaryResponse = {
   _id: string;

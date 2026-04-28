@@ -1,5 +1,5 @@
-import { TUserProfileSummary } from '../profile/profileResponse';
-import { TBaseComment } from './comment';
+import { TUserProfileSummary } from '../profile/profileResponse.js';
+import { TBaseComment } from './comment.js';
 
 export type TCommentResponse = Omit<TBaseComment, 'commentBy'> & {
   _id: string;

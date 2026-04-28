@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { projectVisibilityEnum } from './project';
+import { projectVisibilityEnum } from './project.js';
 
 // For API request (update) - requires _id, we'll get it from req.user
 export const updateProjectFieldSchema = z

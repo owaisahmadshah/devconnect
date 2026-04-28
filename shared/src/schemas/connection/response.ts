@@ -1,5 +1,5 @@
-import { TUserProfileSummaryResponse } from '../profile/profileResponse';
-import { TBaseConnection, TConnectionPendingState } from './connection';
+import { TUserProfileSummaryResponse } from '../profile/profileResponse.js';
+import { TBaseConnection, TConnectionPendingState } from './connection.js';
 
 export type TConnectionResponse = Omit<TBaseConnection, 'sender'> & {
   _id: string;

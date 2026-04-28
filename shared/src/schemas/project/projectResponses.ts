@@ -1,5 +1,5 @@
-import { TUserProfileSummaryResponse } from '../profile/profileResponse';
-import { TProjectWithId } from './project';
+import { TUserProfileSummaryResponse } from '../profile/profileResponse.js';
+import { TProjectWithId } from './project.js';
 
 // Project response
 export type TProjectResponse = Omit<TProjectWithId, 'createdBy' | 'collaborators'> & {

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { createCollaboratorSchema } from './collaborator';
-import { createTagSchema } from './tag';
-import { createTechStackSchema } from './techStack';
+import { createCollaboratorSchema } from './collaborator.js';
+import { createTagSchema } from './tag.js';
+import { createTechStackSchema } from './techStack.js';
 
 // For API request (update) - requires user _id, we'll get it from req.user and project _id we will provide with data
 export const addProjectArrayItem = z.discriminatedUnion('fieldName', [

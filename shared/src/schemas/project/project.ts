@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { baseCollaboratorSchema, createCollaboratorSchema } from './collaborator';
-import { baseTagSchema, createTagSchema, tagWithIdSchema } from './tag';
-import { baseMediaSchema, mediaWithIdSchema } from './media';
-import { baseTechStackSchema, createTechStackSchema, techStackWithIdSchema } from './techStack';
-import { multipleBackendImagesSchema, multipleImagesSchema } from '../image/image';
+import { baseCollaboratorSchema, createCollaboratorSchema } from './collaborator.js';
+import { baseTagSchema, createTagSchema, tagWithIdSchema } from './tag.js';
+import { baseMediaSchema, mediaWithIdSchema } from './media.js';
+import { baseTechStackSchema, createTechStackSchema, techStackWithIdSchema } from './techStack.js';
+import { multipleBackendImagesSchema, multipleImagesSchema } from '../image/image.js';
 
 export const projectVisibilityEnum = z.enum(['Private', 'Public', 'connections-only']);
 

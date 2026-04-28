@@ -1,6 +1,6 @@
-import { TlikeEnum } from '../like/like';
-import { TUserProfileSummaryResponse } from '../profile/profileResponse';
-import { TBasePost } from './post';
+import { TlikeEnum } from '../like/like.js';
+import { TUserProfileSummaryResponse } from '../profile/profileResponse.js';
+import { TBasePost } from './post.js';
 
 export type TPostResponse = Omit<TBasePost, 'createdBy'> & {
   _id: string;

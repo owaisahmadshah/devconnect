@@ -1,6 +1,6 @@
-import { TOrganizationSummaryResponse } from '../organization/response';
-import { TUserProfileSummary } from '../profile/profileResponse';
-import { TBaseJob } from './job';
+import { TOrganizationSummaryResponse } from '../organization/response.js';
+import { TUserProfileSummary } from '../profile/profileResponse.js';
+import { TBaseJob } from './job.js';
 
 export type TJobResponse = Omit<TBaseJob, 'organizationId' | 'postedBy'> & {
   _id: string;

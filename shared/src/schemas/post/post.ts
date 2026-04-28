@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { baseMediaSchema } from '../project/media';
-import { multipleBackendImagesSchema, multipleImagesSchema } from '../image/image';
+import { baseMediaSchema } from '../project/media.js';
+import { multipleBackendImagesSchema, multipleImagesSchema } from '../image/image.js';
 
 // Base schema for post
 export const basePostSchema = z.object({

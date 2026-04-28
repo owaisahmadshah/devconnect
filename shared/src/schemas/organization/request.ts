@@ -1,7 +1,6 @@
 import * as z from 'zod';
 
-import { baseOrganizationSchema } from './organization';
-import { singleBackendImageSchema } from '../image/image';
+import { baseOrganizationSchema } from './organization.js';
 
 // For api request (create) - no _id required
 // We will attach createdBy directly in the backend

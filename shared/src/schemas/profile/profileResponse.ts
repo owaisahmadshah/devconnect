@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { TBaseProfile } from './profile';
-import { profileUrlsWithIdSchema } from './profileUrls';
-import { connectionPendingState } from '../connection/connection';
+import { TBaseProfile } from './profile.js';
+import { profileUrlsWithIdSchema } from './profileUrls.js';
+import { connectionPendingState } from '../connection/connection.js';
 
 // User profile summary light weight response
 export const userProfileSummarySchema = z.object({

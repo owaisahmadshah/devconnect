@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { connectionPendingState } from '../connection/connection';
 
 // For API request (update) - requires _id, we'll get it from req.user
 export const updateProfileFieldSchema = z

@@ -1,6 +1,6 @@
-import { TOrganizationSummaryResponse } from '../organization/response';
-import { TUserProfileSummary } from '../profile/profileResponse';
-import { TBaseOrganizationMember } from './organization-member';
+import { TOrganizationSummaryResponse } from '../organization/response.js';
+import { TUserProfileSummary } from '../profile/profileResponse.js';
+import { TBaseOrganizationMember } from './organization-member.js';
 
 export type TOrganizationMemberResponse = Omit<
   TBaseOrganizationMember,

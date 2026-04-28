@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { createSkillSchema, skillWithIdSchema } from './skill';
-import { createEducationSchema, educationWithIdSchema } from './education';
-import { certificationWithIdSchema, createCertificationSchema } from './certification';
-import { achievementWithIdSchema, createAchievementSchema } from './achievement';
-import { createExperienceSchema, experienceWithIdSchema } from './experience';
-import { createSocialMediaLinkSchema, socialMediaLinkWithIdSchema } from './socialMediaLink';
-import { profileUrlsWithIdSchema } from './profileUrls';
+import { createSkillSchema, skillWithIdSchema } from './skill.js';
+import { createEducationSchema, educationWithIdSchema } from './education.js';
+import { certificationWithIdSchema, createCertificationSchema } from './certification.js';
+import { achievementWithIdSchema, createAchievementSchema } from './achievement.js';
+import { createExperienceSchema, experienceWithIdSchema } from './experience.js';
+import { createSocialMediaLinkSchema, socialMediaLinkWithIdSchema } from './socialMediaLink.js';
+import { profileUrlsWithIdSchema } from './profileUrls.js';
 
 // For API request (update) - requires _id, we'll get it from req.user
 export const addProfileArrayFieldSchema = z

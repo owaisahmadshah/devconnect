@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-import { baseOrganizationMemberSchema } from './organization-member';
+import { baseOrganizationMemberSchema } from './organization-member.js';
 
 // For api request (add member) - no _id required
 export const createOrganizationMemberSchema = baseOrganizationMemberSchema.extend({

@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { skillWithIdSchema } from './skill';
-import { educationWithIdSchema } from './education';
-import { certificationWithIdSchema } from './certification';
-import { achievementWithIdSchema } from './achievement';
-import { experienceWithIdSchema } from './experience';
-import { fullVisibilitySchema } from './visibility';
-import { socialMediaLinkWithIdSchema } from './socialMediaLink';
-import { profileUrlsWithIdSchema } from './profileUrls';
+import { skillWithIdSchema } from './skill.js';
+import { educationWithIdSchema } from './education.js';
+import { certificationWithIdSchema } from './certification.js';
+import { achievementWithIdSchema } from './achievement.js';
+import { experienceWithIdSchema } from './experience.js';
+import { fullVisibilitySchema } from './visibility.js';
+import { socialMediaLinkWithIdSchema } from './socialMediaLink.js';
+import { profileUrlsWithIdSchema } from './profileUrls.js';
 
 // Main profile schema combining all pieces together
 export const baseProfileSchema = z.object({
