@@ -41,11 +41,10 @@ jobs:
       - name: Install all dependencies
         run: pnpm install
 
-      - name: Build shared
-        run: pnpm build:shared
-
-      - name: Build server
-        run: pnpm build:server
+      - name: Build all packages
+        run: |
+          pnpm build:shared
+          pnpm build:server
 
       - name: Build client
         run: pnpm build:client
