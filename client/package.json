@@ -1,15 +1,17 @@
 {
   "name": "client",
+  "description": "React frontend for DevConnect — developer portfolio and networking platform.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "author": "Owais Ahmad Shah",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "author": "Owais Ahmad Shah",
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.15",

@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".gitignore"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        uses: actions/action-setup@v4
+        with:
+          version: 10.4.1
+
+      - name: Install all dependencies
+        run: pnpm run install
+
+      - name: Build shared
+        run: pnpm run build:shared
+
+      - name: Build server
+        run: pnpm run build:server
+
+      - name: Build client
+        run: pnpm run build:client
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+  deploy:
+    name: Deploy to AWS-EC2
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v
+        with:
+          version: 10.4.1
+
+      - name: Insatll all dependencies
+        run: pnpm run install
+
+      - name: Install all dependencies
+        run: pnpm run install
+
+      - name: Build shared
+        run: pnpm run build:shared
+
+      - name: Build server
+        run: pnpm run build:server
+
+      - name: Build client
+        run: pnpm run build:client
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+      - name: Copy file to EC2
+        uses: appleboy/scp-actions@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          sources: "server/dist/,client/dist/,shared/dist/,package.json,pnpm-lock.yaml,pnpm-workspace.yaml,server/package.json,client/package.json,shared/package.json"
+          target: "/home/ubuntu/devconnect"
+
+      - name: SSH and restart app
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/devconnect
+            which pnpm | npm install -g pnpm@10.4.1
+            pnpm install --prod
+            pm2 restart devconnect-server | pm2 start dist/index.js --name "devconnect-server" --node-args="--env-file=.env"
+            pm2 save
