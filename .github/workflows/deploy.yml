@@ -98,5 +98,5 @@ jobs:
             cd /home/ubuntu/devconnect
             which pnpm || npm install -g pnpm@10.4.1
             pnpm install --prod
-            pm2 restart devconnect-server || pm2 start dist/index.js --name "devconnect-server" --node-args="--env-file=.env"
+            pm2 restart devconnect-server || pm2 start dist/src/index.js --name "devconnect-server" --node-args="--env-file=.env"
             pm2 save
