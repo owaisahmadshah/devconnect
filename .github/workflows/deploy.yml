@@ -30,16 +30,16 @@ jobs:
           version: 10.4.1
 
       - name: Install all dependencies
-        run: pnpm run install
+        run: pnpm install
 
       - name: Build shared
-        run: pnpm run build:shared
+        run: pnpm build:shared
 
       - name: Build server
-        run: pnpm run build:server
+        run: pnpm build:server
 
       - name: Build client
-        run: pnpm run build:client
+        run: pnpm build:client
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
 
@@ -63,19 +63,19 @@ jobs:
           version: 10.4.1
 
       - name: Insatll all dependencies
-        run: pnpm run install
+        run: pnpm install
 
       - name: Install all dependencies
-        run: pnpm run install
+        run: pnpm install
 
       - name: Build shared
-        run: pnpm run build:shared
+        run: pnpm build:shared
 
       - name: Build server
-        run: pnpm run build:server
+        run: pnpm build:server
 
       - name: Build client
-        run: pnpm run build:client
+        run: pnpm build:client
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
 
