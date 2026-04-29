@@ -47,6 +47,7 @@ function InnerApp() {
 
   router = createRouter({
     routeTree,
+    basepath: '/devconnect',
     context: {
       queryClient,
       authentication,
