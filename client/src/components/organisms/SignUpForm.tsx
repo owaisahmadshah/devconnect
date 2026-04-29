@@ -44,31 +44,32 @@ const SignUpForm = ({ onSubmit, isLoading, error }: SignInProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 p-6">
-        <FormField
-          form={form}
-          id="firstName"
-          name="firstName"
-          labelText="First name"
-          placeholder="Enter your first name"
-          type="text"
-        />
-
-        <FormField
-          form={form}
-          id="lastName"
-          name="lastName"
-          labelText="Last name"
-          placeholder="Enter your last name"
-          type="text"
-        />
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            form={form}
+            id="firstName"
+            name="firstName"
+            labelText="First name"
+            placeholder="Jane"
+            type="text"
+          />
+          <FormField
+            form={form}
+            id="lastName"
+            name="lastName"
+            labelText="Last name"
+            placeholder="Smith"
+            type="text"
+          />
+        </div>
 
         <FormField
           form={form}
           id="username"
           name="username"
           labelText="Username"
-          placeholder="Enter username"
+          placeholder="janesmith"
           type="text"
         />
 
@@ -76,41 +77,58 @@ const SignUpForm = ({ onSubmit, isLoading, error }: SignInProps) => {
           form={form}
           id="email"
           name="email"
-          labelText="Email"
-          placeholder="Enter your email"
+          labelText="Work email"
+          placeholder="jane@company.com"
           type="email"
         />
 
-        <RadioFormField
-          form={form}
-          name="role"
-          label="Role"
-          options={[
-            { label: 'Developer', value: 'developer' },
-            { label: 'Recruiter', value: 'recruiter' },
-          ]}
-        />
+        <div className="py-1">
+          <RadioFormField
+            form={form}
+            name="role"
+            label="I am joining as a"
+            options={[
+              { label: 'Developer', value: 'developer' },
+              { label: 'Recruiter', value: 'recruiter' },
+            ]}
+          />
+        </div>
 
-        <FormField
-          form={form}
-          id="password"
-          name="password"
-          labelText="Password"
-          placeholder="Enter your password"
-          type="password"
-        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField
+            form={form}
+            id="password"
+            name="password"
+            labelText="Password"
+            placeholder="••••••••"
+            type="password"
+          />
 
-        <FormField
-          form={form}
-          id="confirmPassword"
-          name="confirmPassword"
-          labelText="Confirm Password"
-          placeholder="Re-enter your password"
-          type="password"
-        />
+          <FormField
+            form={form}
+            id="confirmPassword"
+            name="confirmPassword"
+            labelText="Confirm"
+            placeholder="••••••••"
+            type="password"
+          />
+        </div>
 
-        <SubmitButton isLoading={isLoading}>Create Account</SubmitButton>
-        <ContinueWithGoogle />
+        <div className="space-y-4 pt-4">
+          <SubmitButton isLoading={isLoading} className="h-11 w-full text-[15px] font-semibold">
+            Create account
+          </SubmitButton>
+
+          <div className="relative flex items-center py-2">
+            <div className="border-border flex-grow border-t"></div>
+            <span className="text-muted-foreground/60 mx-4 flex-shrink text-[12px] font-medium tracking-wider uppercase">
+              OR
+            </span>
+            <div className="border-border flex-grow border-t"></div>
+          </div>
+
+          <ContinueWithGoogle />
+        </div>
       </form>
     </Form>
   );

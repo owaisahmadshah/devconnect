@@ -39,13 +39,25 @@ export const FormField = <
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
-          {labelText && <FormLabel>{labelText}</FormLabel>}
+        <FormItem className="space-y-1.5">
+          {labelText && (
+            <FormLabel className="text-foreground/90 text-[13px] font-semibold">
+              {labelText}
+            </FormLabel>
+          )}
           <FormControl>
-            <Input id={id} type={type} placeholder={placeholder || '...'} {...field} />
+            <Input
+              id={id}
+              type={type}
+              placeholder={placeholder || '...'}
+              {...field}
+              className="bg-background border-border focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-foreground/50 h-11 transition-all"
+            />
           </FormControl>
-          {formDescription && <FormDescription>{formDescription}</FormDescription>}
-          <FormMessage />
+          {formDescription && (
+            <FormDescription className="text-[12px]">{formDescription}</FormDescription>
+          )}
+          <FormMessage className="text-[12px] font-medium" />
         </FormItem>
       )}
     />

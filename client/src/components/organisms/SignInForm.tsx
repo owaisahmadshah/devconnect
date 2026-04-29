@@ -30,32 +30,55 @@ const SignInForm = ({ onSubmit, isLoading, isError, error }: SignInProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 p-6">
-        {isError && <p className="text-sm text-red-500">{error}</p>}
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
+        {isError && (
+          <div className="bg-destructive/10 text-destructive border-destructive/20 rounded-lg border p-3 text-[13px] font-medium">
+            {error}
+          </div>
+        )}
 
         <FormField
           form={form}
           id="identifier"
           name="identifier"
           labelText="Email or username"
-          placeholder="Email or username"
+          placeholder="name@example.com"
           type="text"
         />
 
-        <FormField
-          form={form}
-          id="password"
-          name="password"
-          labelText="Password"
-          placeholder="Enter your password"
-          type="password"
-        />
+        <div className="space-y-1">
+          <FormField
+            form={form}
+            id="password"
+            name="password"
+            labelText="Password"
+            placeholder="••••••••"
+            type="password"
+          />
+          <div className="flex justify-end">
+            <Link to="/">
+              <span className="text-muted-foreground hover:text-primary text-[13px] font-medium transition-colors">
+                Forgot password?
+              </span>
+            </Link>
+          </div>
+        </div>
 
-        <SubmitButton isLoading={isLoading}>Sign In</SubmitButton>
-        <ContinueWithGoogle />
-        <Link to="/">
-          <span className="text-primary text-sm hover:underline">Forget Password</span>
-        </Link>
+        <div className="space-y-4 pt-2">
+          <SubmitButton isLoading={isLoading} className="h-11 text-[15px] font-semibold">
+            Sign in
+          </SubmitButton>
+
+          <div className="relative flex items-center py-2">
+            <div className="border-border flex-grow border-t"></div>
+            <span className="text-muted-foreground/60 mx-4 flex-shrink text-[12px] font-medium tracking-wider uppercase">
+              OR
+            </span>
+            <div className="border-border flex-grow border-t"></div>
+          </div>
+
+          <ContinueWithGoogle />
+        </div>
       </form>
     </Form>
   );

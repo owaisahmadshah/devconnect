@@ -11,7 +11,7 @@ export const SignUpContent = () => {
   };
 
   return (
-    <div>
+    <div className="grid gap-6">
       <SignUpForm
         onSubmit={handleSubmit}
         isLoading={signUpMutation.isPending}
