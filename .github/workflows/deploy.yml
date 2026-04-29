@@ -85,7 +85,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          sources: "server/dist/,client/dist/,shared/dist/,package.json,pnpm-lock.yaml,pnpm-workspace.yaml,server/package.json,client/package.json,shared/package.json"
+          source: "server/dist/,client/dist/,shared/dist/,package.json,pnpm-lock.yaml,pnpm-workspace.yaml,server/package.json,client/package.json,shared/package.json"
           target: "/home/ubuntu/devconnect"
 
       - name: SSH and restart app
@@ -96,7 +96,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/devconnect
-            which pnpm | npm install -g pnpm@10.4.1
+            which pnpm || npm install -g pnpm@10.4.1
             pnpm install --prod
-            pm2 restart devconnect-server | pm2 start dist/index.js --name "devconnect-server" --node-args="--env-file=.env"
+            pm2 restart devconnect-server || pm2 start dist/index.js --name "devconnect-server" --node-args="--env-file=.env"
             pm2 save
