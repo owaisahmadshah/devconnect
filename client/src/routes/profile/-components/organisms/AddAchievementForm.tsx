@@ -31,32 +31,55 @@ export const AddAchivementForm = () => {
   };
 
   return (
-    <DynamicDialogWithHeaderAction title="Add Achivements" description="Add your achievements">
+    <DynamicDialogWithHeaderAction
+      title="Add Achievement"
+      description="Highlight your honors, awards, and professional milestones"
+      mode={'create'}
+    >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField form={form} placeholder="Title" id="title" name="fieldData.title" />
-          <FormField
-            form={form}
-            placeholder="Description"
-            id="description"
-            name="fieldData.description"
-          />
-          <FormField
-            form={form}
-            placeholder="AwardedBy"
-            id="awardedBy"
-            name="fieldData.awardedBy"
-          />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-4">
+          <div className="grid grid-cols-1 gap-4">
+            <FormField
+              form={form}
+              labelText="Achievement Title"
+              placeholder="e.g. Employee of the Year"
+              id="title"
+              name="fieldData.title"
+            />
 
-          <DatePickerField
-            form={form}
-            id="date"
-            name="fieldData.date"
-            placeholder="Pick award date"
-            labelText="Award Date"
-          />
+            <FormField
+              form={form}
+              labelText="Awarding Organization"
+              placeholder="e.g. Global Tech Forum"
+              id="awardedBy"
+              name="fieldData.awardedBy"
+            />
 
-          <SubmitButton isLoading={isPending}>Save</SubmitButton>
+            <DatePickerField
+              form={form}
+              id="date"
+              name="fieldData.date"
+              labelText="Award Date"
+              placeholder="Pick award date"
+            />
+
+            <FormField
+              form={form}
+              labelText="Description"
+              placeholder="Provide more context about this honor..."
+              id="description"
+              name="fieldData.description"
+            />
+          </div>
+
+          <div className="pt-4">
+            <SubmitButton
+              isLoading={isPending}
+              className="h-11 w-full rounded-xl font-bold tracking-tight uppercase shadow-sm"
+            >
+              Save Achievement
+            </SubmitButton>
+          </div>
         </form>
       </Form>
     </DynamicDialogWithHeaderAction>

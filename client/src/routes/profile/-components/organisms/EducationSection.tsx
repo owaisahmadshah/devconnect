@@ -11,7 +11,7 @@ interface EducationSectionProps {
 export const EducationSection = ({ educations, isCurrentUser }: EducationSectionProps) => {
   return (
     <ProfileSectionCard title="Education" actionAddChild={isCurrentUser && <AddEducationForm />}>
-      <div className="flex w-full flex-col gap-3">
+      <div className="divide-border/40 flex w-full flex-col divide-y">
         {educations.map(education => (
           <EducationItem
             key={education._id}
@@ -22,6 +22,7 @@ export const EducationSection = ({ educations, isCurrentUser }: EducationSection
             started={education.started}
             ended={education.ended}
             isCurrentUser={isCurrentUser}
+            className="py-6 first:pt-0 last:pb-0"
           />
         ))}
       </div>

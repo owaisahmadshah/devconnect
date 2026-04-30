@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { useSelector } from 'react-redux';
 import { SkillsSection } from './organisms/SkillsSection';
 import { useProfile } from '../-hooks/useProfile';
@@ -8,13 +10,17 @@ import { CertificationSection } from './organisms/CertificationSection';
 import { ExperienceSection } from './organisms/ExperienceSection';
 import { EducationSection } from './organisms/EducationSection';
 import { SuggestionsSection } from './organisms/SuggestionsSection';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserPosts } from './UserPosts';
 import { useCreateConnection } from '@/hooks/connection/useCreateConnection';
 import { useDeleteConnection } from '@/hooks/connection/useDeleteConnection';
 import { useUpdateConnection } from '@/hooks/connection/useUpdateConnection';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const ProfileFeature = ({ identifier }: { identifier: string }) => {
+  const [isActivityFocusMode, setIsActivityFocusMode] = useState(false);
+
   // Fetching user profile
   useProfile(identifier);
 
@@ -30,9 +36,24 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
   const hasExperience = profile.experiences.length > 0;
   const hasEducation = profile.educations.length > 0;
 
+  const hasAnyProfessionalContent =
+    hasSkills ||
+    hasAchievements ||
+    hasCertfications ||
+    hasExperience ||
+    hasEducation ||
+    !!profile.bio;
+
+  // TODO: Update it
+  // const hasAnyActivity = (profile?.postsCount && profile.postsCount > 0) || true;
+  const hasAnyActivity = true;
+
+  const leftColClass = hasAnyActivity ? 'lg:col-span-7' : 'lg:col-span-12';
+  const rightColClass = hasAnyProfessionalContent ? 'lg:col-span-5' : 'lg:col-span-12';
+
   return (
     <div className="mx-auto min-h-screen space-y-2 md:w-10/12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="">
         <ProfileHeader
           firstName={profile.firstName}
           lastName={profile.lastName || ''}
@@ -61,64 +82,123 @@ export const ProfileFeature = ({ identifier }: { identifier: string }) => {
         />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto grid gap-2 md:w-11/12">
-          <div className="space-y-2">
-            {isCurrentUser && (
-              <SuggestionsSection
-                showAddSkillButton={!hasSkills}
-                showAddAchievementButton={!hasAchievements}
-                showAddCertficationButton={!hasCertfications}
-                showAddExperienceButton={!hasExperience}
-                showAddEducationButton={!hasEducation}
-                navigateProfileUrl={profile.profileUrls[0].url}
-                showOrganizationsButton={isCurrentUser}
-                showPostAJobButton={isCurrentUser}
-              />
+      {!isActivityFocusMode && (
+        <>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {hasAnyProfessionalContent && (
+              <div className={cn('space-y-6', leftColClass)}>
+                <section className="border-border/50 bg-card rounded-2xl border p-6 shadow-sm">
+                  <h3 className="text-foreground/80 mb-4 text-lg font-black tracking-widest uppercase">
+                    About
+                  </h3>
+                  <p className="text-foreground/70 leading-relaxed">
+                    {profile.bio || 'No bio added yet.'}
+                  </p>
+                </section>
+
+                <div className="space-y-4">
+                  {hasExperience && (
+                    <ExperienceSection
+                      experiences={profile.experiences}
+                      isCurrentUser={isCurrentUser}
+                    />
+                  )}
+                  {hasEducation && (
+                    <EducationSection
+                      educations={profile.educations}
+                      isCurrentUser={isCurrentUser}
+                    />
+                  )}
+                  {hasSkills && (
+                    <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
+                  )}
+                </div>
+                <div className="space-y-4">
+                  {hasCertfications && (
+                    <CertificationSection
+                      certificates={profile.certifications}
+                      isCurrentUser={isCurrentUser}
+                    />
+                  )}
+                  {hasAchievements && (
+                    <AchievementsSection
+                      achievements={profile.achievements}
+                      isCurrentUser={isCurrentUser}
+                    />
+                  )}
+                </div>
+              </div>
             )}
 
-            <Tabs defaultValue="profile">
-              <TabsList>
-                <TabsTrigger value="profile">Profile</TabsTrigger>
-                <TabsTrigger value="posts">Posts</TabsTrigger>
-              </TabsList>
-              <TabsContent value="posts">
-                {' '}
-                <UserPosts profileUrl={identifier} isCurrentUser={isCurrentUser} />{' '}
-              </TabsContent>
-              <TabsContent value="profile" className="space-y-2">
-                {hasSkills && (
-                  <SkillsSection skills={profile.skills} isCurrentUser={isCurrentUser} />
-                )}
+            <div className={cn('space-y-6 self-start lg:sticky lg:top-24', rightColClass)}>
+              {isCurrentUser && (
+                <SuggestionsSection
+                  showAddSkillButton={!hasSkills}
+                  showAddAchievementButton={!hasAchievements}
+                  showAddCertficationButton={!hasCertfications}
+                  showAddExperienceButton={!hasExperience}
+                  showAddEducationButton={!hasEducation}
+                  navigateProfileUrl={profile.profileUrls[0].url}
+                  showOrganizationsButton={isCurrentUser}
+                  showPostAJobButton={isCurrentUser}
+                />
+              )}
 
-                {hasAchievements && (
-                  <AchievementsSection
-                    achievements={profile.achievements}
-                    isCurrentUser={isCurrentUser}
-                  />
-                )}
+              {hasAnyActivity && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                    <h3 className="text-muted-foreground text-sm font-black tracking-widest uppercase">
+                      Recent Activity
+                    </h3>
+                    <button
+                      className="text-primary text-xs font-bold hover:underline"
+                      onClick={() => setIsActivityFocusMode(true)}
+                    >
+                      View All
+                    </button>
+                  </div>
 
-                {hasCertfications && (
-                  <CertificationSection
-                    certificates={profile.certifications}
-                    isCurrentUser={isCurrentUser}
-                  />
-                )}
-
-                {hasExperience && (
-                  <ExperienceSection
-                    experiences={profile.experiences}
-                    isCurrentUser={isCurrentUser}
-                  />
-                )}
-                {hasEducation && (
-                  <EducationSection educations={profile.educations} isCurrentUser={isCurrentUser} />
-                )}
-              </TabsContent>
-            </Tabs>
+                  <UserPosts profileUrl={identifier} isCurrentUser={isCurrentUser} limit={1} />
+                </div>
+              )}
+            </div>
           </div>
+        </>
+      )}
+
+      {isActivityFocusMode && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto max-w-3xl pt-6 duration-500">
+          <div className="border-border/50 bg-background/80 sticky top-20 z-20 mb-6 flex items-center justify-between rounded-2xl border p-4 shadow-sm backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsActivityFocusMode(false)}
+                className="hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+              >
+                <X className="size-5" />
+              </button>
+              <div>
+                <h2 className="text-lg leading-none font-black">All Activity</h2>
+                <p className="text-muted-foreground mt-1 text-xs font-bold tracking-wider uppercase">
+                  {profile.firstName}'s Posts
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <UserPosts profileUrl={identifier} isCurrentUser={isCurrentUser} />
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsActivityFocusMode(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="text-muted-foreground hover:text-primary mt-8 w-full rounded-xl border-dashed py-6"
+          >
+            Back to Profile
+          </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -12,19 +12,19 @@ export const AchievementsSection = ({ achievements, isCurrentUser }: Achievement
   return (
     <ProfileSectionCard
       title="Achievements"
-      className="relative"
       actionAddChild={isCurrentUser && <AddAchivementForm />}
     >
-      <div className="flex flex-col gap-4">
+      <div className="divide-border/40 flex w-full flex-col divide-y">
         {achievements.map(achievement => (
           <AchievementItem
             key={achievement._id}
+            _id={achievement._id}
             title={achievement.title}
             awardedBy={achievement.awardedBy}
             description={achievement.description}
             date={achievement.date}
-            _id={achievement._id}
             isCurrentUser={isCurrentUser}
+            className="py-6 first:pt-0 last:pb-0"
           />
         ))}
       </div>

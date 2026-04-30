@@ -35,44 +35,74 @@ export const AddExperienceForm = () => {
   };
 
   return (
-    <DynamicDialogWithHeaderAction title="Add Education" description="Add your education">
+    <DynamicDialogWithHeaderAction
+      title="Add Experience"
+      description="Document your professional journey and key projects"
+      mode={'create'}
+    >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            form={form}
-            placeholder="Company or Project"
-            id="componyOrProject"
-            name="fieldData.companyOrProject"
-          />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-4">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                form={form}
+                labelText="Role / Title"
+                placeholder="e.g. Senior Developer"
+                id="role"
+                name="fieldData.role"
+              />
+              <FormField
+                form={form}
+                labelText="Company / Project"
+                placeholder="e.g. Acme Corp"
+                id="companyOrProject"
+                name="fieldData.companyOrProject"
+              />
+            </div>
 
-          <FormField
-            form={form}
-            placeholder="Description"
-            id="description"
-            name="fieldData.description"
-          />
+            <FormField
+              form={form}
+              labelText="Location"
+              placeholder="e.g. Remote, New York, US"
+              id="location"
+              name="fieldData.location"
+            />
 
-          <FormField form={form} placeholder="Role" id="role" name="fieldData.role" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <DatePickerField
+                form={form}
+                id="started"
+                name="fieldData.started"
+                labelText="Start Date"
+                placeholder="Start Date"
+              />
+              <DatePickerField
+                form={form}
+                id="ended"
+                name="fieldData.ended"
+                labelText="End Date"
+                placeholder="End Date"
+              />
+            </div>
 
-          <FormField form={form} placeholder="Location" id="location" name="fieldData.location" />
+            <FormField
+              form={form}
+              labelText="Description"
+              placeholder="Describe your responsibilities and achievements..."
+              id="description"
+              name="fieldData.description"
+              // Ensure your FormField supports multiline or textarea for description
+            />
+          </div>
 
-          {/* TODO: Add Type and Technologies */}
-
-          <DatePickerField
-            form={form}
-            id="started"
-            name="fieldData.started"
-            placeholder="Pick start date"
-          />
-
-          <DatePickerField
-            form={form}
-            id="ended"
-            name="fieldData.ended"
-            placeholder="Pick end date"
-          />
-
-          <SubmitButton isLoading={isPending}>Save</SubmitButton>
+          <div className="pt-4">
+            <SubmitButton
+              isLoading={isPending}
+              className="h-11 w-full rounded-xl font-bold tracking-tight uppercase"
+            >
+              Save Experience
+            </SubmitButton>
+          </div>
         </form>
       </Form>
     </DynamicDialogWithHeaderAction>

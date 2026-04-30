@@ -32,32 +32,61 @@ export const AddCertificationForm = () => {
   };
 
   return (
-    <DynamicDialogWithHeaderAction title="Add Certificate" description="Add your certifications">
+    <DynamicDialogWithHeaderAction
+      title="Add Certification"
+      description="Showcase your verified professional achievements"
+      mode={'create'}
+    >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField form={form} placeholder="Issuer" id="issuer" name="fieldData.issuer" />
-          <FormField form={form} placeholder="Title" id="title" name="fieldData.title" />
-          <FormField
-            form={form}
-            placeholder="Credentials"
-            id="credentials"
-            name="fieldData.credentials"
-          />
-          <FormField
-            form={form}
-            placeholder="Credentials urls"
-            id="credentialsUrl"
-            name="fieldData.credentialsUrl"
-          />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-4">
+          <div className="grid grid-cols-1 gap-4">
+            <FormField
+              form={form}
+              labelText="Issuing Organization"
+              placeholder="e.g. Google, AWS, Coursera"
+              id="issuer"
+              name="fieldData.issuer"
+            />
+            <FormField
+              form={form}
+              labelText="Certification Name"
+              placeholder="e.g. Professional Cloud Architect"
+              id="title"
+              name="fieldData.title"
+            />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                form={form}
+                labelText="Credential ID"
+                placeholder="Certificate serial number"
+                id="credentials"
+                name="fieldData.credentials"
+              />
+              <DatePickerField
+                form={form}
+                id="date"
+                name="fieldData.issuedDate"
+                placeholder="Date of issue"
+                labelText="Issue Date"
+              />
+            </div>
+            <FormField
+              form={form}
+              labelText="Credential URL"
+              placeholder="Link to verify certificate"
+              id="credentialsUrl"
+              name="fieldData.credentialsUrl"
+            />
+          </div>
 
-          <DatePickerField
-            form={form}
-            id="date"
-            name="fieldData.issuedDate"
-            placeholder="Pick issued date"
-          />
-
-          <SubmitButton isLoading={isPending}>Save</SubmitButton>
+          <div className="pt-4">
+            <SubmitButton
+              isLoading={isPending}
+              className="h-11 w-full rounded-xl font-bold tracking-tight uppercase"
+            >
+              Add Certification
+            </SubmitButton>
+          </div>
         </form>
       </Form>
     </DynamicDialogWithHeaderAction>

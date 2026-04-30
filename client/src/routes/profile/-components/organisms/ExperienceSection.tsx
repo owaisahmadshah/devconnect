@@ -11,7 +11,7 @@ interface ExperienceSectionProps {
 export const ExperienceSection = ({ experiences, isCurrentUser }: ExperienceSectionProps) => {
   return (
     <ProfileSectionCard title="Experience" actionAddChild={isCurrentUser && <AddExperienceForm />}>
-      <div className="flex w-full flex-col gap-3">
+      <div className="divide-border/40 flex w-full flex-col divide-y">
         {experiences.map(experience => (
           <ExperienceItem
             key={experience._id}
@@ -25,6 +25,7 @@ export const ExperienceSection = ({ experiences, isCurrentUser }: ExperienceSect
             ended={experience.ended}
             technologies={experience.technologies}
             isCurrentUser={isCurrentUser}
+            className="py-6 first:pt-0 last:pb-0"
           />
         ))}
       </div>

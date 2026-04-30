@@ -12,21 +12,24 @@ export const AllSkills = ({ skills, noOfSkills }: AllSkillsProps) => {
   return (
     <DynamicDialogWithHeaderAction
       title="All Skills"
-      description="All the skills of user"
+      description="Professional skillset and endorsements"
       mode={`Show all ${noOfSkills} skills`}
     >
-      <ScrollArea className="max-h-[60vh] w-full flex-col gap-3 pt-3">
-        {skills.map((skill, index) => (
-          <SkillItem
-            key={index}
-            skillName={skill.skillName}
-            endorsements={skill.endorsements}
-            skillProficiency={skill.skillProficiency}
-            isCurrentUser={true}
-            className="my-3 border-b p-3"
-            isEditable={false}
-          />
-        ))}
+      <ScrollArea className="h-[50vh] pr-4">
+        <div className="divide-border/40 flex flex-col space-y-1 divide-y">
+          {skills.map(skill => (
+            <SkillItem
+              key={skill._id}
+              _id={skill._id}
+              skillName={skill.skillName}
+              endorsements={skill.endorsements}
+              skillProficiency={skill.skillProficiency}
+              isCurrentUser={false}
+              className="py-4"
+              isEditable={false}
+            />
+          ))}
+        </div>
       </ScrollArea>
     </DynamicDialogWithHeaderAction>
   );

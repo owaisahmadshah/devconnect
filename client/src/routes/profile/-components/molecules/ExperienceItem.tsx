@@ -1,13 +1,13 @@
-import { Trash2 } from 'lucide-react';
-import { MdLocationOn, MdCalendarToday } from 'react-icons/md';
-
+import { Trash2, Briefcase, MapPin, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getDateRange, getDuration } from '@/lib/dateUtils';
 import { type TExperienceWithId } from 'shared';
 import { useProfileArrayDelete } from '../../-hooks/useProfile';
+import { cn } from '@/lib/utils';
 
 interface ExperienceItemProps extends Partial<TExperienceWithId> {
   isCurrentUser: boolean;
+  className?: string;
 }
 
 export const ExperienceItem = ({
@@ -21,6 +21,7 @@ export const ExperienceItem = ({
   started,
   ended,
   isCurrentUser,
+  className,
 }: ExperienceItemProps) => {
   const { mutateAsync, isPending } = useProfileArrayDelete();
 
@@ -29,57 +30,74 @@ export const ExperienceItem = ({
   };
 
   return (
-    <div className="flex w-full justify-between">
-      <div className="grid flex-1 gap-3">
-        {/* Main experience info */}
-        <div>
-          <h1 className="text-lg font-semibold">{role}</h1>
-          <p className="text-base font-medium">{companyOrProject}</p>
-          {type && <p className="text-sm capitalize">{type}</p>}
+    <div className={cn('group flex w-full items-start justify-between gap-4', className)}>
+      <div className="flex min-w-0 flex-1 gap-4">
+        <div className="border-border/50 bg-muted/30 mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+          <Briefcase className="text-muted-foreground group-hover:text-primary size-6 transition-colors" />
         </div>
 
-        {/* Date and location info */}
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1">
-            <MdCalendarToday size={16} />
-            <span>{getDateRange(started!, ended!)}</span>
-            {getDuration(started!, ended!) && <span>· {getDuration(started!, ended!)}</span>}
+        <div className="min-w-0 flex-1 space-y-3">
+          <div>
+            <h4 className="text-foreground text-lg leading-tight font-bold tracking-tight uppercase">
+              {role}
+            </h4>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-foreground/80 text-[15px] font-medium">{companyOrProject}</p>
+              {type && (
+                <span className="text-muted-foreground bg-muted rounded px-2 py-0.5 text-[10px] font-black tracking-widest uppercase">
+                  {type}
+                </span>
+              )}
+            </div>
           </div>
 
-          {location && (
-            <div className="flex items-center gap-1">
-              <MdLocationOn size={16} />
-              <span>{location}</span>
+          <div className="text-muted-foreground/70 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-bold tracking-wider uppercase">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="size-3.5" />
+              <span>{getDateRange(started!, ended!)}</span>
+              {getDuration(started!, ended!) && (
+                <span className="text-primary/60">· {getDuration(started!, ended!)}</span>
+              )}
+            </div>
+
+            {location && (
+              <div className="flex items-center gap-1.5">
+                <MapPin className="size-3.5" />
+                <span>{location}</span>
+              </div>
+            )}
+          </div>
+
+          {description && (
+            <p className="text-foreground/70 max-w-2xl text-[14px] leading-relaxed">
+              {description}
+            </p>
+          )}
+
+          {technologies && technologies.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {technologies.map((tech, index) => (
+                <span
+                  key={index}
+                  className="border-border/60 bg-background text-foreground/60 group-hover:border-primary/30 rounded-lg border px-2.5 py-1 text-[11px] font-bold tracking-tighter uppercase transition-colors"
+                >
+                  {tech}
+                </span>
+              ))}
             </div>
           )}
         </div>
-
-        {/* Description */}
-        {description && (
-          <div className="text-sm">
-            <p>{description}</p>
-          </div>
-        )}
-
-        {/* Technologies/Skills */}
-        {technologies && technologies.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            <span className="text-sm font-medium">Skills:</span>
-            {technologies.map((tech, index) => (
-              <span key={index} className="rounded-md bg-gray-100 px-2 py-1 text-xs">
-                {tech}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Edit button for current user */}
       {isCurrentUser && (
-        <Button variant={'ghost'} onClick={deleteAchievement} disabled={isPending}>
-          <span className="cursor-pointer transition-colors hover:text-gray-600">
-            <Trash2 size={20} />
-          </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={deleteAchievement}
+          disabled={isPending}
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-9 w-9 shrink-0 transition-colors"
+        >
+          {isPending ? '...' : <Trash2 size={18} />}
         </Button>
       )}
     </div>

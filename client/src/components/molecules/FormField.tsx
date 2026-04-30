@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import {
   FormControl,
   FormDescription,
@@ -20,6 +21,7 @@ interface FormFieldProps<
   placeholder?: string;
   formDescription?: string;
   type?: string;
+  className?: string;
 }
 
 export const FormField = <
@@ -33,13 +35,14 @@ export const FormField = <
   placeholder,
   formDescription,
   type = 'text',
+  className,
 }: FormFieldProps<TFieldValues, TName>) => {
   return (
     <ShadcnFormField
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="space-y-1.5">
+        <FormItem className={cn('space-y-1.5', className)}>
           {labelText && (
             <FormLabel className="text-foreground/90 text-[13px] font-semibold">
               {labelText}

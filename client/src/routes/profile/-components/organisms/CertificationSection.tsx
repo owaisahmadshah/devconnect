@@ -14,7 +14,7 @@ export const CertificationSection = ({ certificates, isCurrentUser }: EducationS
       title="Certifications"
       actionAddChild={isCurrentUser && <AddCertificationForm />}
     >
-      <div className="flex w-full flex-col gap-3">
+      <div className="divide-border/40 flex w-full flex-col divide-y">
         {certificates.map(certificate => (
           <CertificationItem
             key={certificate._id}
@@ -25,6 +25,7 @@ export const CertificationSection = ({ certificates, isCurrentUser }: EducationS
             credentialsUrl={certificate.credentialsUrl}
             issuedDate={certificate.issuedDate}
             isCurrentUser={isCurrentUser}
+            className="py-4 first:pt-0 last:pb-0"
           />
         ))}
       </div>
