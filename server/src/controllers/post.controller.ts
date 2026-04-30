@@ -14,7 +14,10 @@ import type { PostService } from '../services/post.service.js';
 import type { ProfileService } from '../services/profile.service.js';
 
 export class PostController {
-  constructor(private service: PostService, private profileServ: ProfileService) {}
+  constructor(
+    private service: PostService,
+    private profileServ: ProfileService,
+  ) {}
 
   /**
    * Creates a new post for the authenticated user.
@@ -110,7 +113,7 @@ export class PostController {
       throw new ApiError(HttpStatus.UNAUTHORIZED, 'Authenticated user not found in request');
     }
 
-    const { profileUrl } = req.params;
+    const { profileId: profileUrl } = req.params;
     const { limit, cursor } = req.query;
 
     let posts: TPostsResponseWithCursorPaginationResponse;

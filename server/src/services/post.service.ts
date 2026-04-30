@@ -138,7 +138,8 @@ export class PostService {
 
     const hasMore = responsePosts.length === limit;
     const lastPost = responsePosts.at(-1);
-    const nextCursor: string | null = lastPost?.createdAt ? lastPost.createdAt.toISOString() : null;
+    const nextCursor: string | null =
+      hasMore && lastPost?.createdAt ? lastPost.createdAt.toISOString() : null;
 
     return { posts: responsePosts, hasMore, nextCursor };
   };
@@ -165,11 +166,11 @@ export class PostService {
   fetchPost = async (postId: string): Promise<TPostResponse> => {
     const { repo, postMapper } = this.deps;
 
-    console.log(postId)
+    console.log(postId);
 
     const post = await repo.findById(postId);
 
-    console.log(post)
+    console.log(post);
 
     if (!post) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'Post not found.');
