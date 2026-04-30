@@ -116,7 +116,7 @@ export const CreateOrganizationForm = () => {
               <SubmitButton
                 isLoading={isPending}
                 disabled={isPending}
-                customClasses="w-full md:w-auto px-8 h-10 bg-primary text-primary-foreground hover:opacity-90 transition-all rounded-full font-bold"
+                className="bg-primary text-primary-foreground h-10 w-full rounded-full px-8 font-bold transition-all hover:opacity-90 md:w-auto"
               >
                 {isPending ? 'Saving...' : 'Create Organization'}
               </SubmitButton>
