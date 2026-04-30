@@ -32,33 +32,65 @@ export const AddEducationForm = () => {
   };
 
   return (
-    <DynamicDialogWithHeaderAction title="Add Education" description="Add your education">
+    <DynamicDialogWithHeaderAction
+      title="Add Education"
+      description="Add your academic background and qualifications"
+      mode={'create'}
+    >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField form={form} placeholder="School" id="school" name="fieldData.school" />
-          <FormField form={form} placeholder="Degree" id="degree" name="fieldData.degree" />
-          <FormField
-            form={form}
-            placeholder="Field of study"
-            id="fieldOfStudy"
-            name="fieldData.fieldOfStudy"
-          />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-4">
+          <div className="grid grid-cols-1 gap-4">
+            <FormField
+              form={form}
+              labelText="School / University"
+              placeholder="e.g. Stanford University"
+              id="school"
+              name="fieldData.school"
+            />
 
-          <DatePickerField
-            form={form}
-            id="started"
-            name="fieldData.started"
-            placeholder="Pick start date"
-          />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                form={form}
+                labelText="Degree"
+                placeholder="e.g. Bachelor of Science"
+                id="degree"
+                name="fieldData.degree"
+              />
+              <FormField
+                form={form}
+                labelText="Field of Study"
+                placeholder="e.g. Computer Science"
+                id="fieldOfStudy"
+                name="fieldData.fieldOfStudy"
+              />
+            </div>
 
-          <DatePickerField
-            form={form}
-            id="ended"
-            name="fieldData.ended"
-            placeholder="Pick end date"
-          />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <DatePickerField
+                form={form}
+                id="started"
+                name="fieldData.started"
+                labelText="Start Date"
+                placeholder="Start Date"
+              />
+              <DatePickerField
+                form={form}
+                id="ended"
+                name="fieldData.ended"
+                labelText="End Date"
+                placeholder="End Date"
+              />
+            </div>
+          </div>
 
-          <SubmitButton isLoading={isPending}>Save</SubmitButton>
+          <div className="pt-4">
+            <SubmitButton
+              isLoading={isPending}
+              className="h-11 w-full rounded-xl font-bold tracking-tight uppercase"
+            >
+              Save Education
+            </SubmitButton>
+          </div>
         </form>
       </Form>
     </DynamicDialogWithHeaderAction>

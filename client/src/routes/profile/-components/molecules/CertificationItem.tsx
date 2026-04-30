@@ -1,13 +1,14 @@
 import { MdVerified, MdOpenInNew } from 'react-icons/md';
-
 import { formatDate } from '@/lib/dateUtils';
 import { type TCertificationWithId } from 'shared';
 import { useProfileArrayDelete } from '../../-hooks/useProfile';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Award } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CertificationItemProps extends Partial<TCertificationWithId> {
   isCurrentUser: boolean;
+  className?: string;
 }
 
 export const CertificationItem = ({
@@ -18,6 +19,7 @@ export const CertificationItem = ({
   credentials,
   credentialsUrl,
   isCurrentUser = false,
+  className,
 }: CertificationItemProps) => {
   const { mutateAsync, isPending } = useProfileArrayDelete();
 
@@ -26,45 +28,52 @@ export const CertificationItem = ({
   };
 
   return (
-    <div className="flex w-full justify-between">
-      <div className="grid gap-3">
-        <div>
-          <h1>{title}</h1>
-          <p>{issuer}</p>
+    <div className={cn('group flex w-full items-start justify-between gap-4', className)}>
+      <div className="flex min-w-0 gap-4">
+        <div className="border-border/50 bg-muted/30 mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border">
+          <Award className="text-muted-foreground group-hover:text-primary size-5 transition-colors" />
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          <div className="flex items-center gap-1">
-            <MdVerified className="text-blue-500" />
-            <span>Issued {formatDate(issuedDate!)}</span>
+        <div className="min-w-0 space-y-1.5">
+          <div>
+            <h4 className="text-foreground text-[15px] leading-none font-bold tracking-tight uppercase">
+              {title}
+            </h4>
+            <p className="text-muted-foreground mt-1 text-[13px] font-medium">{issuer}</p>
           </div>
 
-          {credentials && (
-            <div className="flex items-center gap-1">
-              <span>ID: {credentials}</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-bold tracking-wider uppercase">
+            <div className="flex items-center gap-1 text-blue-500/80">
+              <MdVerified className="size-3.5" />
+              <span>Issued {formatDate(issuedDate!)}</span>
             </div>
-          )}
 
-          {credentialsUrl && (
-            <a
-              href={credentialsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-blue-500 transition-colors hover:text-blue-600"
-            >
-              <span>View Certificate</span>
-              <MdOpenInNew size={14} />
-            </a>
-          )}
+            {credentials && <span className="text-muted-foreground/60">ID: {credentials}</span>}
+
+            {credentialsUrl && (
+              <a
+                href={credentialsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary flex items-center gap-1 transition-all hover:underline"
+              >
+                <span>View</span>
+                <MdOpenInNew size={12} />
+              </a>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* If the user is signed and looking at his own profile then he can perform action on his profile */}
       {isCurrentUser && (
-        <Button variant={'ghost'} onClick={deleteAchievement} disabled={isPending}>
-          <span className="cursor-pointer transition-colors hover:text-gray-600">
-            <Trash2 size={20} />
-          </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={deleteAchievement}
+          disabled={isPending}
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 transition-colors"
+        >
+          {isPending ? '...' : <Trash2 size={16} />}
         </Button>
       )}
     </div>

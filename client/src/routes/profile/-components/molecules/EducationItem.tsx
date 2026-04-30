@@ -1,12 +1,13 @@
-import { Trash2 } from 'lucide-react';
-import { MdCalendarToday } from 'react-icons/md';
-
+import { Trash2, GraduationCap, Calendar } from 'lucide-react';
 import { getDateRange } from '@/lib/dateUtils';
 import { type TEducationWithId } from 'shared';
 import { useProfileArrayDelete } from '../../-hooks/useProfile';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
 interface EducationItemProps extends Partial<TEducationWithId> {
   isCurrentUser: boolean;
+  className?: string;
 }
 
 export const EducationItem = ({
@@ -17,6 +18,7 @@ export const EducationItem = ({
   started,
   ended,
   isCurrentUser = false,
+  className,
 }: EducationItemProps) => {
   const { mutateAsync, isPending } = useProfileArrayDelete();
 
@@ -25,26 +27,40 @@ export const EducationItem = ({
   };
 
   return (
-    <div className="flex w-full justify-between">
-      <div className="grid gap-3">
-        <div>
-          <h1>{degree}</h1>
-          <p>{fieldOfStudy}</p>
-          <p>{school}</p>
+    <div className={cn('group flex w-full items-start justify-between gap-4', className)}>
+      <div className="flex min-w-0 flex-1 gap-4">
+        <div className="border-border/50 bg-muted/30 mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border">
+          <GraduationCap className="text-muted-foreground group-hover:text-primary size-6 transition-colors" />
         </div>
 
-        <div className="flex items-center gap-2 text-sm">
-          <MdCalendarToday size={16} />
-          <span>{getDateRange(started!, ended!)}</span>
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <div>
+            <h4 className="text-foreground text-lg leading-tight font-bold tracking-tight uppercase">
+              {school}
+            </h4>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-foreground/80 text-[15px] font-medium">
+                {degree}, {fieldOfStudy}
+              </p>
+            </div>
+          </div>
+
+          <div className="text-muted-foreground/70 flex items-center gap-1.5 text-[12px] font-bold tracking-wider uppercase">
+            <Calendar className="size-3.5" />
+            <span>{getDateRange(started!, ended!)}</span>
+          </div>
         </div>
       </div>
 
-      {/* If the user is signed and looking at his own profile then he can perform action on his profile */}
       {isCurrentUser && (
-        <Button variant={'ghost'} onClick={deleteAchievement} disabled={isPending}>
-          <span className="cursor-pointer transition-colors hover:text-gray-600">
-            <Trash2 size={20} />
-          </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={deleteAchievement}
+          disabled={isPending}
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-9 w-9 shrink-0 transition-colors"
+        >
+          {isPending ? '...' : <Trash2 size={18} />}
         </Button>
       )}
     </div>

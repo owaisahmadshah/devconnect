@@ -40,6 +40,7 @@ export type TUserProfileResponse = Omit<TBaseProfile, 'user'> & {
     state: z.infer<typeof connectionPendingState>;
   };
   connections?: number
+  postsCount?: number
 };
 export type TUserProfileSummaryResponse = z.infer<typeof userProfileSummarySchema>;
 export type TUserProfileSummary = TUserProfileSummaryResponse;

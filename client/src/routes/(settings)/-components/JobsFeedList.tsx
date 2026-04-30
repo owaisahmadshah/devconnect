@@ -21,14 +21,14 @@ export const JobsFeedList = () => {
     isError: isSearchError,
   } = useFetchInfiniteSearchJobs();
 
-  const isLoading = isFeedLoading || (isSearchActive && isSearchLoading);
+  const isSearchLoadingAndActive = isSearchActive && isSearchLoading;
   const isError = isFeedError || (isSearchActive && isSearchError);
 
   const jobs = isSearchActive
     ? searchData?.pages.flatMap(page => page.jobs)
     : feedData?.pages.flatMap(page => page.jobs);
 
-  if (isLoading) {
+  if (isFeedLoading) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center space-y-2 py-4">
         <JobsSearchBarSkeleton />
@@ -52,7 +52,8 @@ export const JobsFeedList = () => {
     <div className="mx-auto flex max-w-3xl flex-col items-center space-y-2 py-4">
       <JobsSearchBar />
       <div className="w-full">
-        {jobs?.length === 0 ? (
+        {isSearchLoadingAndActive && <JobsListSkeleton />}
+        {!isSearchLoadingAndActive && jobs?.length === 0 ? (
           <p className="text-muted-foreground py-8 text-center text-sm">No jobs found.</p>
         ) : (
           jobs?.map(job => <JobSummaryCard key={job._id} {...job} />)

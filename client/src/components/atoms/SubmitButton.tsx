@@ -6,26 +6,29 @@ interface SubmitButtonProps {
   isLoading?: boolean;
   loadingText?: string;
   disabled?: boolean;
-  customClasses?: string;
+  className?: string;
 }
 
 export const SubmitButton = ({
   children,
   isLoading = false,
-  loadingText = 'Loading...',
+  loadingText = 'Authenticating...',
   disabled = false,
-  customClasses = '',
+  className = '',
 }: SubmitButtonProps) => {
   return (
     <Button
       type="submit"
-      className={cn('w-full bg-blue-600 text-white hover:bg-blue-700', customClasses)}
+      className={cn(
+        'bg-primary text-primary-foreground w-full transition-all hover:opacity-90 active:scale-[0.98]',
+        className,
+      )}
       disabled={disabled || isLoading}
     >
       {isLoading ? (
-        <span className="flex items-center">
+        <span className="flex items-center gap-2">
           <svg
-            className="mr-2 -ml-1 h-4 w-4 animate-spin text-white"
+            className="h-4 w-4 animate-spin"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

@@ -1,4 +1,3 @@
-import { FaRegCommentDots } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -28,6 +27,7 @@ import { useCreateComment } from '@/routes/post/-hooks/useCreateComment';
 import { useDeleteComment } from '@/routes/post/-hooks/useDeleteComment';
 import { Button } from '../ui/button';
 import { Comment } from './Comment';
+import { MessageSquare } from 'lucide-react';
 
 interface PostCommentsProps {
   post: TPostResponse;
@@ -65,17 +65,22 @@ export function PostComments({ post, onReaction }: PostCommentsProps) {
 
   return (
     <Dialog>
-      <DialogTrigger className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-blue-500 dark:text-slate-400 dark:hover:bg-slate-800">
-        <FaRegCommentDots className="h-[18px] w-[18px]" />
-        <span className="hidden sm:inline">
-          Comment{' '}
-          {post?.totalComments && post.totalComments > 0 ? (
-            <span className="text-xs">{`(${post.totalComments})`}</span>
-          ) : (
-            ''
-          )}
-        </span>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:bg-muted/50 hover:text-foreground h-10 flex-1 gap-2 font-semibold"
+        >
+          <MessageSquare className="h-[18px] w-[18px]" />
+          <span className="hidden sm:inline">
+            Comment{' '}
+            {post?.totalComments && post?.totalComments > 0 && (
+              <span className="ml-1 opacity-60">({post.totalComments})</span>
+            )}
+          </span>
+        </Button>
       </DialogTrigger>
+
       <DialogContent className="max-h-[92vh] min-w-[85vw] p-0 max-sm:min-h-[70vh]">
         <DialogHeader>
           <DialogTitle className="sr-only">Post Comments</DialogTitle>
@@ -87,7 +92,7 @@ export function PostComments({ post, onReaction }: PostCommentsProps) {
               </div>
 
               {/* Comment Section */}
-              <div className="flex h-full flex-col justify-between p-3 max-sm:min-h-[70vh] max-sm:w-full sm:w-[50%]">
+              <div className="flex h-full flex-col justify-around p-3 max-sm:min-h-[70vh] max-sm:w-full sm:w-[50%]">
                 <div className="h-full">
                   {/* Profile */}
                   <div className="flex flex-1 items-center gap-3 max-sm:hidden">
@@ -130,7 +135,7 @@ export function PostComments({ post, onReaction }: PostCommentsProps) {
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="flex justify-center gap-3 pb-3"
+                    className="mb-5 flex justify-center gap-3"
                   >
                     <div className="w-full">
                       <FormField
@@ -141,9 +146,9 @@ export function PostComments({ post, onReaction }: PostCommentsProps) {
                             <FormControl>
                               <Textarea
                                 {...field}
-                                placeholder="Add a comment..."
+                                placeholder="Write your comment..."
                                 className="max-h-24 min-h-[40px] resize-none"
-                                rows={4}
+                                rows={1}
                               />
                             </FormControl>
                             {/* <FormMessage /> */}
@@ -154,7 +159,7 @@ export function PostComments({ post, onReaction }: PostCommentsProps) {
                     <SubmitButton
                       isLoading={createComment.isPending}
                       disabled={createComment.isPending}
-                      customClasses="text-base font-semibold w-20"
+                      className="w-20 text-base font-semibold"
                     >
                       {createComment.isPending ? 'Commenting...' : 'Comment'}
                     </SubmitButton>

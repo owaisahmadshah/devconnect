@@ -16,7 +16,7 @@ function RootLayout() {
   const router = useRouterState();
   const path = router.location.pathname;
 
-  const noNavbarPaths = ['/signin', '/signup', '/project/new', '/post/new'];
+  const noNavbarPaths = ['/devconnect/signin', '/devconnect/signup', '/devconnect/project/new', '/devconnect/post/new'];
   const hideNavbar = noNavbarPaths.some(p => path.startsWith(p));
 
   // TODO: Move it to _authenticated

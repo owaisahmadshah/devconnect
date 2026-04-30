@@ -1,11 +1,10 @@
-import { Link } from '@tanstack/react-router';
 import { useInfiniteFetchPosts } from '../-hooks/useInfiniteFetchFeed';
 import { Post } from '@/components/organisms/Post';
 import { Button } from '@/components/ui/button';
-import { FaPlus } from 'react-icons/fa';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PostSkeleton } from '@/components/PostSkeleton';
 import { useReaction } from '../-hooks/useReaction';
+import { CreatePostTrigger } from './organisms/CreatePostTrigger';
 
 export const Posts = () => {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
@@ -28,13 +27,7 @@ export const Posts = () => {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center space-y-2 py-4">
-      {/* If user is signed in then he can create a post */}
-      <Link to={'/post/new'} className="w-full">
-        <Button variant="outline" className="w-full">
-          <FaPlus className="h-4 w-4" />
-          <span className="text-sm font-medium max-sm:hidden">Create Post</span>
-        </Button>
-      </Link>
+      <CreatePostTrigger />
       {posts.map(post => (
         <Post key={post._id} post={post} onReaction={onReaction} />
       ))}

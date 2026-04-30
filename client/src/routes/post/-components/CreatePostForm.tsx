@@ -1,121 +1,105 @@
 import { Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { ImagePlus } from 'lucide-react';
-import { FiX } from 'react-icons/fi';
+import { useNavigate } from '@tanstack/react-router';
+import { X, ChevronDown } from 'lucide-react';
 import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import 'react-quill-new/dist/quill.bubble.css';
 
 import { createPostFrontendSchema, type TCreatePostFrontend } from 'shared';
 import { Form } from '@/components/ui/form';
 import { ImageUploadSection } from '@/components/organisms/ImageUploadSection';
 import { SubmitButton } from '@/components/atoms/SubmitButton';
-import { getErrorDetails } from '@/lib/errorHanldling';
 import { useCreatePost } from '../-hooks/useCreatePost';
 import { useImageUpload } from '@/hooks/useImageUpload';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardAction,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { ProfileImage } from '@/components/atoms/ProfileImage';
+import { useSelector } from 'react-redux';
+import { cn } from '@/lib/utils';
+import type { RootState } from '@/store/store';
 
 export const CreatePostForm = () => {
   const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.profileSummary);
 
   const form = useForm<TCreatePostFrontend>({
     resolver: zodResolver(createPostFrontendSchema),
-    defaultValues: {
-      description: '',
-      links: [],
-      media: [],
-    },
+    defaultValues: { description: '', links: [], media: [] },
   });
 
-  const { mutateAsync, isPending, isSuccess, error, isError } = useCreatePost();
+  const { mutateAsync, isPending, isSuccess } = useCreatePost();
   const imageUpload = useImageUpload(form);
+  const hasImages = imageUpload?.preview && imageUpload.preview.length > 0;
 
   const onSubmit = async (data: TCreatePostFrontend) => {
     const formData = new FormData();
     formData.append('description', data.description ?? '');
-    formData.append('createdBy', '');
-
-    if (data.links.length) {
-      data.links.forEach((link, i) => {
-        formData.append(`links[${i}]`, link);
-      });
-    }
-
     if (data.media?.length) {
-      data.media.forEach(mediaObj => {
-        formData.append('media', mediaObj.image);
-      });
+      data.media.forEach(mediaObj => formData.append('media', mediaObj.image));
     }
-
     await mutateAsync(formData);
   };
 
-  if (isSuccess) {
-    navigate({ to: '/' });
-  }
+  if (isSuccess) navigate({ to: '/' });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8 dark:from-slate-950 dark:to-slate-900">
-      <div className="mx-auto max-w-3xl">
-        <Card className="border-slate-200 shadow-lg dark:border-slate-800">
-          <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-2xl font-bold tracking-tight">Create New Post</CardTitle>
-            <CardDescription className="text-base">
-              Share your thoughts, links, and images with the community
-            </CardDescription>
-            <CardAction>
-              <Link to="/" className="sticky text-gray-500 transition-colors hover:text-gray-800">
-                <FiX size={22} />
-              </Link>
-            </CardAction>
-          </CardHeader>
+    <div className="bg-background flex min-h-screen justify-center pt-4">
+      <div className="w-full max-w-4xl px-6">
+        <div className="border-border/10 mb-2 flex items-center justify-between border-b pb-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate({ to: '/' })}
+            className="text-muted-foreground hover:text-foreground rounded-full"
+          >
+            <X className="mr-1 h-5 w-5" />
+            Cancel
+          </Button>
+          <Button variant="ghost" size="sm" className="text-primary rounded-full font-bold">
+            Drafts
+          </Button>
+        </div>
 
-          <Separator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6">
+            <div className="flex gap-5">
+              <ProfileImage
+                src={user?.profilePictureUrl}
+                fallback={user?.firstName?.[0] ?? ''}
+                className="ring-border h-12 w-12 shadow-sm ring-1"
+              />
 
-          <CardContent className="pt-6">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit, error => {
-                  console.log('Form validation failed:', error);
-                })}
-                className="space-y-8"
-              >
-                {/* Description Section */}
-                <div className="space-y-3">
-                  <Label htmlFor="description" className="text-base font-semibold">
-                    Description
-                  </Label>
+              <div className="flex-1">
+                {/* Audience Selector */}
+                <button
+                  type="button"
+                  className="border-primary/30 text-primary hover:bg-primary/5 mb-3 flex items-center gap-1 rounded-full border px-3 py-0.5 text-[12px] font-bold transition-colors"
+                >
+                  Public <ChevronDown className="h-3 w-3" />
+                </button>
+
+                <div className="min-h-[150px]">
                   <Controller
                     name="description"
                     control={form.control}
                     render={({ field }) => (
                       <ReactQuill
-                        theme="snow"
+                        theme="bubble"
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="What's on your mind? Share your thoughts here..."
-                        className="min-h-[150px]"
+                        placeholder="What's your story?"
+                        className="text-xl leading-relaxed"
                       />
                     )}
                   />
                 </div>
 
-                {/* Images Section */}
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-base font-semibold">
-                    <ImagePlus className="h-4 w-4" />
-                    Images
-                  </Label>
+                <div
+                  className={cn(
+                    'mt-4 transition-all duration-300',
+                    hasImages ? 'opacity-100' : 'opacity-80 hover:opacity-100',
+                  )}
+                >
                   <ImageUploadSection
                     preview={imageUpload.preview}
                     onDrop={imageUpload.onDrop}
@@ -128,30 +112,25 @@ export const CreatePostForm = () => {
                   />
                 </div>
 
-                {/* Error Message */}
-                {isError && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-                    <p className="text-center text-sm font-medium text-red-600 dark:text-red-400">
-                      {getErrorDetails(error).message}
-                    </p>
-                  </div>
-                )}
-
-                {/* Submit Button */}
-                <div className="pt-4">
+                <div className="border-border/40 bg-background/80 sticky bottom-4 mt-8 flex items-center justify-between border-t pt-4 backdrop-blur-md">
                   <SubmitButton
                     isLoading={isPending}
-                    disabled={isPending}
-                    customClasses="w-full h-11 text-base font-semibold"
+                    disabled={isPending || (!form.getValues('description') && !hasImages)}
+                    className="shadow-primary/20 h-10 rounded-full px-8 text-[15px] font-black shadow-lg transition-all hover:scale-[1.02] active:scale-95"
                   >
-                    {isPending ? 'Creating Post...' : 'Create Post'}
+                    Post
                   </SubmitButton>
                 </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+              </div>
+            </div>
+          </form>
+        </Form>
       </div>
+
+      <style>{`
+        .ql-editor { font-size: 1.25rem; min-height: 150px; padding: 0; }
+        .ql-editor.ql-blank::before { left: 0; font-style: normal; opacity: 0.5; }
+      `}</style>
     </div>
   );
 };

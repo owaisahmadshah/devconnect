@@ -1,7 +1,8 @@
-import { MoreVertical, MapPin, Building2, Clock } from 'lucide-react';
+import { MoreHorizontal, MapPin, Building2, Clock, CheckCircle2 } from 'lucide-react';
 import type { TJobSummaryResponse } from 'shared';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 interface IJobSummaryCardProps extends TJobSummaryResponse {
   action?: () => void;
@@ -12,55 +13,73 @@ export const JobSummaryCard = (props: IJobSummaryCardProps) => {
 
   return (
     <Link
-      className="group border-border bg-card hover:bg-accent/50 relative flex cursor-pointer gap-4 border-b p-4 transition-colors"
       to="/organization/$organizationURL/job/$jobId"
       params={{ organizationURL: organization.organizationURL, jobId: _id }}
+      className="group border-border/40 bg-card hover:bg-muted/30 relative flex w-full gap-4 border-b p-5 transition-all duration-300"
     >
-      <div className="border-border bg-muted h-12 w-12 shrink-0 overflow-hidden rounded-md border">
+      <div className="border-border/60 bg-muted/50 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border shadow-sm transition-transform group-hover:scale-105">
         {organization.logo ? (
           <img
             src={organization.logo}
             alt={organization.name}
-            className="h-full w-full object-contain"
+            className="h-full w-full object-contain p-1"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <Building2 className="text-muted-foreground h-6 w-6" />
-          </div>
+          <Building2 className="text-muted-foreground/50 h-6 w-6" />
         )}
       </div>
 
-      <div className="flex flex-1 flex-col space-y-1">
-        <div className="flex items-start justify-between">
-          <h3 className="text-foreground group-hover:text-primary text-lg leading-tight font-semibold transition-colors">
-            {title}
-          </h3>
-          <button className="hover:bg-muted text-muted-foreground rounded-full p-1">
-            <MoreVertical className="h-5 w-5" />
+      <div className="flex flex-1 flex-col">
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-0.5">
+            <h3 className="text-foreground group-hover:text-primary text-[17px] leading-tight font-black tracking-tight transition-colors sm:text-lg">
+              {title}
+            </h3>
+
+            <div className="flex items-center gap-1.5">
+              <span className="text-foreground/80 text-[14px] font-bold hover:underline">
+                {organization.name}
+              </span>
+              {status === 'open' && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
+            </div>
+          </div>
+
+          <button
+            onClick={e => e.preventDefault()}
+            className="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          >
+            <MoreHorizontal className="h-5 w-5" />
           </button>
         </div>
 
-        <p className="text-foreground/90 text-sm font-medium">{organization.name}</p>
-
-        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-4 w-4" />
+        <div className="text-muted-foreground mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px] font-medium">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="text-primary/70 h-3.5 w-3.5" />
             {location}
-          </span>
+          </div>
 
-          <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5" />
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
-          </span>
+          </div>
         </div>
 
-        {status && (
-          <div className="mt-2">
-            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-              {status}
-            </span>
-          </div>
-        )}
+        <div className="mt-4 flex items-center gap-2">
+          <span
+            className={cn(
+              'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-black tracking-widest uppercase',
+              status === 'open'
+                ? 'border-emerald-200/50 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
+                : 'bg-muted text-muted-foreground border-border',
+            )}
+          >
+            {status}
+          </span>
+
+          {status === 'open' && (
+            <span className="text-[11px] font-bold text-emerald-600/80">Actively recruiting</span>
+          )}
+        </div>
       </div>
     </Link>
   );

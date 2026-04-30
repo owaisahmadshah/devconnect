@@ -16,57 +16,56 @@ interface CommentProps {
 }
 
 export const Comment = ({ comment, onDelete, isAuthor = false }: CommentProps) => {
-  const { body, commentBy } = comment;
-
   return (
-    <div className="flex gap-3 py-3">
-      {/* Profile Picture */}
+    <div className="group flex gap-3 py-2.5 transition-all">
       <Link
         to={'/profile/$identifier'}
-        params={{
-          identifier: commentBy.profileUrls[0].url,
-        }}
-        className="flex-shrink-0"
+        params={{ identifier: comment.commentBy.profileUrls[0].url }}
+        className="mt-1 flex-shrink-0"
       >
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={commentBy.profilePictureUrl} />
-          <AvatarFallback>
-            {commentBy.firstName[0]}
-            {commentBy.lastName[0]}
+        <Avatar className="ring-border/20 h-8 w-8 ring-1">
+          <AvatarImage src={comment.commentBy.profilePictureUrl} />
+          <AvatarFallback className="bg-muted text-[10px]">
+            {comment.commentBy.firstName[0]}
+            {comment.commentBy.lastName[0]}
           </AvatarFallback>
         </Avatar>
       </Link>
-
-      {/* Comment Content */}
-      <div className="min-w-0 flex-1">
+      <div className="flex-1 space-y-1">
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <Link
-              to={'/profile/$identifier'}
-              params={{
-                identifier: commentBy.profileUrls[0].url,
-              }}
-              className="text-sm font-semibold text-black"
-            >
-              {`${commentBy.firstName} ${commentBy.lastName}`}
-              {isAuthor && <span className="text-xs text-gray-600"> Author</span>}
-            </Link>
-            <p className="text-foreground mt-0.5 text-sm break-words whitespace-pre-wrap">{body}</p>
+          <div className="bg-muted/40 border-border/10 rounded-2xl border px-3 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex justify-between gap-2">
+                <Link
+                  to={'/profile/$identifier'}
+                  params={{ identifier: comment.commentBy.profileUrls[0].url }}
+                  className="text-foreground text-[13px] font-bold underline-offset-2 hover:underline"
+                >
+                  {`${comment.commentBy.firstName} ${comment.commentBy.lastName}`}
+                </Link>
+                {isAuthor && (
+                  <span className="bg-primary/10 text-primary rounded-md px-1.5 py-0.5 text-[10px] font-bold tracking-tight uppercase">
+                    Author
+                  </span>
+                )}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex-shrink-0 transition-opacity hover:opacity-70 focus:outline-none">
+                  <MoreHorizontal className="text-muted-foreground h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {onDelete && (
+                    <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                      Delete
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <p className="text-foreground/90 mt-1 text-[14px] leading-relaxed whitespace-pre-wrap">
+              {comment.body}
+            </p>
           </div>
-
-          {/* Three Dots Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex-shrink-0 transition-opacity hover:opacity-70 focus:outline-none">
-              <MoreHorizontal className="text-muted-foreground h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {onDelete && (
-                <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                  Delete
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
     </div>

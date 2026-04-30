@@ -8,9 +8,11 @@ import { useReaction } from '@/routes/post/-hooks/useReaction';
 export const UserPosts = ({
   profileUrl,
   isCurrentUser,
+  limit,
 }: {
   profileUrl: string;
   isCurrentUser: boolean;
+  limit?: number;
 }) => {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
     useInfiniteFetchUserPosts(profileUrl);
@@ -19,7 +21,9 @@ export const UserPosts = ({
 
   const { mutateAsync: onReact } = useReaction();
 
-  const posts = data?.pages.flatMap(page => page.posts) ?? [];
+  const allPosts = data?.pages.flatMap(page => page.posts) ?? [];
+
+  const posts = limit ? allPosts.slice(0, limit) : allPosts;
 
   if (isLoading) {
     return <PostSkeleton />;
@@ -37,7 +41,7 @@ export const UserPosts = ({
           currentUserProfileUrl={profileUrl}
         />
       ))}
-      {hasNextPage && (
+      {!limit && hasNextPage && (
         <div className="px-4 py-2">
           <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} variant="link">
             {isFetchingNextPage ? 'Loading more posts...' : 'Load more posts'}

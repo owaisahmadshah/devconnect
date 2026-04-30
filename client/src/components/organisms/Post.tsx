@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { ProfileWithUrl } from '@/components/organisms/ProfileWithUrl';
 import { Button } from '@/components/ui/button';
 import type { TCreateLike, TPostResponse } from 'shared';
-import { HiDotsHorizontal } from 'react-icons/hi';
+import { MoreHorizontal } from 'lucide-react';
 import { ImagesCarousel } from '@/components/organisms/ImagesCarousel';
 import { useState } from 'react';
 
@@ -61,13 +61,12 @@ export const Post = ({
   return (
     <Card
       className={cn(
-        'mx-auto w-full rounded-xl border-none shadow-sm transition-all duration-300 hover:shadow-lg',
-        showProfile === false && 'rounded-sm shadow-none',
+        'group border-border/40 bg-card hover:border-border/80 mx-auto w-full border shadow-[0_2px_10px_-3px_rgba(0,0,0,0.07)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]',
+        !showProfile && 'rounded-none border-none bg-transparent shadow-none',
       )}
     >
-      {/* Header */}
       {showProfile && (
-        <CardHeader className="flex flex-row items-center justify-between px-5">
+        <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex flex-1 items-center gap-3">
             <ProfileWithUrl
               user={post.createdBy}
@@ -82,16 +81,16 @@ export const Post = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                className="text-muted-foreground hover:bg-secondary hover:text-foreground h-8 w-8 rounded-full transition-colors"
               >
-                <HiDotsHorizontal className="h-5 w-5" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="border-border/50 w-48 rounded-xl">
               {isEditable && (
                 <DropdownMenuItem
                   onClick={() => onDelete?.({ _id: post._id })}
-                  className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-950/30 dark:focus:text-red-400"
+                  className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
                 >
                   Delete Post
                 </DropdownMenuItem>
@@ -102,67 +101,56 @@ export const Post = ({
         </CardHeader>
       )}
 
-      {/* Description */}
       {post.description && (
-        <CardContent className="px-5 py-0">
+        <CardContent className={cn('px-4 pt-0 pb-3', !showProfile && 'pt-0')}>
           <div
-            className="text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+            className="text-foreground/90 text-[15px] leading-relaxed"
             dangerouslySetInnerHTML={{ __html: displayDescription }}
           />
           {descriptionTooLong && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-2 text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              className="text-primary mt-1 text-[13px] font-semibold transition-opacity hover:opacity-80"
             >
               {isExpanded ? 'Show less' : 'Show more'}
             </button>
           )}
-          {/* Divider */}
-          {showProfile && <div className="mx-5 border-t border-slate-200 dark:border-slate-800" />}
         </CardContent>
       )}
 
-      {/* Media */}
       {post.media && post.media.length > 0 && (
-        <div className="px-0 py-0">
+        <div className="border-border/30 bg-muted/10 overflow-hidden border-y">
           <ImagesCarousel images={post.media} openImages={openImages} />
         </div>
       )}
 
-      {/* Stats Bar */}
-      {post?.totalLikes && post.totalLikes > 0 ? (
-        <div className="px-5 text-sm text-slate-600 dark:text-slate-400">
-          <span className="font-medium">{post.totalLikes}</span>{' '}
-          {post.totalLikes === 1 ? 'reaction' : 'reactions'}
-        </div>
-      ) : (
-        ''
-      )}
+      <CardFooter className="flex flex-col p-2 pt-2">
+        {post?.totalLikes && post.totalLikes > 0 ? (
+          <div className="text-muted-foreground/80 mb-1.5 w-full px-2 text-[12px] font-medium">
+            <span className="text-foreground/80">{post.totalLikes.toLocaleString()}</span>{' '}
+            {post.totalLikes === 1 ? 'reaction' : 'reactions'}
+          </div>
+        ) : null}
 
-      {/* Divider */}
-      {showProfile && <div className="mx-5 border-t border-slate-200 dark:border-slate-800" />}
+        <div className="border-border/40 flex w-full items-center justify-between border-t pt-0.5">
+          <div className="flex flex-1 justify-between">
+            <ReactionButton
+              postOwnerId={post.createdBy._id}
+              postId={post._id}
+              onAction={onReaction}
+              likeType={post.likeType}
+              currentUserProfileUrl={currentUserProfileUrl}
+            />
 
-      {/* Actions */}
-      <CardFooter className="px-3 py-0">
-        <div className="flex w-full justify-between gap-1">
-          {/* Like */}
-          <ReactionButton
-            postOwnerId={post.createdBy._id}
-            postId={post._id}
-            onAction={onReaction}
-            likeType={post.likeType}
-            currentUserProfileUrl={currentUserProfileUrl}
-          />
+            <PostComments
+              post={post}
+              onReaction={onReaction}
+              currentUserProfileUrl={currentUserProfileUrl}
+              onDelete={onDelete}
+            />
 
-          {/* Comment */}
-          <PostComments
-            post={post}
-            onReaction={onReaction}
-            currentUserProfileUrl={currentUserProfileUrl}
-            onDelete={onDelete}
-          />
-          {/* Share */}
-          <ShareDialog postId={post._id} baseUrl="http://localhost:5173" />
+            <ShareDialog postId={post._id} baseUrl="http://localhost:5173" />
+          </div>
         </div>
       </CardFooter>
     </Card>

@@ -23,6 +23,7 @@ interface FormFieldProps<
   placeholder?: string;
   formDescription?: string;
   textAreaClasses?: string;
+  className?: string;
 }
 
 export const TextAreaField = <
@@ -36,6 +37,7 @@ export const TextAreaField = <
   placeholder,
   formDescription,
   textAreaClasses,
+  className,
 }: FormFieldProps<TFieldValues, TName>) => {
   return (
     <ShadcnFormField
@@ -50,6 +52,7 @@ export const TextAreaField = <
               className={cn(
                 'max-h-[400px] resize-none overflow-auto',
                 textAreaClasses,
+                className,
                 form.formState.errors[name] && 'border-red-500',
               )}
               id={id || name}
